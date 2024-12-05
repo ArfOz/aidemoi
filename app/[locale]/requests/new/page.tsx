@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import ServiceCard from "@/components/ServiceCard";
+import ServiceCard from "@/[locale]/components/ServiceCard";
 
 export const generateMetadata = async ({ params }: { params: { category: string } }): Promise<Metadata> => {
   return {
