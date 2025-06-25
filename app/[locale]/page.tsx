@@ -1,12 +1,17 @@
-import {useTranslations} from 'next-intl';
-import {Link} from '../../i18n/routing';
- 
-export default function HomePage() {
-  const t = useTranslations('HomePage');
-  return (
-    <div>
-      <h1>{t('title')}</h1>
-      <Link href="/about">{t('about')}</Link>
-    </div>
-  );
+// import { useTranslations } from "next-intl"
+
+// export default function Home() {
+//   const t = useTranslations("index")
+//   return (
+//     <div>
+//       <h1>{t("welcome")}</h1>
+//       <p>{t("description")}</p>
+//     </div>
+//   )
+// }
+import { getTranslations } from "next-intl/server"
+
+export default async function HomePage() {
+  const t = await getTranslations("Index")
+  return <h1>{t("welcome")}</h1>
 }

@@ -1,39 +1,34 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from 'next/navigation';
 
-const languages = [
-  { code: "en", name: "English" },
-  { code: "de", name: "Deutsch" },
-  { code: "fr", name: "Français" },
-  { code: "it", name: "Italiano" },
-];
-
-export default function Navbar() {
+const Navbar: React.FC<{ currentLang: string }> = ({ currentLang }) => {
+  const router = useRouter();
   const pathname = usePathname();
 
-  return (
-    <nav className="bg-white shadow-md">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        {/* Logo */}
-        <Link href="/" className="text-xl font-bold text-blue-600">
-          ArmutClone
-        </Link>
+  const changeLanguage = (lang: string) => {
+    const newPathname = pathname.replace(`/${currentLang}`, `/${lang}`);
+    router.push(newPathname);
+  };
 
-        {/* Dil Seçimi */}
-        <div className="space-x-4">
-          {languages.map((lang) => (
-            <Link
-              key={lang.code}
-              href={`/${lang.code}${pathname}`}
-              className="text-gray-700 hover:text-blue-600"
-            >
-              {lang.name}
-            </Link>
-          ))}
-        </div>
+  return (
+    <nav className="flex justify-between p-4 bg-gray-800 text-white">
+      <div className="text-lg font-bold">My App</div>
+      <div className="space-x-4">
+        {['en', 'fr'].map((lang) => (
+          <button
+            key={lang}
+            onClick={() => changeLanguage(lang)}
+            className={`px-4 py-2 rounded ${
+              currentLang === lang ? 'bg-blue-500' : 'bg-gray-600'
+            }`}
+          >
+            {lang.toUpperCase()}
+          </button>
+        ))}
       </div>
     </nav>
   );
-}
+};
+
+export default Navbar;
