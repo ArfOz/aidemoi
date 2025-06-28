@@ -1,6 +1,27 @@
 {
-  "Index": {
-    "welcome": "Bienvenue sur notre site !",
-    "description": "Ceci est un exemple d'une application multilingue."
+  "home": {
+    "title": "Choisissez un service"
+  },
+  "categories": {
+    "moving": {
+      "name": "Déménagement",
+      "description": "Services de déménagement de maison et de bureau",
+      "icon": "🚚"
+    },
+    "repair": {
+      "name": "Réparation",
+      "description": "Réparations d'appareils et de maison",
+      "icon": "🛠️"
+    },
+    "cleaning": {
+      "name": "Nettoyage",
+      "description": "Nettoyage domestique et commercial",
+      "icon": "🧼"
+    },
+    "handyman": {
+      "name": "Bricoleur",
+      "description": "Petits travaux et installations",
+      "icon": "🔧"
+    }
   }
 }
