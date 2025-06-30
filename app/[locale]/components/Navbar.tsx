@@ -4,36 +4,23 @@ import { locales } from "@/i18n/routing"
 import { useRouter, usePathname, useParams } from "next/navigation"
 import { FaLanguage } from "react-icons/fa"
 import Link from "next/link"
-
-// Map locale codes to language names
-const languageMap: Record<string, string> = {
-  en: "English",
-  fr: "Français",
-  tr: "Türkçe",
-  de: "Deutsch",
-  it: "Italiano",
-}
-
-// Example categories (should match your category keys)
-const categories = [
-  { key: "moving", label: "Moving" },
-  { key: "repair", label: "Repair" },
-  { key: "cleaning", label: "Cleaning" },
-  { key: "handyman", label: "Handyman" },
-]
+import { useTranslations } from "next-intl"
 
 const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
   const router = useRouter()
   const pathname = usePathname()
   const params = useParams()
+  const t = useTranslations()
+  const categoryKeys = Object.keys(t.raw("categories"))
 
   const changeLanguage = (lang: string) => {
     const newPathname = pathname.replace(`/${currentLang}`, `/${lang}`)
     router.push(newPathname)
   }
 
-  // Get current locale for links
   const locale = (params.locale as string) || currentLang
+
+  console.log("Current t", t)
 
   return (
     <nav className="flex items-center justify-between px-8 py-6 bg-gradient-to-r from-purple-800 via-fuchsia-700 to-pink-600 shadow-lg mb-8">
@@ -49,15 +36,18 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
       </div>
       {/* Center: Categories */}
       <div className="flex gap-4">
-        {categories.map((cat) => (
-          <Link
-            key={cat.key}
-            href={`/${locale}/${cat.key}`}
-            className="px-4 py-2 rounded-lg text-xl font-semibold bg-white text-pink-700 hover:bg-pink-200 transition-colors duration-200"
-          >
-            {cat.label}
-          </Link>
-        ))}
+        {categoryKeys.map((key) => {
+          const cat = t.raw(`categories.${key}`)
+          return (
+            <Link
+              key={key}
+              href={`/${locale}/${key}`}
+              className="text-2xl font-bold text-white hover:underline"
+            >
+              {cat.name}
+            </Link>
+          )
+        })}
       </div>
       {/* Right side: Language buttons */}
       <div className="flex gap-4">
@@ -72,7 +62,7 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
             }`}
             aria-current={currentLang === lang ? "page" : undefined}
           >
-            {languageMap[lang] || lang.toUpperCase()}
+            {lang.toUpperCase()}
           </button>
         ))}
       </div>

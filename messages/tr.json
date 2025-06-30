@@ -1,6 +1,27 @@
 {
-  "Index": {
-    "welcome": "Sitemize hoş geldiniz!",
-    "description": "Bu çok dilli bir uygulamanın örneğidir."
+  "home": {
+    "title": "Choose a Service"
+  },
+  "categories": {
+    "moving": {
+      "name": "Moving",
+      "description": "House and office relocation services",
+      "icon": "🚚"
+    },
+    "repair": {
+      "name": "Repair",
+      "description": "Appliance and home repairs",
+      "icon": "🛠️"
+    },
+    "cleaning": {
+      "name": "Cleaning",
+      "description": "Home and commercial cleaning",
+      "icon": "🧼"
+    },
+    "handyman": {
+      "name": "Handyman",
+      "description": "Small tasks and installations",
+      "icon": "🔧"
+    }
   }
 }
