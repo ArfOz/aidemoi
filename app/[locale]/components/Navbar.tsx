@@ -29,10 +29,12 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
         <span className="text-5xl text-pink-200 drop-shadow-lg">
           <FaLanguage />
         </span>
-        <span className="font-logo text-5xl font-extrabold tracking-tight text-white drop-shadow-lg">
-          <span className="text-pink-200">Aide</span>
-          <span className="text-white">Moi</span>
-        </span>
+        <Link href={`/${locale}`} className="flex items-center">
+          <span className="font-logo text-5xl font-extrabold tracking-tight text-white drop-shadow-lg">
+            <span className="text-pink-200">Aide</span>
+            <span className="text-white">Moi</span>
+          </span>
+        </Link>
       </div>
       {/* Center: Categories */}
       <div className="flex gap-4">
