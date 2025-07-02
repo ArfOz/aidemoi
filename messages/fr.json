@@ -1,27 +1,241 @@
 {
   "home": {
-    "title": "Choisissez un service"
+    "title": "Choisissez un service",
+    "subtitle": "Trouvez les meilleurs prestataires locaux pour vos besoins",
+    "searchPlaceholder": "Rechercher un service",
+    "buttonText": "Commencer"
   },
   "categories": {
-    "moving": {
-      "name": "Déménagement",
-      "description": "Services de déménagement de maison et de bureau",
-      "icon": "🚚"
-    },
-    "repair": {
-      "name": "Réparation",
-      "description": "Réparations d'appareils et de maison",
-      "icon": "🛠️"
-    },
-    "cleaning": {
-      "name": "Nettoyage",
-      "description": "Nettoyage domestique et commercial",
-      "icon": "🧼"
-    },
-    "handyman": {
-      "name": "Bricoleur",
-      "description": "Petits travaux et installations",
-      "icon": "🔧"
-    }
+    "categories": [
+      {
+        "id": "moving",
+        "name": "Moving",
+        "description": "House and office relocation services",
+        "icon": "🚚",
+        "specialties": {
+          "local": {
+            "name": "Local Moves",
+            "description": "Short-distance moves within the same city or metro area",
+            "icon": "🏠"
+          },
+          "longDistance": {
+            "name": "Long Distance",
+            "description": "Cross-state or cross-country relocations",
+            "icon": "🛣️"
+          },
+          "packing": {
+            "name": "Packing Services",
+            "description": "Professional packing of furniture, fragile items, and boxes",
+            "icon": "📦"
+          },
+          "unpacking": {
+            "name": "Unpacking & Setup",
+            "description": "Unpacking, arranging, and setting up furniture at destination",
+            "icon": "📬"
+          },
+          "furnitureAssembly": {
+            "name": "Furniture Assembly",
+            "description": "Disassembly and reassembly of furniture pieces",
+            "icon": "🪑"
+          },
+          "storage": {
+            "name": "Short-Term Storage",
+            "description": "Secure storage solutions for items between moves",
+            "icon": "📦🔒"
+          }
+        }
+      },
+      {
+        "id": "cleaning",
+        "name": "Cleaning",
+        "description": "Home and commercial cleaning",
+        "icon": "🧼",
+        "specialties": {
+          "residential": {
+            "name": "Residential Cleaning",
+            "description": "Cleaning homes, apartments, and condos",
+            "icon": "🏠"
+          },
+          "commercial": {
+            "name": "Commercial Cleaning",
+            "description": "Cleaning offices, retail, and industrial spaces",
+            "icon": "🏢"
+          },
+          "deepCleaning": {
+            "name": "Deep Cleaning",
+            "description": "Thorough cleaning of high-traffic and hard-to-reach areas",
+            "icon": "🧽"
+          },
+          "moveInOut": {
+            "name": "Move In/Out Cleaning",
+            "description": "Cleaning before move-in or after move-out",
+            "icon": "📦"
+          },
+          "windowCleaning": {
+            "name": "Window Cleaning",
+            "description": "Interior and exterior window washing",
+            "icon": "🪟"
+          }
+        }
+      },
+      {
+        "id": "plumbing",
+        "name": "Plumbing",
+        "description": "Repairs, installations and maintenance of plumbing systems",
+        "icon": "🚰",
+        "specialties": {
+          "leakRepair": {
+            "name": "Leak Repair",
+            "description": "Fixing pipe and faucet leaks",
+            "icon": "💧"
+          },
+          "fixtureInstall": {
+            "name": "Fixture Installation",
+            "description": "Sinks, toilets, showers and dishwashers",
+            "icon": "🚿"
+          },
+          "pipeReplacement": {
+            "name": "Pipe Replacement",
+            "description": "Repiping and sewer line services",
+            "icon": "🔩"
+          }
+        }
+      },
+      {
+        "id": "electrical",
+        "name": "Electrical",
+        "description": "Electrical wiring, lighting and safety inspections",
+        "icon": "💡",
+        "specialties": {
+          "rewiring": {
+            "name": "Rewiring",
+            "description": "Home and commercial rewiring services",
+            "icon": "⚡"
+          },
+          "lighting": {
+            "name": "Lighting Installation",
+            "description": "Indoor and outdoor lighting setups",
+            "icon": "💡"
+          },
+          "safetyInspections": {
+            "name": "Safety Inspections",
+            "description": "Code compliance and safety checks",
+            "icon": "🔍"
+          }
+        }
+      },
+      {
+        "id": "painting",
+        "name": "Painting",
+        "description": "Interior and exterior painting for homes and offices",
+        "icon": "🎨",
+        "specialties": {
+          "interior": {
+            "name": "Interior Painting",
+            "description": "Walls, ceilings, trim and cabinets",
+            "icon": "🖌️"
+          },
+          "exterior": {
+            "name": "Exterior Painting",
+            "description": "Siding, fences, decks and exterior trim",
+            "icon": "🌳"
+          },
+          "colorConsult": {
+            "name": "Color Consultation",
+            "description": "Professional advice on color schemes and finishes",
+            "icon": "🖍️"
+          }
+        }
+      },
+      {
+        "id": "handyman",
+        "name": "Handyman",
+        "description": "Small tasks and installations",
+        "icon": "🔧",
+        "specialties": {
+          "furnitureAssembly": {
+            "name": "Furniture Assembly",
+            "description": "Building and assembling furniture pieces",
+            "icon": "🪑"
+          },
+          "installation": {
+            "name": "Minor Installations",
+            "description": "Installing shelves, blinds, and fixtures",
+            "icon": "🔩"
+          },
+          "paintingTouchUps": {
+            "name": "Painting Touch-Ups",
+            "description": "Small painting and touch-up jobs",
+            "icon": "🎨"
+          },
+          "oddJobs": {
+            "name": "Odd Jobs",
+            "description": "Various small repairs and tasks around the home",
+            "icon": "🔨"
+          },
+          "doorInstallation": {
+            "name": "Door & Window Installation",
+            "description": "Hanging doors and mounting windows",
+            "icon": "🚪"
+          }
+        }
+      },
+      {
+        "id": "repair",
+        "name": "Repair",
+        "description": "Appliance and home repairs",
+        "icon": "🛠️",
+        "specialties": {
+          "applianceRepair": {
+            "name": "Appliance Repair",
+            "description": "Fixing refrigerators, ovens, washers, and dryers",
+            "icon": "🍽️"
+          },
+          "electricalRepair": {
+            "name": "Electrical Repairs",
+            "description": "Troubleshooting and repairing electrical issues",
+            "icon": "💡"
+          },
+          "plumbingRepair": {
+            "name": "Plumbing Repairs",
+            "description": "Repairing pipes, faucets, and leaks",
+            "icon": "🚰"
+          },
+          "carpentryRepair": {
+            "name": "Carpentry Repairs",
+            "description": "Fixing cabinets, doors, and wood fixtures",
+            "icon": "🪚"
+          },
+          "drywallRepair": {
+            "name": "Drywall Repair",
+            "description": "Patching holes and fixing wall damage",
+            "icon": "🧱"
+          }
+        }
+      },
+      {
+        "id": "gardening",
+        "name": "Gardening",
+        "description": "Lawn care, planting and landscape maintenance",
+        "icon": "🌿",
+        "specialties": {
+          "lawnMowing": {
+            "name": "Lawn Mowing",
+            "description": "Regular mowing and edging",
+            "icon": "🚜"
+          },
+          "planting": {
+            "name": "Planting & Weeding",
+            "description": "Flower beds, shrubs and vegetable gardens",
+            "icon": "🌷"
+          },
+          "landscapeDesign": {
+            "name": "Landscape Design",
+            "description": "Hardscaping and garden planning",
+            "icon": "🏡"
+          }
+        }
+      }
+    ]
   }
 }

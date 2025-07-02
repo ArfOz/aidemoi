@@ -11,7 +11,8 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
   const pathname = usePathname()
   const params = useParams()
   const t = useTranslations()
-  const categoryKeys = Object.keys(t.raw("categories"))
+  // Get the categories array directly
+  const categories = t.raw("categories") as Array<{ id: string; name: string }>
 
   const changeLanguage = (lang: string) => {
     const newPathname = pathname.replace(`/${currentLang}`, `/${lang}`)
@@ -19,8 +20,6 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
   }
 
   const locale = (params.locale as string) || currentLang
-
-  console.log("Current t", t)
 
   return (
     <nav className="flex items-center justify-between px-8 py-6 bg-gradient-to-r from-purple-800 via-fuchsia-700 to-pink-600 shadow-lg mb-8">
@@ -38,18 +37,15 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
       </div>
       {/* Center: Categories */}
       <div className="flex gap-4">
-        {categoryKeys.map((key) => {
-          const cat = t.raw(`categories.${key}`)
-          return (
-            <Link
-              key={key}
-              href={`/${locale}/${key}`}
-              className="text-2xl font-bold text-white hover:underline"
-            >
-              {cat.name}
-            </Link>
-          )
-        })}
+        {categories.map((cat) => (
+          <Link
+            key={cat.id}
+            href={`/${locale}/${cat.id}`}
+            className="text-2xl font-bold text-white hover:underline"
+          >
+            {cat.name}
+          </Link>
+        ))}
       </div>
       {/* Right side: Language buttons */}
       <div className="flex gap-4">
