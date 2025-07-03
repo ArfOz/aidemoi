@@ -5,6 +5,8 @@ import { useRouter, usePathname, useParams } from "next/navigation"
 import { FaLanguage } from "react-icons/fa"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
+import React from "react"
+import { PostalCodes } from "./postal-code"
 
 const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
   const router = useRouter()
@@ -47,8 +49,11 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
           </Link>
         ))}
       </div>
-      {/* Right side: Language buttons */}
-      <div className="flex gap-4">
+      {/* Right side: Address select and Language buttons */}
+      <div className="flex gap-4 items-center">
+        {/* Address Autocomplete Bar */}
+        <PostalCodes />
+        {/* Language buttons */}
         {locales.map((lang) => (
           <button
             key={lang}
