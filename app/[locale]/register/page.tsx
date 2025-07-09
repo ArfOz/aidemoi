@@ -3,9 +3,10 @@
 import React, { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { apiRequest } from "@/lib"
 
 interface CreateUserData {
-  name: string
+  username: string
   email: string
   password: string
 }
@@ -16,7 +17,7 @@ const RegisterPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
   const resolvedParams = React.use(params)
   const router = useRouter()
   const [formData, setFormData] = useState<CreateUserData>({
-    name: "",
+    username: "",
     email: "",
     password: "",
   })
@@ -46,9 +47,9 @@ const RegisterPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {}
 
-    // Validate name (required, minLength: 1)
-    if (!formData.name || formData.name.trim().length === 0) {
-      newErrors.name = "Username is required"
+    // Validate username (required, minLength: 1)
+    if (!formData.username || formData.username.trim().length === 0) {
+      newErrors.username = "Username is required"
     }
 
     // Validate email (required, format: email)
@@ -77,26 +78,24 @@ const RegisterPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
     setIsLoading(true)
 
     try {
-      const response = await fetch("/api/users/create", {
+      console.log("Submitting registration data:", formData)
+      const response = await apiRequest("/user", {
+        body: formData,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          name: formData.name.trim(),
-          email: formData.email.trim(),
-          password: formData.password,
-        }),
       })
-
-      if (response.ok) {
+      console.log(response)
+      if (response && response.success) {
         // Redirect to login page or dashboard
         router.push(`/${resolvedParams.locale}/login?registered=true`)
       } else {
-        const error = await response.json()
+        const error = await response
         setErrors({ general: error.message || "Registration failed" })
       }
-    } catch {
+    } catch (error) {
+      console.error("Registration error:", error)
       setErrors({ general: "Network error. Please try again." })
     } finally {
       setIsLoading(false)
@@ -130,25 +129,25 @@ const RegisterPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
           {/* Username Field */}
           <div>
             <label
-              htmlFor="name"
+              htmlFor="username"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
               Username *
             </label>
             <input
               type="text"
-              id="name"
-              name="name"
-              value={formData.name}
+              id="username"
+              name="username"
+              value={formData.username}
               onChange={handleInputChange}
               className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 transition-colors ${
-                errors.name ? "border-red-300" : "border-gray-300"
+                errors.username ? "border-red-300" : "border-gray-300"
               }`}
               placeholder="Enter your username"
               required
             />
-            {errors.name && (
-              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+            {errors.username && (
+              <p className="text-red-500 text-sm mt-1">{errors.username}</p>
             )}
           </div>
 
