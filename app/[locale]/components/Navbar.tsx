@@ -2,7 +2,7 @@
 
 import { locales } from "@/i18n/routing"
 import { useRouter, usePathname, useParams } from "next/navigation"
-import { FaLanguage } from "react-icons/fa"
+import { FaLanguage, FaSignInAlt } from "react-icons/fa"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import React from "react"
@@ -49,10 +49,24 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
           </Link>
         ))}
       </div>
-      {/* Right side: Address select and Language buttons */}
+      {/* Right side: Address select, Auth buttons, and Language buttons */}
       <div className="flex gap-4 items-center">
         {/* Address Autocomplete Bar */}
         <PostalCodes />
+
+        {/* Authentication buttons */}
+        <div className="flex gap-2 items-center">
+          {/* Login Button */}
+          <Link
+            href={`/${locale}/login`}
+            className="flex items-center gap-2 px-4 py-2 bg-white text-purple-700 rounded-lg font-semibold hover:bg-purple-100 transition-colors duration-200 shadow-md"
+            title={t("auth.login")}
+          >
+            <FaSignInAlt className="text-lg" />
+            <span className="hidden sm:inline">{t("auth.login")}</span>
+          </Link>
+        </div>
+
         {/* Language buttons */}
         {locales.map((lang) => (
           <button

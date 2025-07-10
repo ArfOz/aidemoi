@@ -233,5 +233,9 @@
         }
       }
     }
-  ]
+  ],
+  "auth": {
+    "login": "Connexion",
+    "register": "S'inscrire"
+  }
 }

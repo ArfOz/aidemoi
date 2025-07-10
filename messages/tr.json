@@ -23,5 +23,9 @@
       "description": "Small tasks and installations",
       "icon": "🔧"
     }
+  },
+  "auth": {
+    "login": "Giriş Yap",
+    "register": "Kayıt Ol"
   }
 }

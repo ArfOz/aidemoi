@@ -23,5 +23,9 @@
       "description": "Small tasks and installations",
       "icon": "🔧"
     }
+  },
+  "auth": {
+    "login": "Accedi",
+    "register": "Registrati"
   }
 }
