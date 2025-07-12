@@ -3,7 +3,7 @@
 import React, { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { apiRequest } from "@/lib"
+import { apiAideMoi } from "@/lib"
 
 interface CreateUserData {
   username: string
@@ -79,9 +79,8 @@ const RegisterPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
 
     try {
       console.log("Submitting registration data:", formData)
-      const response = await apiRequest("/user", {
+      const response = await apiAideMoi.post("/user", {
         body: formData,
-        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },

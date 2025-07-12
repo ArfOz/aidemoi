@@ -2,10 +2,11 @@
 
 import { locales } from "@/i18n/routing"
 import { useRouter, usePathname, useParams } from "next/navigation"
-import { FaLanguage, FaSignInAlt } from "react-icons/fa"
+import { FaLanguage, FaSignInAlt, FaUser, FaSignOutAlt } from "react-icons/fa"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import React from "react"
+import { useAuth } from "@/contexts/AuthContext"
 import { PostalCodes } from "./postal-code"
 
 const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
@@ -13,12 +14,18 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
   const pathname = usePathname()
   const params = useParams()
   const t = useTranslations()
+  const { user, isAuthenticated, logout } = useAuth()
   // Get the categories array directly
   const categories = t.raw("categories") as Array<{ id: string; name: string }>
 
   const changeLanguage = (lang: string) => {
     const newPathname = pathname.replace(`/${currentLang}`, `/${lang}`)
     router.push(newPathname)
+  }
+
+  const handleLogout = () => {
+    logout()
+    router.push(`/${locale}`)
   }
 
   const locale = (params.locale as string) || currentLang
@@ -54,17 +61,39 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
         {/* Address Autocomplete Bar */}
         <PostalCodes />
 
-        {/* Authentication buttons */}
+        {/* Authentication section */}
         <div className="flex gap-2 items-center">
-          {/* Login Button */}
-          <Link
-            href={`/${locale}/login`}
-            className="flex items-center gap-2 px-4 py-2 bg-white text-purple-700 rounded-lg font-semibold hover:bg-purple-100 transition-colors duration-200 shadow-md"
-            title={t("auth.login")}
-          >
-            <FaSignInAlt className="text-lg" />
-            <span className="hidden sm:inline">{t("auth.login")}</span>
-          </Link>
+          {isAuthenticated && user ? (
+            // Show user info and logout when authenticated
+            <div className="flex items-center gap-2">
+              <Link
+                href={`/${locale}/profile`}
+                className="flex items-center gap-2 px-4 py-2 bg-white text-purple-700 rounded-lg font-semibold hover:bg-purple-100 transition-colors duration-200 shadow-md"
+                title={`Welcome, ${user.username}`}
+              >
+                <FaUser className="text-lg" />
+                <span className="hidden sm:inline">{user.username}</span>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition-colors duration-200 shadow-md"
+                title={t("auth.logout")}
+              >
+                <FaSignOutAlt className="text-lg" />
+                <span className="hidden sm:inline">{t("auth.logout")}</span>
+              </button>
+            </div>
+          ) : (
+            // Show login button when not authenticated
+            <Link
+              href={`/${locale}/login`}
+              className="flex items-center gap-2 px-4 py-2 bg-white text-purple-700 rounded-lg font-semibold hover:bg-purple-100 transition-colors duration-200 shadow-md"
+              title={t("auth.login")}
+            >
+              <FaSignInAlt className="text-lg" />
+              <span className="hidden sm:inline">{t("auth.login")}</span>
+            </Link>
+          )}
         </div>
 
         {/* Language buttons */}

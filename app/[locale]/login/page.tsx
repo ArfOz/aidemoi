@@ -3,6 +3,8 @@
 import React, { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/AuthContext"
+import { apiAideMoi } from "@/lib"
 
 interface LoginData {
   email: string
@@ -14,6 +16,7 @@ const LoginPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
 }) => {
   const resolvedParams = React.use(params)
   const router = useRouter()
+  const { login } = useAuth()
   const [formData, setFormData] = useState<LoginData>({
     email: "",
     password: "",
@@ -65,23 +68,36 @@ const LoginPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
     setIsLoading(true)
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: formData.email.trim(),
-          password: formData.password,
-        }),
-      })
+      console.log("Sending login data:", formData)
 
-      if (response.ok) {
+      const response = (await apiAideMoi.post(
+        "/auth/login",
+        formData
+      )) as unknown as {
+        user: {
+          id: number
+          username: string
+          email: string
+          createdAt: string
+          updatedAt: string
+        }
+        tokens: {
+          accessToken: string
+          refreshToken: string
+          expiresIn: string
+        }
+      }
+
+      console.log("Login response:", response)
+
+      if (response && response.user && response.tokens) {
+        // Store user and tokens in auth context
+        login(response.user, response.tokens)
         // Redirect to dashboard or home page
         router.push(`/${resolvedParams.locale}`)
       } else {
-        const error = await response.json()
-        setErrors({ general: error.message || "Login failed" })
+        const errorMessage = "Login failed"
+        setErrors({ general: errorMessage })
       }
     } catch {
       setErrors({ general: "Network error. Please try again." })

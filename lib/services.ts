@@ -2,7 +2,7 @@
  * Data fetching functions for services
  */
 
-import { api } from "./api"
+import { apiAideMoi } from "./api"
 import {
   CreateServiceData,
   UpdateServiceData,
@@ -72,7 +72,7 @@ export const serviceApi = {
    */
   async getServices(query?: ServiceQueryData): Promise<PaginatedServices> {
     const params = buildQueryParams(query)
-    const response = await api.get<PaginatedServices>(
+    const response = await apiAideMoi.get<PaginatedServices>(
       `/services?${params.toString()}`
     )
 
@@ -87,7 +87,7 @@ export const serviceApi = {
    * Get a single service by ID
    */
   async getService(id: string): Promise<Service> {
-    const response = await api.get<Service>(`/services/${id}`)
+    const response = await apiAideMoi.get<Service>(`/services/${id}`)
 
     if (!response.success || !response.data) {
       throw new Error(response.error || "Failed to fetch service")
@@ -100,7 +100,7 @@ export const serviceApi = {
    * Create a new service
    */
   async createService(data: CreateServiceData): Promise<Service> {
-    const response = await api.post<Service>("/services", data)
+    const response = await apiAideMoi.post<Service>("/services", data)
 
     if (!response.success || !response.data) {
       throw new Error(response.error || "Failed to create service")
@@ -113,7 +113,7 @@ export const serviceApi = {
    * Update an existing service
    */
   async updateService(id: string, data: UpdateServiceData): Promise<Service> {
-    const response = await api.put<Service>(`/services/${id}`, data)
+    const response = await apiAideMoi.put<Service>(`/services/${id}`, data)
 
     if (!response.success || !response.data) {
       throw new Error(response.error || "Failed to update service")
@@ -126,7 +126,7 @@ export const serviceApi = {
    * Delete a service
    */
   async deleteService(id: string): Promise<void> {
-    const response = await api.delete(`/services/${id}`)
+    const response = await apiAideMoi.delete(`/services/${id}`)
 
     if (!response.success) {
       throw new Error(response.error || "Failed to delete service")
@@ -171,7 +171,7 @@ export const serviceApi = {
     query?: ServiceQueryData
   ): Promise<PaginatedServices> {
     const params = buildQueryParams(query)
-    const response = await api.get<PaginatedServices>(
+    const response = await apiAideMoi.get<PaginatedServices>(
       `/users/${userId}/services?${params.toString()}`
     )
 
@@ -186,7 +186,9 @@ export const serviceApi = {
    * Get all service categories
    */
   async getCategories(): Promise<ServiceCategory[]> {
-    const response = await api.get<ServiceCategory[]>("/services/categories")
+    const response = await apiAideMoi.get<ServiceCategory[]>(
+      "/services/categories"
+    )
 
     if (!response.success || !response.data) {
       throw new Error(response.error || "Failed to fetch categories")
@@ -203,7 +205,7 @@ export const serviceApi = {
     query?: ServiceQueryData
   ): Promise<PaginatedServices> {
     const params = buildQueryParams({ ...query, search: searchTerm })
-    const response = await api.get<PaginatedServices>(
+    const response = await apiAideMoi.get<PaginatedServices>(
       `/services/search?${params.toString()}`
     )
 

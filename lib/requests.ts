@@ -2,7 +2,7 @@
  * Data fetching functions for service requests
  */
 
-import { api } from "./api"
+import { apiAideMoi } from "./api"
 import { CreateRequestData, UpdateRequestData } from "./validation"
 
 // Request data types
@@ -66,7 +66,7 @@ export const requestApi = {
    */
   async getRequests(query?: RequestQuery): Promise<PaginatedRequests> {
     const params = buildQueryParams(query)
-    const response = await api.get<PaginatedRequests>(
+    const response = await apiAideMoi.get<PaginatedRequests>(
       `/requests?${params.toString()}`
     )
 
@@ -81,7 +81,7 @@ export const requestApi = {
    * Get a single request by ID
    */
   async getRequest(id: string): Promise<ServiceRequest> {
-    const response = await api.get<ServiceRequest>(`/requests/${id}`)
+    const response = await apiAideMoi.get<ServiceRequest>(`/requests/${id}`)
 
     if (!response.success || !response.data) {
       throw new Error(response.error || "Failed to fetch request")
@@ -94,7 +94,7 @@ export const requestApi = {
    * Create a new request
    */
   async createRequest(data: CreateRequestData): Promise<ServiceRequest> {
-    const response = await api.post<ServiceRequest>("/requests", data)
+    const response = await apiAideMoi.post<ServiceRequest>("/requests", data)
 
     if (!response.success || !response.data) {
       throw new Error(response.error || "Failed to create request")
@@ -110,7 +110,10 @@ export const requestApi = {
     id: string,
     data: UpdateRequestData
   ): Promise<ServiceRequest> {
-    const response = await api.put<ServiceRequest>(`/requests/${id}`, data)
+    const response = await apiAideMoi.put<ServiceRequest>(
+      `/requests/${id}`,
+      data
+    )
 
     if (!response.success || !response.data) {
       throw new Error(response.error || "Failed to update request")
@@ -123,7 +126,7 @@ export const requestApi = {
    * Delete a request
    */
   async deleteRequest(id: string): Promise<void> {
-    const response = await api.delete(`/requests/${id}`)
+    const response = await apiAideMoi.delete(`/requests/${id}`)
 
     if (!response.success) {
       throw new Error(response.error || "Failed to delete request")
@@ -168,7 +171,7 @@ export const requestApi = {
     query?: RequestQuery
   ): Promise<PaginatedRequests> {
     const params = buildQueryParams(query)
-    const response = await api.get<PaginatedRequests>(
+    const response = await apiAideMoi.get<PaginatedRequests>(
       `/users/${userId}/requests?${params.toString()}`
     )
 
@@ -187,7 +190,7 @@ export const requestApi = {
     query?: RequestQuery
   ): Promise<PaginatedRequests> {
     const params = buildQueryParams({ ...query, search: searchTerm })
-    const response = await api.get<PaginatedRequests>(
+    const response = await apiAideMoi.get<PaginatedRequests>(
       `/requests/search?${params.toString()}`
     )
 

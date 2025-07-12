@@ -1,6 +1,7 @@
 import { NextIntlClientProvider } from "next-intl"
 import { notFound } from "next/navigation"
 import { routing } from "@/i18n/routing"
+import { AuthProvider } from "@/contexts/AuthContext"
 import Navbar from "./components/Navbar"
 import "./styles/globals.css"
 
@@ -27,8 +28,10 @@ export default async function LocaleLayout({
     <html lang={locale}>
       <body>
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <Navbar lang={locale} />
-          {children}
+          <AuthProvider>
+            <Navbar lang={locale} />
+            {children}
+          </AuthProvider>
         </NextIntlClientProvider>
       </body>
     </html>

@@ -26,6 +26,7 @@
   },
   "auth": {
     "login": "Accedi",
-    "register": "Registrati"
+    "register": "Registrati",
+    "logout": "Esci"
   }
 }

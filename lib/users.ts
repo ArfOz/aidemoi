@@ -2,7 +2,7 @@
  * Data fetching functions for users and authentication
  */
 
-import { api } from "./api"
+import { apiAideMoi } from "./api"
 import {
   RegisterUserData,
   LoginUserData,
@@ -41,7 +41,7 @@ export const userApi = {
    * Register a new user
    */
   async register(data: RegisterUserData): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>("/auth/register", data)
+    const response = await apiAideMoi.post<AuthResponse>("/auth/register", data)
 
     if (!response.success || !response.data) {
       throw new Error(response.error || "Failed to register user")
@@ -54,7 +54,7 @@ export const userApi = {
    * Login user
    */
   async login(data: LoginUserData): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>("/auth/login", data)
+    const response = await apiAideMoi.post<AuthResponse>("/auth/login", data)
 
     if (!response.success || !response.data) {
       throw new Error(response.error || "Failed to login")
@@ -67,7 +67,7 @@ export const userApi = {
    * Logout user
    */
   async logout(): Promise<void> {
-    const response = await api.post("/auth/logout")
+    const response = await apiAideMoi.post("/auth/logout")
 
     if (!response.success) {
       throw new Error(response.error || "Failed to logout")
@@ -78,7 +78,7 @@ export const userApi = {
    * Get current user profile
    */
   async getProfile(): Promise<User> {
-    const response = await api.get<User>("/auth/profile")
+    const response = await apiAideMoi.get<User>("/auth/profile")
 
     if (!response.success || !response.data) {
       throw new Error(response.error || "Failed to get profile")
@@ -91,7 +91,7 @@ export const userApi = {
    * Update user profile
    */
   async updateProfile(data: UpdateProfileData): Promise<User> {
-    const response = await api.put<User>("/auth/profile", data)
+    const response = await apiAideMoi.put<User>("/auth/profile", data)
 
     if (!response.success || !response.data) {
       throw new Error(response.error || "Failed to update profile")
@@ -107,7 +107,7 @@ export const userApi = {
     currentPassword: string,
     newPassword: string
   ): Promise<void> {
-    const response = await api.post("/auth/change-password", {
+    const response = await apiAideMoi.post("/auth/change-password", {
       currentPassword,
       newPassword,
     })
@@ -121,7 +121,7 @@ export const userApi = {
    * Request password reset
    */
   async requestPasswordReset(email: string): Promise<void> {
-    const response = await api.post("/auth/reset-password", { email })
+    const response = await apiAideMoi.post("/auth/reset-password", { email })
 
     if (!response.success) {
       throw new Error(response.error || "Failed to request password reset")
@@ -132,7 +132,7 @@ export const userApi = {
    * Reset password with token
    */
   async resetPassword(token: string, newPassword: string): Promise<void> {
-    const response = await api.post("/auth/reset-password/confirm", {
+    const response = await apiAideMoi.post("/auth/reset-password/confirm", {
       token,
       newPassword,
     })
@@ -146,7 +146,7 @@ export const userApi = {
    * Verify email with token
    */
   async verifyEmail(token: string): Promise<void> {
-    const response = await api.post("/auth/verify-email", { token })
+    const response = await apiAideMoi.post("/auth/verify-email", { token })
 
     if (!response.success) {
       throw new Error(response.error || "Failed to verify email")
@@ -157,7 +157,7 @@ export const userApi = {
    * Resend email verification
    */
   async resendEmailVerification(): Promise<void> {
-    const response = await api.post("/auth/resend-verification")
+    const response = await apiAideMoi.post("/auth/resend-verification")
 
     if (!response.success) {
       throw new Error(response.error || "Failed to resend verification")
@@ -168,7 +168,7 @@ export const userApi = {
    * Refresh authentication token
    */
   async refreshToken(refreshToken: string): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>("/auth/refresh", {
+    const response = await apiAideMoi.post<AuthResponse>("/auth/refresh", {
       refreshToken,
     })
 
@@ -183,7 +183,7 @@ export const userApi = {
    * Get user by ID (admin function)
    */
   async getUser(id: string): Promise<User> {
-    const response = await api.get<User>(`/users/${id}`)
+    const response = await apiAideMoi.get<User>(`/users/${id}`)
 
     if (!response.success || !response.data) {
       throw new Error(response.error || "Failed to get user")
@@ -199,7 +199,7 @@ export const userApi = {
     const formData = new FormData()
     formData.append("avatar", file)
 
-    const response = await api.post<{ url: string }>(
+    const response = await apiAideMoi.post<{ url: string }>(
       "/users/avatar",
       formData,
       {
@@ -220,7 +220,7 @@ export const userApi = {
    * Delete user account
    */
   async deleteAccount(): Promise<void> {
-    const response = await api.delete("/users/account")
+    const response = await apiAideMoi.delete("/users/account")
 
     if (!response.success) {
       throw new Error(response.error || "Failed to delete account")

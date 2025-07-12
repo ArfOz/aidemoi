@@ -4,7 +4,7 @@
 
 // Base configuration for API calls
 export const API_CONFIG = {
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3300/api/v1",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
@@ -39,7 +39,7 @@ export interface RequestOptions {
 /**
  * Generic fetch wrapper with error handling and type safety
  */
-export async function apiRequest<T = unknown>(
+async function apiRequest<T = unknown>(
   endpoint: string,
   options: RequestOptions = {}
 ): Promise<APIResponse<T>> {
@@ -109,7 +109,7 @@ export async function apiRequest<T = unknown>(
 /**
  * Convenience methods for common HTTP operations
  */
-export const api = {
+export const apiAideMoi = {
   get: <T>(endpoint: string, options?: Omit<RequestOptions, "method">) =>
     apiRequest<T>(endpoint, { ...options, method: "GET" }),
 

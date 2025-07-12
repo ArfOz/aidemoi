@@ -236,6 +236,7 @@
   ],
   "auth": {
     "login": "Login",
-    "register": "Register"
+    "register": "Register",
+    "logout": "Logout"
   }
 }

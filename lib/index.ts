@@ -5,6 +5,18 @@
 // API utilities
 export * from "./api"
 
+// Authentication utilities
+export {
+  getStoredTokens,
+  getStoredUser,
+  getAuthHeader,
+  isAuthenticated,
+  authenticatedRequest,
+  clearAuthData,
+  type AuthTokens,
+  type User as AuthUser,
+} from "./auth"
+
 // Data validation
 export * from "./validation"
 

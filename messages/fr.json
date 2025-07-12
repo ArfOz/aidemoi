@@ -236,6 +236,7 @@
   ],
   "auth": {
     "login": "Connexion",
-    "register": "S'inscrire"
+    "register": "S'inscrire",
+    "logout": "Déconnexion"
   }
 }
