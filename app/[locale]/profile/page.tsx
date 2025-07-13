@@ -79,12 +79,6 @@ const ProfilePage: React.FC<{ params: Promise<{ locale: string }> }> = ({
             >
               Back to Home
             </Link>
-            <Link
-              href={`/${resolvedParams.locale}/requests/new`}
-              className="px-6 py-3 bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-lg font-semibold hover:from-green-600 hover:to-blue-600 transition-colors"
-            >
-              Create Request
-            </Link>
           </div>
         </div>
       </div>
