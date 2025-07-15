@@ -1,4 +1,6 @@
-const Footer = (): JSX.Element => {
+import React from 'react';
+
+const Footer = (): React.ReactElement => {
   return (
     <footer className="bg-gray-800 text-white py-6">
       <div className="container mx-auto text-center">
@@ -13,7 +15,7 @@ const Footer = (): JSX.Element => {
         </div> */}
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

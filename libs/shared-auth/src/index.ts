@@ -1,1 +1,2 @@
-export * from './lib/shared-auth.js';
+// export * from './contexts';  // removed because './contexts' does not exist
+export * from './shared-auth';

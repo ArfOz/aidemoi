@@ -1,20 +1,19 @@
-// src/components/service/category-card.tsx
-"use client"
+'use client';
 
-import type { ReactNode } from "react"
-import { useParams, useRouter } from "next/navigation"
+import type { ReactNode } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 
 type Category = {
-  id: string
-  name: string
-  description: string
-  icon: ReactNode
-}
+  id: string;
+  name: string;
+  description: string;
+  icon: ReactNode;
+};
 
 export function CategoryCard({ cat }: { cat: Category }) {
-  const router = useRouter()
-  const params = useParams()
-  const locale = (params.locale as string) || "en"
+  const router = useRouter();
+  const params = useParams();
+  const locale = (params.locale as string) || 'en';
 
   return (
     <div
@@ -27,5 +26,5 @@ export function CategoryCard({ cat }: { cat: Category }) {
       <h2 className="font-semibold text-lg mt-2">{cat.name}</h2>
       <p className="text-sm text-gray-500">{cat.description}</p>
     </div>
-  )
+  );
 }

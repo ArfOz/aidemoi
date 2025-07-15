@@ -19,8 +19,8 @@
     "customConditions": ["development"],
     "baseUrl": ".",
     "paths": {
-      "@aidemoi-monorepo/shared-api": ["libs/shared-api/src/index.ts"],
-      "@aidemoi-monorepo/shared-auth": ["libs/shared-auth/src/index.ts"]
+      "@api": ["libs/api/src/index.ts"],
+      "@shared-auth": ["libs/shared-auth/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
