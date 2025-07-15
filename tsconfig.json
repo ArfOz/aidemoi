@@ -8,6 +8,15 @@
     },
     {
       "path": "./apps/customer-app"
+    },
+    {
+      "path": "./libs/shared-auth"
+    },
+    {
+      "path": "./libs/shared-api"
+    },
+    {
+      "path": "./apps/company-app"
     }
   ]
 }

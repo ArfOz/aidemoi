@@ -2,14 +2,33 @@
   "name": "@aidemoi-monorepo/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "build": "nx build",
+    "dev:customer": "nx dev @aidemoi-monorepo/customer-app",
+    "dev:company": "nx dev @aidemoi-monorepo/company-app",
+    "dev:all": "nx run-many --target=dev --projects=@aidemoi-monorepo/customer-app,@aidemoi-monorepo/company-app --parallel",
+    "build:all": "nx run-many --target=build --projects=@aidemoi-monorepo/customer-app,@aidemoi-monorepo/company-app",
+    "test": "nx test",
+    "lint": "nx lint",
+    "e2e": "nx e2e"
+  },
   "private": true,
   "dependencies": {
+    "@types/react": "19.0.0",
+    "@types/react-dom": "19.0.0",
+    "autoprefixer": "^10.4.0",
     "next": "~15.2.4",
+    "next-intl": "^3.22.0",
+    "postcss": "^8.4.0",
     "react": "19.0.0",
-    "react-dom": "19.0.0"
+    "react-dom": "19.0.0",
+    "react-icons": "^5.5.0",
+    "tailwindcss": "^3.4.0",
+    "zod": "^4.0.5"
   },
   "devDependencies": {
+    "@babel/core": "^7.14.5",
+    "@babel/preset-react": "^7.14.5",
     "@eslint/compat": "^1.1.1",
     "@eslint/eslintrc": "^2.1.1",
     "@eslint/js": "^9.8.0",
@@ -20,6 +39,7 @@
     "@nx/jest": "21.2.3",
     "@nx/js": "21.2.3",
     "@nx/next": "21.2.3",
+    "@nx/react": "21.2.3",
     "@nx/workspace": "21.2.3",
     "@swc-node/register": "~1.9.1",
     "@swc/cli": "~0.6.0",
@@ -28,7 +48,7 @@
     "@testing-library/dom": "10.4.0",
     "@testing-library/react": "16.1.0",
     "@types/jest": "^29.5.12",
-    "@types/node": "18.16.9",
+    "@types/node": "^20.0.0",
     "@types/react": "19.0.0",
     "@types/react-dom": "19.0.0",
     "babel-jest": "^29.7.0",
@@ -43,6 +63,7 @@
     "eslint-plugin-react-hooks": "5.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
+    "jsonc-eslint-parser": "^2.1.0",
     "nx": "21.2.3",
     "prettier": "^2.6.2",
     "ts-jest": "^29.1.0",
@@ -52,6 +73,7 @@
     "typescript-eslint": "^8.29.0"
   },
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "libs/*"
   ]
 }
