@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { apiAideMoi } from '../../../api/src/index';
 
 export interface User {
   id: string;
@@ -112,21 +113,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setError(null);
 
     try {
-      // API call to backend server
-      const response = await fetch('http://localhost:3300/api/v1/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-      });
+      // API call to backend server using api library
+      const response = await apiAideMoi.post<AuthResponse>(
+        '/auth/login',
+        credentials
+      );
 
-      if (!response.ok) {
-        throw new Error('Login failed');
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Login failed');
       }
 
-      const { user: userData, tokens: tokenData } =
-        (await response.json()) as AuthResponse;
+      const { user: userData, tokens: tokenData } = response.data;
 
       setUser(userData);
       setTokens(tokenData);
@@ -146,24 +143,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setError(null);
 
     try {
-      // API call to backend server
-      const response = await fetch(
-        'http://localhost:3300/api/v1/auth/register',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data),
-        }
+      // API call to backend server using api library
+      const response = await apiAideMoi.post<AuthResponse>(
+        '/auth/register',
+        data
       );
 
-      if (!response.ok) {
-        throw new Error('Registration failed');
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Registration failed');
       }
 
-      const { user: userData, tokens: tokenData } =
-        (await response.json()) as AuthResponse;
+      const { user: userData, tokens: tokenData } = response.data;
 
       setUser(userData);
       setTokens(tokenData);

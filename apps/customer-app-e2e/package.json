@@ -1,10 +1,10 @@
 {
-  "name": "@aidemoi-monorepo/customer-app-e2e",
+  "name": "@aidemoi/customer-app-e2e",
   "version": "0.0.1",
   "private": true,
   "nx": {
     "implicitDependencies": [
-      "@aidemoi-monorepo/customer-app"
+      "@aidemoi/customer-app"
     ]
   }
 }

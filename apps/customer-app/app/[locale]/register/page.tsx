@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@shared-auth';
+import { useAuth } from '@aidemoi/shared-auth';
 
 interface CreateUserData {
   name: string;

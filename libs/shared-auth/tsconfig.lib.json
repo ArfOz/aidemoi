@@ -13,5 +13,9 @@
     "jsx": "react-jsx"
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "references": []
+  "references": [
+    {
+      "path": "../api/tsconfig.lib.json"
+    }
+  ]
 }

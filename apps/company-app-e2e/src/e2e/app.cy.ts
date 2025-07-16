@@ -1,6 +1,6 @@
 import { getGreeting } from '../support/app.po';
 
-describe('@aidemoi-monorepo/repairmen-app-e2e', () => {
+describe('@aidemoi/company-app-e2e', () => {
   beforeEach(() => cy.visit('/'));
 
   it('should display welcome message', () => {

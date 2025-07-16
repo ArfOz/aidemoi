@@ -6,7 +6,7 @@ import { FaLanguage, FaSignInAlt, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import React from 'react';
-import { useAuth } from '@shared-auth';
+import { useAuth } from '@aidemoi/shared-auth';
 import { PostalCodes } from './postal-code';
 
 const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {

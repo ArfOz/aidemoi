@@ -6,9 +6,9 @@ export default defineConfig({
     ...nxE2EPreset(__filename, {
       cypressDir: 'src',
       webServerCommands: {
-        default: 'npx nx run @aidemoi-monorepo/customer-app:dev',
+        default: 'npx nx run @aidemoi/customer-app:dev',
       },
-      ciWebServerCommand: 'npx nx run @aidemoi-monorepo/customer-app:start',
+      ciWebServerCommand: 'npx nx run @aidemoi/customer-app:start',
       ciBaseUrl: 'http://localhost:3000',
     }),
     baseUrl: 'http://127.0.0.1:3000',

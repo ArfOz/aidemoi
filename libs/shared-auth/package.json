@@ -1,5 +1,5 @@
 {
-  "name": "@aidemoi-monorepo/shared-auth",
+  "name": "@aidemoi/shared-auth",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -16,6 +16,8 @@
     }
   },
   "dependencies": {
+    "react": "^19.0.0",
+    "@aidemoi/api": "*",
     "tslib": "^2.3.0"
   }
 }

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@shared-auth';
+import { useAuth } from '@aidemoi/shared-auth';
 
 interface LoginData {
   email: string;
@@ -71,7 +71,7 @@ const LoginPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
 
       // Use the AuthContext login function which handles the API call
       await login(formData);
-      
+
       // Redirect to dashboard or home page
       router.push(`/${resolvedParams.locale}`);
     } catch (err) {

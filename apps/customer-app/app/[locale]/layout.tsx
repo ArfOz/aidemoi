@@ -1,7 +1,7 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { notFound } from 'next/navigation';
 import { routing } from '../../i18n/routing';
-import { AuthProvider } from '@shared-auth';
+import { AuthProvider } from '@aidemoi/shared-auth';
 import Navbar from './components/Navbar';
 import './styles/globals.css';
 

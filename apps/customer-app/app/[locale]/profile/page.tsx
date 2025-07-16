@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useAuth } from '@shared-auth';
+import { useAuth } from '@aidemoi/shared-auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 

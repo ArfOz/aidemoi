@@ -1,5 +1,5 @@
 {
-  "name": "@aidemoi-monorepo/api",
+  "name": "@aidemoi/api",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "tslib": "^2.3.0",
-    "zod": "^3.22.4",
+    "zod": "^4.0.5",
     "react": "19.0.0"
   }
 }

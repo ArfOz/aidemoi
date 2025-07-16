@@ -19,8 +19,8 @@
     "customConditions": ["development"],
     "baseUrl": ".",
     "paths": {
-      "@api": ["libs/api/src/index.ts"],
-      "@shared-auth": ["libs/shared-auth/src/index.ts"]
+      "@aidemoi/api": ["libs/api/src/index.ts"],
+      "@aidemoi/shared-auth": ["libs/shared-auth/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

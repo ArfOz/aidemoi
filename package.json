@@ -1,13 +1,13 @@
 {
-  "name": "@aidemoi-monorepo/source",
+  "name": "@aidemoi/source",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
     "build": "nx build",
-    "dev:customer": "nx dev @aidemoi-monorepo/customer-app",
-    "dev:company": "nx dev @aidemoi-monorepo/company-app",
-    "dev:all": "nx run-many --target=dev --projects=@aidemoi-monorepo/customer-app,@aidemoi-monorepo/company-app --parallel",
-    "build:all": "nx run-many --target=build --projects=@aidemoi-monorepo/customer-app,@aidemoi-monorepo/company-app",
+    "dev:customer": "nx dev @aidemoi/customer-app",
+    "dev:company": "nx dev @aidemoi/company-app",
+    "dev:all": "nx run-many --target=dev --projects=@aidemoi/customer-app,@aidemoi/company-app --parallel",
+    "build:all": "nx run-many --target=build --projects=@aidemoi/customer-app,@aidemoi/company-app",
     "test": "nx test",
     "lint": "nx lint",
     "e2e": "nx e2e"
