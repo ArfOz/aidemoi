@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@aidemoi-monorepo/shared-auth';
+import { useAuth } from '@shared-auth';
 
 interface LoginData {
   email: string;
@@ -69,17 +69,13 @@ const LoginPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
     try {
       console.log('Sending login data:', formData);
 
-      await login({
-        email: formData.email,
-        password: formData.password,
-      });
-
+      // Use the AuthContext login function which handles the API call
+      await login(formData);
+      
       // Redirect to dashboard or home page
       router.push(`/${resolvedParams.locale}`);
-    } catch (error) {
-      console.error('Login error:', error);
-      const errorMessage =
-        error instanceof Error ? error.message : 'Login failed';
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Login failed';
       setErrors({ general: errorMessage });
     } finally {
       setIsLoading(false);
