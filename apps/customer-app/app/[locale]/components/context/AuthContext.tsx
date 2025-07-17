@@ -119,8 +119,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         credentials
       );
 
-      console.log('Login response: AUTHCONTEXT', response);
-
       if (!response.tokens || !response.user) {
         throw new Error('Login failed');
       }
