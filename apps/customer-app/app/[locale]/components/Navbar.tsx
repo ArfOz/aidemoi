@@ -6,8 +6,8 @@ import { FaLanguage, FaSignInAlt, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import React from 'react';
-import { useAuth } from '@aidemoi/shared-auth';
 import { PostalCodes } from './postal-code';
+import { useAuth } from './context/AuthContext';
 
 const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
   const router = useRouter();
@@ -69,10 +69,10 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
               <Link
                 href={`/${locale}/profile`}
                 className="flex items-center gap-2 px-4 py-2 bg-white text-purple-700 rounded-lg font-semibold hover:bg-purple-100 transition-colors duration-200 shadow-md"
-                title={`Welcome, ${user.name}`}
+                title={`Welcome, ${user.username}`}
               >
                 <FaUser className="text-lg" />
-                <span className="hidden sm:inline">{user.name}</span>
+                <span className="hidden sm:inline">{user.username}</span>
               </Link>
               <button
                 onClick={handleLogout}

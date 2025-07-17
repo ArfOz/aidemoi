@@ -1,12 +1,12 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { apiAideMoi } from '../../../api/src/index';
+import { apiAideMoi } from '@api';
 
 export interface User {
   id: string;
   email: string;
-  name: string;
+  username: string;
   role: 'customer' | 'repairman' | 'admin';
   phone?: string;
   avatar?: string;
@@ -119,11 +119,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         credentials
       );
 
-      if (!response.success || !response.data) {
-        throw new Error(response.error || 'Login failed');
+      console.log('Login response: AUTHCONTEXT', response);
+
+      if (!response.tokens || !response.user) {
+        throw new Error('Login failed');
       }
 
-      const { user: userData, tokens: tokenData } = response.data;
+      const { user: userData, tokens: tokenData } = response;
 
       setUser(userData);
       setTokens(tokenData);
@@ -150,7 +152,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       );
 
       if (!response.success || !response.data) {
-        throw new Error(response.error || 'Registration failed');
+        const errorMessage =
+          response.error ?? response.message ?? 'Registration failed';
+        throw new Error(errorMessage);
       }
 
       const { user: userData, tokens: tokenData } = response.data;

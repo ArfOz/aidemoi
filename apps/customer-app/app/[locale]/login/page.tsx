@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@aidemoi/shared-auth';
+import { useAuth } from '../components/context/AuthContext';
 
 interface LoginData {
   email: string;
@@ -75,6 +75,7 @@ const LoginPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
       // Redirect to dashboard or home page
       router.push(`/${resolvedParams.locale}`);
     } catch (err) {
+      console.error('Login error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Login failed';
       setErrors({ general: errorMessage });
     } finally {

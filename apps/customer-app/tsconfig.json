@@ -3,6 +3,7 @@
   "compilerOptions": {
     "jsx": "preserve",
     "noEmit": true,
+    "rootDir": "../../",
     "emitDeclarationOnly": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
@@ -23,6 +24,7 @@
   "include": [
     "../../apps/customer-app/.next/types/**/*.ts",
     "../../dist/apps/customer-app/.next/types/**/*.ts",
+    "../../libs/api/src/**/*.ts",
     "next-env.d.ts",
     "app/**/*.js",
     "app/**/*.jsx",
@@ -49,7 +51,7 @@
   ],
   "references": [
     {
-      "path": "../../libs/shared-auth"
+      "path": "../../libs/api"
     }
   ]
 }

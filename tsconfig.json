@@ -1,22 +1,5 @@
 {
   "extends": "./tsconfig.base.json",
   "compileOnSave": false,
-  "files": [],
-  "references": [
-    {
-      "path": "./apps/customer-app-e2e"
-    },
-    {
-      "path": "./apps/customer-app"
-    },
-    {
-      "path": "./libs/shared-auth"
-    },
-    {
-      "path": "./libs/api"
-    },
-    {
-      "path": "./apps/company-app"
-    }
-  ]
+  "files": []
 }

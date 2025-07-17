@@ -19,9 +19,19 @@
     "customConditions": ["development"],
     "baseUrl": ".",
     "paths": {
-      "@aidemoi/api": ["libs/api/src/index.ts"],
-      "@aidemoi/shared-auth": ["libs/shared-auth/src/index.ts"]
+      "@authcontext": ["libs/authcontext/src/index.ts"],
+      "@api": ["libs/api/src/index.ts"]
     }
   },
-  "exclude": ["node_modules", "tmp"]
+  "rootDirs": [".", "apps", "libs"],
+  "exclude": ["node_modules", "tmp"],
+  "include": [
+    "apps/**/*",
+    "libs/**/*",
+    "jest.config.ts",
+    "nx.json",
+    "package.json",
+    "tsconfig.base.json",
+    "tsconfig.json"
+  ]
 }

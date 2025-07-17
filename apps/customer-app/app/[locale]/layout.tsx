@@ -1,9 +1,9 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { notFound } from 'next/navigation';
 import { routing } from '../../i18n/routing';
-import { AuthProvider } from '@aidemoi/shared-auth';
 import Navbar from './components/Navbar';
 import './styles/globals.css';
+import { AuthProvider } from './components/context/AuthContext';
 
 export default async function LocaleLayout({
   children,
