@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { apiAideMoi } from '@api';
+import { apiAideMoi, APIResponse } from '@api';
 
 export interface User {
   id: string;
@@ -114,12 +114,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     try {
       // API call to backend server using api library
-      const response = await apiAideMoi.post<AuthResponse>(
+      const response: APIResponse = await apiAideMoi.post(
         '/auth/login',
         credentials
       );
 
-      if (!response.tokens || !response.user) {
+      if (!response.data.tokens || !response.data.user) {
         throw new Error('Login failed');
       }
 

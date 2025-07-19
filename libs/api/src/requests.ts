@@ -2,61 +2,61 @@
  * Data fetching functions for service requests
  */
 
-import { apiAideMoi } from "./api"
-import { CreateRequestData, UpdateRequestData } from "./validation"
+import { apiAideMoi } from './api';
+import { CreateRequestData, UpdateRequestData } from './validation';
 
 // Request data types
 export interface ServiceRequest {
-  id: string
-  title: string
-  description: string
-  category: string
-  budget?: number
-  location: string
-  postalCode: string
-  deadline?: string
-  priority: "low" | "medium" | "high"
-  status: "active" | "completed" | "cancelled"
-  userId: string
-  createdAt: string
-  updatedAt: string
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  budget?: number;
+  location: string;
+  postalCode: string;
+  deadline?: string;
+  priority: 'low' | 'medium' | 'high';
+  status: 'active' | 'completed' | 'cancelled';
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface PaginatedRequests {
-  requests: ServiceRequest[]
-  totalCount: number
-  page: number
-  limit: number
-  totalPages: number
+  requests: ServiceRequest[];
+  totalCount: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 // Request query interface
 export interface RequestQuery {
-  category?: string
-  location?: string
-  postalCode?: string
-  minBudget?: number
-  maxBudget?: number
-  priority?: "low" | "medium" | "high"
-  status?: "active" | "completed" | "cancelled"
-  page?: number
-  limit?: number
-  [key: string]: unknown
+  category?: string;
+  location?: string;
+  postalCode?: string;
+  minBudget?: number;
+  maxBudget?: number;
+  priority?: 'low' | 'medium' | 'high';
+  status?: 'active' | 'completed' | 'cancelled';
+  page?: number;
+  limit?: number;
+  [key: string]: unknown;
 }
 
 // Helper function to build query params
 function buildQueryParams(query?: RequestQuery): URLSearchParams {
-  const params = new URLSearchParams()
+  const params = new URLSearchParams();
 
   if (query) {
     Object.entries(query).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
-        params.append(key, String(value))
+        params.append(key, String(value));
       }
-    })
+    });
   }
 
-  return params
+  return params;
 }
 
 // Request API functions
@@ -65,42 +65,42 @@ export const requestApi = {
    * Get all requests with optional filtering
    */
   async getRequests(query?: RequestQuery): Promise<PaginatedRequests> {
-    const params = buildQueryParams(query)
+    const params = buildQueryParams(query);
     const response = await apiAideMoi.get<PaginatedRequests>(
       `/requests?${params.toString()}`
-    )
+    );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || "Failed to fetch requests")
+      throw new Error(response.error || 'Failed to fetch requests');
     }
 
-    return response.data
+    return response.data;
   },
 
   /**
    * Get a single request by ID
    */
   async getRequest(id: string): Promise<ServiceRequest> {
-    const response = await apiAideMoi.get<ServiceRequest>(`/requests/${id}`)
+    const response = await apiAideMoi.get<ServiceRequest>(`/requests/${id}`);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || "Failed to fetch request")
+      throw new Error(response.error || 'Failed to fetch request');
     }
 
-    return response.data
+    return response.data;
   },
 
   /**
    * Create a new request
    */
   async createRequest(data: CreateRequestData): Promise<ServiceRequest> {
-    const response = await apiAideMoi.post<ServiceRequest>("/requests", data)
+    const response = await apiAideMoi.post<ServiceRequest>('/requests', data);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || "Failed to create request")
+      throw new Error(response.error || 'Failed to create request');
     }
 
-    return response.data
+    return response.data;
   },
 
   /**
@@ -113,23 +113,23 @@ export const requestApi = {
     const response = await apiAideMoi.put<ServiceRequest>(
       `/requests/${id}`,
       data
-    )
+    );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || "Failed to update request")
+      throw new Error(response.error || 'Failed to update request');
     }
 
-    return response.data
+    return response.data;
   },
 
   /**
    * Delete a request
    */
   async deleteRequest(id: string): Promise<void> {
-    const response = await apiAideMoi.delete(`/requests/${id}`)
+    const response = await apiAideMoi.delete(`/requests/${id}`);
 
     if (!response.success) {
-      throw new Error(response.error || "Failed to delete request")
+      throw new Error(response.error || 'Failed to delete request');
     }
   },
 
@@ -138,9 +138,9 @@ export const requestApi = {
    */
   async getRequestsByCategory(
     category: string,
-    query?: Omit<RequestQuery, "category">
+    query?: Omit<RequestQuery, 'category'>
   ): Promise<PaginatedRequests> {
-    return this.getRequests({ ...query, category })
+    return this.getRequests({ ...query, category });
   },
 
   /**
@@ -148,9 +148,9 @@ export const requestApi = {
    */
   async getRequestsByLocation(
     location: string,
-    query?: Omit<RequestQuery, "location">
+    query?: Omit<RequestQuery, 'location'>
   ): Promise<PaginatedRequests> {
-    return this.getRequests({ ...query, location })
+    return this.getRequests({ ...query, location });
   },
 
   /**
@@ -158,9 +158,9 @@ export const requestApi = {
    */
   async getRequestsByPostalCode(
     postalCode: string,
-    query?: Omit<RequestQuery, "postalCode">
+    query?: Omit<RequestQuery, 'postalCode'>
   ): Promise<PaginatedRequests> {
-    return this.getRequests({ ...query, postalCode })
+    return this.getRequests({ ...query, postalCode });
   },
 
   /**
@@ -170,16 +170,16 @@ export const requestApi = {
     userId: string,
     query?: RequestQuery
   ): Promise<PaginatedRequests> {
-    const params = buildQueryParams(query)
+    const params = buildQueryParams(query);
     const response = await apiAideMoi.get<PaginatedRequests>(
       `/users/${userId}/requests?${params.toString()}`
-    )
+    );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || "Failed to fetch user requests")
+      throw new Error(response.error || 'Failed to fetch user requests');
     }
 
-    return response.data
+    return response.data;
   },
 
   /**
@@ -189,38 +189,38 @@ export const requestApi = {
     searchTerm: string,
     query?: RequestQuery
   ): Promise<PaginatedRequests> {
-    const params = buildQueryParams({ ...query, search: searchTerm })
+    const params = buildQueryParams({ ...query, search: searchTerm });
     const response = await apiAideMoi.get<PaginatedRequests>(
       `/requests/search?${params.toString()}`
-    )
+    );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || "Failed to search requests")
+      throw new Error(response.error || 'Failed to search requests');
     }
 
-    return response.data
+    return response.data;
   },
 
   /**
    * Get active requests
    */
   async getActiveRequests(
-    query?: Omit<RequestQuery, "status">
+    query?: Omit<RequestQuery, 'status'>
   ): Promise<PaginatedRequests> {
-    return this.getRequests({ ...query, status: "active" })
+    return this.getRequests({ ...query, status: 'active' });
   },
 
   /**
    * Mark request as completed
    */
   async completeRequest(id: string): Promise<ServiceRequest> {
-    return this.updateRequest(id, { status: "completed" })
+    return this.updateRequest(id, { status: 'completed' });
   },
 
   /**
    * Cancel request
    */
   async cancelRequest(id: string): Promise<ServiceRequest> {
-    return this.updateRequest(id, { status: "cancelled" })
+    return this.updateRequest(id, { status: 'cancelled' });
   },
-}
+};

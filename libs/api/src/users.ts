@@ -2,37 +2,37 @@
  * Data fetching functions for users and authentication
  */
 
-import { apiAideMoi } from "./api"
+import { apiAideMoi } from './api';
 import {
   RegisterUserData,
   LoginUserData,
   UpdateProfileData,
-} from "./validation"
+} from './validation';
 
 // User data types
 export interface User {
-  id: string
-  email: string
-  firstName: string
-  lastName: string
-  phoneNumber?: string
-  postalCode: string
-  avatar?: string
-  isEmailVerified: boolean
-  createdAt: string
-  updatedAt: string
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber?: string;
+  postalCode: string;
+  avatar?: string;
+  isEmailVerified: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AuthResponse {
-  user: User
-  token: string
-  refreshToken: string
+  user: User;
+  token: string;
+  refreshToken: string;
 }
 
 export interface AuthSession {
-  user: User
-  token: string
-  expiresAt: string
+  user: User;
+  token: string;
+  expiresAt: string;
 }
 
 // User API functions
@@ -41,36 +41,39 @@ export const userApi = {
    * Register a new user
    */
   async register(data: RegisterUserData): Promise<AuthResponse> {
-    const response = await apiAideMoi.post<AuthResponse>("/auth/register", data)
+    const response = await apiAideMoi.post<AuthResponse>(
+      '/auth/register',
+      data
+    );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || "Failed to register user")
+      throw new Error(response.error || 'Failed to register user');
     }
 
-    return response.data
+    return response.data;
   },
 
   /**
    * Login user
    */
   async login(data: LoginUserData): Promise<AuthResponse> {
-    const response = await apiAideMoi.post<AuthResponse>("/auth/login", data)
+    const response = await apiAideMoi.post<AuthResponse>('/auth/login', data);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || "Failed to login")
+      throw new Error(response.error || 'Failed to login');
     }
 
-    return response.data
+    return response.data;
   },
 
   /**
    * Logout user
    */
   async logout(): Promise<void> {
-    const response = await apiAideMoi.post("/auth/logout")
+    const response = await apiAideMoi.post('/auth/logout');
 
     if (!response.success) {
-      throw new Error(response.error || "Failed to logout")
+      throw new Error(response.error || 'Failed to logout');
     }
   },
 
@@ -78,26 +81,26 @@ export const userApi = {
    * Get current user profile
    */
   async getProfile(): Promise<User> {
-    const response = await apiAideMoi.get<User>("/auth/profile")
+    const response = await apiAideMoi.get<User>('/auth/profile');
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || "Failed to get profile")
+      throw new Error(response.error || 'Failed to get profile');
     }
 
-    return response.data
+    return response.data;
   },
 
   /**
    * Update user profile
    */
   async updateProfile(data: UpdateProfileData): Promise<User> {
-    const response = await apiAideMoi.put<User>("/auth/profile", data)
+    const response = await apiAideMoi.put<User>('/auth/profile', data);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || "Failed to update profile")
+      throw new Error(response.error || 'Failed to update profile');
     }
 
-    return response.data
+    return response.data;
   },
 
   /**
@@ -107,13 +110,13 @@ export const userApi = {
     currentPassword: string,
     newPassword: string
   ): Promise<void> {
-    const response = await apiAideMoi.post("/auth/change-password", {
+    const response = await apiAideMoi.post('/auth/change-password', {
       currentPassword,
       newPassword,
-    })
+    });
 
     if (!response.success) {
-      throw new Error(response.error || "Failed to change password")
+      throw new Error(response.error || 'Failed to change password');
     }
   },
 
@@ -121,10 +124,10 @@ export const userApi = {
    * Request password reset
    */
   async requestPasswordReset(email: string): Promise<void> {
-    const response = await apiAideMoi.post("/auth/reset-password", { email })
+    const response = await apiAideMoi.post('/auth/reset-password', { email });
 
     if (!response.success) {
-      throw new Error(response.error || "Failed to request password reset")
+      throw new Error(response.error || 'Failed to request password reset');
     }
   },
 
@@ -132,13 +135,13 @@ export const userApi = {
    * Reset password with token
    */
   async resetPassword(token: string, newPassword: string): Promise<void> {
-    const response = await apiAideMoi.post("/auth/reset-password/confirm", {
+    const response = await apiAideMoi.post('/auth/reset-password/confirm', {
       token,
       newPassword,
-    })
+    });
 
     if (!response.success) {
-      throw new Error(response.error || "Failed to reset password")
+      throw new Error(response.error || 'Failed to reset password');
     }
   },
 
@@ -146,10 +149,10 @@ export const userApi = {
    * Verify email with token
    */
   async verifyEmail(token: string): Promise<void> {
-    const response = await apiAideMoi.post("/auth/verify-email", { token })
+    const response = await apiAideMoi.post('/auth/verify-email', { token });
 
     if (!response.success) {
-      throw new Error(response.error || "Failed to verify email")
+      throw new Error(response.error || 'Failed to verify email');
     }
   },
 
@@ -157,10 +160,10 @@ export const userApi = {
    * Resend email verification
    */
   async resendEmailVerification(): Promise<void> {
-    const response = await apiAideMoi.post("/auth/resend-verification")
+    const response = await apiAideMoi.post('/auth/resend-verification');
 
     if (!response.success) {
-      throw new Error(response.error || "Failed to resend verification")
+      throw new Error(response.error || 'Failed to resend verification');
     }
   },
 
@@ -168,62 +171,62 @@ export const userApi = {
    * Refresh authentication token
    */
   async refreshToken(refreshToken: string): Promise<AuthResponse> {
-    const response = await apiAideMoi.post<AuthResponse>("/auth/refresh", {
+    const response = await apiAideMoi.post<AuthResponse>('/auth/refresh', {
       refreshToken,
-    })
+    });
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || "Failed to refresh token")
+      throw new Error(response.error || 'Failed to refresh token');
     }
 
-    return response.data
+    return response.data;
   },
 
   /**
    * Get user by ID (admin function)
    */
   async getUser(id: string): Promise<User> {
-    const response = await apiAideMoi.get<User>(`/users/${id}`)
+    const response = await apiAideMoi.get<User>(`/users/${id}`);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || "Failed to get user")
+      throw new Error(response.error || 'Failed to get user');
     }
 
-    return response.data
+    return response.data;
   },
 
   /**
    * Upload user avatar
    */
   async uploadAvatar(file: File): Promise<string> {
-    const formData = new FormData()
-    formData.append("avatar", file)
+    const formData = new FormData();
+    formData.append('avatar', file);
 
     const response = await apiAideMoi.post<{ url: string }>(
-      "/users/avatar",
+      '/users/avatar',
       formData,
       {
         headers: {
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'multipart/form-data',
         },
       }
-    )
+    );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || "Failed to upload avatar")
+      throw new Error(response.error || 'Failed to upload avatar');
     }
 
-    return response.data.url
+    return response.data.url;
   },
 
   /**
    * Delete user account
    */
   async deleteAccount(): Promise<void> {
-    const response = await apiAideMoi.delete("/users/account")
+    const response = await apiAideMoi.delete('/users/account');
 
     if (!response.success) {
-      throw new Error(response.error || "Failed to delete account")
+      throw new Error(response.error || 'Failed to delete account');
     }
   },
-}
+};
