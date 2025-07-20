@@ -1,4 +1,4 @@
-import jwt, { SignOptions, Secret } from 'jsonwebtoken';
+import { sign, verify, decode, SignOptions, Secret } from 'jsonwebtoken';
 
 interface TokenPayload {
   userId: number;
@@ -26,9 +26,9 @@ export class JwtService {
     const options: SignOptions = {
       expiresIn: this.JWT_EXPIRES_IN,
       issuer: 'aide-moi-backend',
-      audience: 'aide-moi-frontend'
+      audience: 'aide-moi-frontend',
     };
-    return jwt.sign(payload, this.JWT_SECRET, options);
+    return sign(payload, this.JWT_SECRET, options);
   }
 
   /**
@@ -38,9 +38,9 @@ export class JwtService {
     const options: SignOptions = {
       expiresIn: this.REFRESH_TOKEN_EXPIRES_IN,
       issuer: 'aide-moi-backend',
-      audience: 'aide-moi-frontend'
+      audience: 'aide-moi-frontend',
     };
-    return jwt.sign(payload, this.JWT_SECRET, options);
+    return sign(payload, this.JWT_SECRET, options);
   }
 
   /**
@@ -48,7 +48,7 @@ export class JwtService {
    */
   static verifyToken(token: string): DecodedToken | null {
     try {
-      const decoded = jwt.verify(token, this.JWT_SECRET) as DecodedToken;
+      const decoded = verify(token, this.JWT_SECRET) as DecodedToken;
       return decoded;
     } catch (error) {
       return null;
@@ -60,7 +60,7 @@ export class JwtService {
    */
   static getTokenExpiration(token: string): Date | null {
     try {
-      const decoded = jwt.decode(token) as DecodedToken;
+      const decoded = decode(token) as DecodedToken;
       return decoded.exp ? new Date(decoded.exp * 1000) : null;
     } catch (error) {
       return null;
@@ -84,7 +84,7 @@ export class JwtService {
   } {
     return {
       accessToken: this.generateAccessToken(payload),
-      refreshToken: this.generateRefreshToken(payload)
+      refreshToken: this.generateRefreshToken(payload),
     };
   }
 }

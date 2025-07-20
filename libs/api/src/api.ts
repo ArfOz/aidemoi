@@ -1,3 +1,5 @@
+import { ApiResponse, HttpMethod } from './interface';
+
 /**
  * API utilities for data fetching
  */
@@ -19,17 +21,9 @@ export class APIError extends Error {
   }
 }
 
-// Generic API response type
-export interface APIResponse<T = unknown> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  message?: string;
-}
-
 // Request options interface
 export interface RequestOptions {
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  method?: HttpMethod;
   headers?: Record<string, string>;
   body?: unknown;
   timeout?: number;
@@ -42,7 +36,7 @@ export interface RequestOptions {
 async function apiRequest<T = unknown>(
   endpoint: string,
   options: RequestOptions = {}
-): Promise<APIResponse<T>> {
+): Promise<ApiResponse<T>> {
   const {
     method = 'GET',
     headers = {},

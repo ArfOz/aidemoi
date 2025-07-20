@@ -4,5 +4,15 @@
   "sourceRoot": "libs/api/src",
   "projectType": "library",
   "tags": [],
-  "targets": {}
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/api",
+        "main": "libs/api/src/index.ts",
+        "tsConfig": "libs/api/tsconfig.lib.json"
+      }
+    }
+  }
 }

@@ -2,7 +2,7 @@ import {
   FastifyInstance,
   FastifyPluginOptions,
   FastifyRequest,
-  FastifyReply
+  FastifyReply,
 } from 'fastify';
 import { UserService } from '../services/UserService';
 import { JwtService } from '../services/JwtService';
@@ -53,8 +53,8 @@ async function authRoutes(
           properties: {
             username: { type: 'string', minLength: 3, maxLength: 255 },
             email: { type: 'string', format: 'email' },
-            password: { type: 'string', minLength: 6 }
-          }
+            password: { type: 'string', minLength: 6 },
+          },
         },
         response: {
           201: {
@@ -70,8 +70,8 @@ async function authRoutes(
                   expiresIn: { type: 'string' },
                   expiresAt: { type: 'string', format: 'date-time' },
                   refreshExpiresIn: { type: 'string' },
-                  refreshExpiresAt: { type: 'string', format: 'date-time' }
-                }
+                  refreshExpiresAt: { type: 'string', format: 'date-time' },
+                },
               },
               user: {
                 type: 'object',
@@ -81,11 +81,11 @@ async function authRoutes(
                   email: { type: 'string' },
                   roles: {
                     type: 'array',
-                    items: { type: 'string' }
-                  }
-                }
-              }
-            }
+                    items: { type: 'string' },
+                  },
+                },
+              },
+            },
           },
           400: {
             type: 'object',
@@ -95,10 +95,10 @@ async function authRoutes(
                 type: 'object',
                 properties: {
                   message: { type: 'string' },
-                  statusCode: { type: 'integer' }
-                }
-              }
-            }
+                  statusCode: { type: 'integer' },
+                },
+              },
+            },
           },
           409: {
             type: 'object',
@@ -108,13 +108,13 @@ async function authRoutes(
                 type: 'object',
                 properties: {
                   message: { type: 'string' },
-                  statusCode: { type: 'integer' }
-                }
-              }
-            }
-          }
-        }
-      } as any
+                  statusCode: { type: 'integer' },
+                },
+              },
+            },
+          },
+        },
+      } as any,
     },
     async (
       request: FastifyRequest<{ Body: RegisterBody }>,
@@ -130,8 +130,8 @@ async function authRoutes(
             success: false,
             error: {
               message: 'User with this email already exists',
-              statusCode: 409
-            }
+              statusCode: 409,
+            },
           });
         }
 
@@ -142,7 +142,7 @@ async function authRoutes(
         const tokenPayload = {
           userId: newUser.id,
           email: newUser.email,
-          username: newUser.username
+          username: newUser.username,
         };
 
         const { accessToken, refreshToken } =
@@ -174,14 +174,14 @@ async function authRoutes(
             expiresIn: accessTokenExpiresIn,
             expiresAt: accessTokenExpiresAt.toISOString(),
             refreshExpiresIn: refreshTokenExpiresIn,
-            refreshExpiresAt: refreshTokenExpiresAt.toISOString()
+            refreshExpiresAt: refreshTokenExpiresAt.toISOString(),
           },
           user: {
             id: newUser.id.toString(),
             username: newUser.username,
             email: newUser.email,
-            roles: ['user'] // Default role for new users
-          }
+            roles: ['user'], // Default role for new users
+          },
         });
       } catch (error) {
         fastify.log.error(error);
@@ -189,8 +189,8 @@ async function authRoutes(
           success: false,
           error: {
             message: 'Registration failed',
-            statusCode: 500
-          }
+            statusCode: 500,
+          },
         });
       }
     }
@@ -209,8 +209,8 @@ async function authRoutes(
           required: ['email', 'password'],
           properties: {
             email: { type: 'string', format: 'email' },
-            password: { type: 'string', minLength: 6 }
-          }
+            password: { type: 'string', minLength: 6 },
+          },
         },
         response: {
           200: {
@@ -226,8 +226,8 @@ async function authRoutes(
                   expiresIn: { type: 'string' },
                   expiresAt: { type: 'string', format: 'date-time' },
                   refreshExpiresIn: { type: 'string' },
-                  refreshExpiresAt: { type: 'string', format: 'date-time' }
-                }
+                  refreshExpiresAt: { type: 'string', format: 'date-time' },
+                },
               },
               user: {
                 type: 'object',
@@ -237,11 +237,11 @@ async function authRoutes(
                   email: { type: 'string' },
                   roles: {
                     type: 'array',
-                    items: { type: 'string' }
-                  }
-                }
-              }
-            }
+                    items: { type: 'string' },
+                  },
+                },
+              },
+            },
           },
           401: {
             type: 'object',
@@ -251,13 +251,13 @@ async function authRoutes(
                 type: 'object',
                 properties: {
                   message: { type: 'string' },
-                  statusCode: { type: 'integer' }
-                }
-              }
-            }
-          }
-        }
-      } as any
+                  statusCode: { type: 'integer' },
+                },
+              },
+            },
+          },
+        },
+      } as any,
     },
     async (
       request: FastifyRequest<{ Body: LoginBody }>,
@@ -273,8 +273,8 @@ async function authRoutes(
             success: false,
             error: {
               message: 'Invalid email or password',
-              statusCode: 401
-            }
+              statusCode: 401,
+            },
           });
         }
 
@@ -282,7 +282,7 @@ async function authRoutes(
         const tokenPayload = {
           userId: user.id,
           email: user.email,
-          username: user.username
+          username: user.username,
         };
 
         const { accessToken, refreshToken } =
@@ -314,14 +314,14 @@ async function authRoutes(
             expiresIn: accessTokenExpiresIn,
             expiresAt: accessTokenExpiresAt.toISOString(),
             refreshExpiresIn: refreshTokenExpiresIn,
-            refreshExpiresAt: refreshTokenExpiresAt.toISOString()
+            refreshExpiresAt: refreshTokenExpiresAt.toISOString(),
           },
           user: {
             id: user.id.toString(),
             username: user.username,
             email: user.email,
-            roles: ['user'] // Default role, you can expand this based on your user model
-          }
+            roles: ['user'], // Default role, you can expand this based on your user model
+          },
         });
       } catch (error) {
         fastify.log.error(error);
@@ -329,8 +329,8 @@ async function authRoutes(
           success: false,
           error: {
             message: 'Login failed',
-            statusCode: 500
-          }
+            statusCode: 500,
+          },
         });
       }
     }
@@ -348,8 +348,8 @@ async function authRoutes(
           type: 'object',
           required: ['refreshToken'],
           properties: {
-            refreshToken: { type: 'string' }
-          }
+            refreshToken: { type: 'string' },
+          },
         },
         response: {
           200: {
@@ -361,10 +361,10 @@ async function authRoutes(
                 properties: {
                   token: { type: 'string' },
                   expiresIn: { type: 'string' },
-                  expiresAt: { type: 'string', format: 'date-time' }
-                }
-              }
-            }
+                  expiresAt: { type: 'string', format: 'date-time' },
+                },
+              },
+            },
           },
           401: {
             type: 'object',
@@ -374,13 +374,13 @@ async function authRoutes(
                 type: 'object',
                 properties: {
                   message: { type: 'string' },
-                  statusCode: { type: 'integer' }
-                }
-              }
-            }
-          }
-        }
-      } as any
+                  statusCode: { type: 'integer' },
+                },
+              },
+            },
+          },
+        },
+      } as any,
     },
     async (
       request: FastifyRequest<{ Body: RefreshTokenBody }>,
@@ -395,8 +395,8 @@ async function authRoutes(
             success: false,
             error: {
               message: 'Invalid refresh token',
-              statusCode: 401
-            }
+              statusCode: 401,
+            },
           });
         }
 
@@ -404,7 +404,7 @@ async function authRoutes(
         const tokenPayload = {
           userId: decoded.userId,
           email: decoded.email,
-          username: decoded.username
+          username: decoded.username,
         };
 
         const newAccessToken = JwtService.generateAccessToken(tokenPayload);
@@ -416,8 +416,8 @@ async function authRoutes(
           tokens: {
             token: newAccessToken,
             expiresIn: expiresIn,
-            expiresAt: expiresAt.toISOString()
-          }
+            expiresAt: expiresAt.toISOString(),
+          },
         });
       } catch (error) {
         fastify.log.error(error);
@@ -425,8 +425,8 @@ async function authRoutes(
           success: false,
           error: {
             message: 'Token refresh failed',
-            statusCode: 500
-          }
+            statusCode: 500,
+          },
         });
       }
     }
@@ -444,9 +444,9 @@ async function authRoutes(
         headers: {
           type: 'object',
           properties: {
-            authorization: { type: 'string' }
+            authorization: { type: 'string' },
           },
-          required: ['authorization']
+          required: ['authorization'],
         },
         response: {
           200: {
@@ -460,10 +460,10 @@ async function authRoutes(
                   username: { type: 'string' },
                   email: { type: 'string' },
                   createdAt: { type: 'string' },
-                  updatedAt: { type: 'string' }
-                }
-              }
-            }
+                  updatedAt: { type: 'string' },
+                },
+              },
+            },
           },
           404: {
             type: 'object',
@@ -473,13 +473,13 @@ async function authRoutes(
                 type: 'object',
                 properties: {
                   message: { type: 'string' },
-                  statusCode: { type: 'integer' }
-                }
-              }
-            }
-          }
-        }
-      } as any
+                  statusCode: { type: 'integer' },
+                },
+              },
+            },
+          },
+        },
+      } as any,
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
@@ -492,14 +492,14 @@ async function authRoutes(
             success: false,
             error: {
               message: 'User not found',
-              statusCode: 404
-            }
+              statusCode: 404,
+            },
           });
         }
 
         return reply.status(200).send({
           success: true,
-          user
+          user,
         });
       } catch (error) {
         fastify.log.error(error);
@@ -507,8 +507,8 @@ async function authRoutes(
           success: false,
           error: {
             message: 'Failed to get user profile',
-            statusCode: 500
-          }
+            statusCode: 500,
+          },
         });
       }
     }
@@ -526,27 +526,27 @@ async function authRoutes(
         headers: {
           type: 'object',
           properties: {
-            authorization: { type: 'string' }
+            authorization: { type: 'string' },
           },
-          required: ['authorization']
+          required: ['authorization'],
         },
         response: {
           200: {
             type: 'object',
             properties: {
               success: { type: 'boolean' },
-              message: { type: 'string' }
-            }
-          }
-        }
-      } as any
+              message: { type: 'string' },
+            },
+          },
+        },
+      } as any,
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       // In a real application, you would add the token to a blacklist
       // For now, we'll just return a success message
       return reply.status(200).send({
         success: true,
-        message: 'Logged out successfully'
+        message: 'Logged out successfully',
       });
     }
   );

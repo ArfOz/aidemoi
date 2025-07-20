@@ -7,7 +7,7 @@ const start = async (): Promise<void> => {
 
   try {
     const host = process.env.HOST || '0.0.0.0';
-    const port = parseInt(process.env.PORT || '3000');
+    const port = parseInt(process.env.BACKEND_PORT || '3000');
 
     await app.listen({ port, host });
     app.log.info(`Server listening on http://${host}:${port}`);

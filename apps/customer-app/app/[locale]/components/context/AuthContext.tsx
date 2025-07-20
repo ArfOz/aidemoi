@@ -1,58 +1,18 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { apiAideMoi, APIResponse } from '@api';
-
-export interface User {
-  id: string;
-  email: string;
-  username: string;
-  role: 'customer' | 'repairman' | 'admin';
-  phone?: string;
-  avatar?: string;
-  isVerified: boolean;
-  // Customer specific fields
-  address?: string;
-  // Repairman specific fields
-  specialties?: string[];
-  hourlyRate?: number;
-  availability?: {
-    days: string[];
-    hours: { start: string; end: string };
-  };
-  rating?: number;
-  completedJobs?: number;
-  createdAt: string;
-  updatedAt?: string;
-}
-
-interface Tokens {
-  accessToken: string;
-  refreshToken: string;
-  expiresAt: string;
-}
-
-interface AuthResponse {
-  user: User;
-  tokens: Tokens;
-}
-
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
-
-export interface RegisterData {
-  email: string;
-  password: string;
-  name: string;
-  role: 'customer' | 'repairman';
-  phone?: string;
-  specialties?: string[];
-}
+import { apiAideMoi, ApiResponse } from '@api';
+import type {
+  AppUser,
+  Tokens,
+  AppAuthResponse,
+  LoginCredentials,
+  RegisterData,
+} from '@api';
+import { LoginResponse } from '@api';
 
 interface AuthContextType {
-  user: User | null;
+  user: AppUser | null;
   tokens: Tokens | null;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -60,7 +20,7 @@ interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
-  updateUser: (data: Partial<User>) => void;
+  updateUser: (data: Partial<AppUser>) => void;
   clearError: () => void;
 }
 
@@ -77,7 +37,7 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
   const [tokens, setTokens] = useState<Tokens | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -114,16 +74,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     try {
       // API call to backend server using api library
-      const response: APIResponse = await apiAideMoi.post(
+      const response = await apiAideMoi.post<LoginResponse>(
         '/auth/login',
         credentials
       );
 
-      if (!response.data.tokens || !response.data.user) {
+      if (
+        !response.data ||
+        !response.data.success ||
+        !response.data.user ||
+        !response.data.tokens
+      ) {
         throw new Error('Login failed');
       }
 
-      const { user: userData, tokens: tokenData } = response;
+      const { user: userData, tokens: tokenData } = response.data;
 
       setUser(userData);
       setTokens(tokenData);
@@ -144,7 +109,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     try {
       // API call to backend server using api library
-      const response = await apiAideMoi.post<AuthResponse>(
+      const response = await apiAideMoi.post<AppAuthResponse>(
         '/auth/register',
         data
       );
@@ -179,7 +144,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.removeItem('auth_tokens');
   };
 
-  const updateUser = (data: Partial<User>) => {
+  const updateUser = (data: Partial<AppUser>) => {
     if (user) {
       const updatedUser = { ...user, ...data };
       setUser(updatedUser);

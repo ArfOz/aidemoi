@@ -3,7 +3,7 @@
  */
 
 import { API_CONFIG } from './api';
-import { User } from './users';
+import { User } from './interface';
 
 export interface AuthTokens {
   accessToken: string;

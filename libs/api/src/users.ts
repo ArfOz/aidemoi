@@ -3,6 +3,7 @@
  */
 
 import { apiAideMoi } from './api';
+import { AuthResponse, User } from './interface';
 import {
   RegisterUserData,
   LoginUserData,
@@ -10,30 +11,18 @@ import {
 } from './validation';
 
 // User data types
-export interface User {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  phoneNumber?: string;
-  postalCode: string;
-  avatar?: string;
-  isEmailVerified: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface AuthResponse {
-  user: User;
-  token: string;
-  refreshToken: string;
-}
-
-export interface AuthSession {
-  user: User;
-  token: string;
-  expiresAt: string;
-}
+// export interface User {
+//   id: string;
+//   email: string;
+//   firstName: string;
+//   lastName: string;
+//   phoneNumber?: string;
+//   postalCode: string;
+//   avatar?: string;
+//   isEmailVerified: boolean;
+//   createdAt: string;
+//   updatedAt: string;
+// }
 
 // User API functions
 export const userApi = {

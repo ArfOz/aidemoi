@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import { hash, compare, genSalt } from 'bcrypt';
 
 export class PasswordService {
   private static readonly SALT_ROUNDS = 12;
@@ -10,8 +10,8 @@ export class PasswordService {
    */
   static async hashPassword(password: string): Promise<string> {
     try {
-      const salt = await bcrypt.genSalt(this.SALT_ROUNDS);
-      const hashedPassword = await bcrypt.hash(password, salt);
+      const salt = await genSalt(this.SALT_ROUNDS);
+      const hashedPassword = await hash(password, salt);
       return hashedPassword;
     } catch (error) {
       throw new Error('Failed to hash password');
@@ -29,7 +29,7 @@ export class PasswordService {
     hashedPassword: string
   ): Promise<boolean> {
     try {
-      return await bcrypt.compare(password, hashedPassword);
+      return await compare(password, hashedPassword);
     } catch (error) {
       throw new Error('Failed to compare password');
     }
@@ -51,14 +51,14 @@ export class PasswordService {
     if (password.length < 8) {
       return {
         isValid: false,
-        message: 'Password must be at least 8 characters long'
+        message: 'Password must be at least 8 characters long',
       };
     }
 
     if (password.length > 128) {
       return {
         isValid: false,
-        message: 'Password must be less than 128 characters long'
+        message: 'Password must be less than 128 characters long',
       };
     }
 
@@ -66,7 +66,7 @@ export class PasswordService {
     if (!/[A-Z]/.test(password)) {
       return {
         isValid: false,
-        message: 'Password must contain at least one uppercase letter'
+        message: 'Password must contain at least one uppercase letter',
       };
     }
 
@@ -74,7 +74,7 @@ export class PasswordService {
     if (!/[a-z]/.test(password)) {
       return {
         isValid: false,
-        message: 'Password must contain at least one lowercase letter'
+        message: 'Password must contain at least one lowercase letter',
       };
     }
 
@@ -82,15 +82,15 @@ export class PasswordService {
     if (!/\d/.test(password)) {
       return {
         isValid: false,
-        message: 'Password must contain at least one number'
+        message: 'Password must contain at least one number',
       };
     }
 
     // Check for at least one special character
-    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
       return {
         isValid: false,
-        message: 'Password must contain at least one special character'
+        message: 'Password must contain at least one special character',
       };
     }
 

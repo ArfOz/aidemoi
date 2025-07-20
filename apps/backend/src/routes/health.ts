@@ -2,7 +2,7 @@ import {
   FastifyInstance,
   FastifyPluginOptions,
   FastifyRequest,
-  FastifyReply
+  FastifyReply,
 } from 'fastify';
 
 async function healthRoutes(
@@ -14,7 +14,6 @@ async function healthRoutes(
     '/',
     {
       schema: {
-        tags: ['health'],
         summary: 'Health check',
         description: 'Check if the service is running',
         response: {
@@ -24,18 +23,18 @@ async function healthRoutes(
               status: { type: 'string' },
               timestamp: { type: 'string' },
               uptime: { type: 'number' },
-              environment: { type: 'string' }
-            }
-          }
-        }
-      }
+              environment: { type: 'string' },
+            },
+          },
+        },
+      },
     },
     async (_request: FastifyRequest, _reply: FastifyReply) => {
       return {
         status: 'ok',
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
-        environment: process.env.NODE_ENV || 'development'
+        environment: process.env.NODE_ENV || 'development',
       };
     }
   );
@@ -45,7 +44,6 @@ async function healthRoutes(
     '/detailed',
     {
       schema: {
-        tags: ['health'],
         summary: 'Detailed health check',
         description: 'Get detailed health information',
         response: {
@@ -58,11 +56,11 @@ async function healthRoutes(
               environment: { type: 'string' },
               version: { type: 'string' },
               memory: { type: 'object' },
-              cpu: { type: 'object' }
-            }
-          }
-        }
-      }
+              cpu: { type: 'object' },
+            },
+          },
+        },
+      },
     },
     async (_request: FastifyRequest, _reply: FastifyReply) => {
       const memoryUsage = process.memoryUsage();
@@ -78,12 +76,12 @@ async function healthRoutes(
           rss: `${Math.round(memoryUsage.rss / 1024 / 1024)} MB`,
           heapTotal: `${Math.round(memoryUsage.heapTotal / 1024 / 1024)} MB`,
           heapUsed: `${Math.round(memoryUsage.heapUsed / 1024 / 1024)} MB`,
-          external: `${Math.round(memoryUsage.external / 1024 / 1024)} MB`
+          external: `${Math.round(memoryUsage.external / 1024 / 1024)} MB`,
         },
         cpu: {
           user: cpuUsage.user,
-          system: cpuUsage.system
-        }
+          system: cpuUsage.system,
+        },
       };
     }
   );

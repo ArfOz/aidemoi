@@ -3,6 +3,7 @@
  */
 
 import { apiAideMoi } from './api';
+import { PaginationResponse } from './interface';
 import {
   CreateServiceData,
   UpdateServiceData,
@@ -12,7 +13,7 @@ import {
 // Type exports for use in components
 export type { CreateServiceData, UpdateServiceData, ServiceQueryData };
 
-// Service data types
+// Service data types - move these to interface.ts
 export interface Service {
   id: string;
   title: string;
@@ -29,13 +30,9 @@ export interface Service {
   isActive: boolean;
 }
 
-export interface PaginatedServices {
+export type PaginatedServices = PaginationResponse<Service> & {
   services: Service[];
-  totalCount: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+};
 
 export interface ServiceCategory {
   id: string;
