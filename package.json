@@ -7,11 +7,15 @@
     "clean": "nx reset && rimraf dist",
     "dev:customer": "nx dev @aidemoi/customer-app",
     "dev:company": "nx dev @aidemoi/company-app",
+    "dev:backend": "nx serve backend",
+    "dev:fullstack": "nx run-many --targets=serve,dev --projects=backend,@aidemoi/customer-app --parallel",
     "dev:all": "nx run-many --target=dev --projects=@aidemoi/customer-app,@aidemoi/company-app --parallel",
     "build:all": "nx run-many --target=build --projects=@aidemoi/customer-app,@aidemoi/company-app",
     "test": "nx test",
     "lint": "nx lint",
-    "e2e": "nx e2e"
+    "e2e": "nx e2e",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "private": true,
   "dependencies": {
@@ -100,3 +104,4 @@
     "libs/*"
   ]
 }
+

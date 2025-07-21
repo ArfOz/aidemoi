@@ -15,33 +15,33 @@ class CreateUserTable1704290400000 {
             type: 'int',
             isPrimary: true,
             isGenerated: true,
-            generationStrategy: 'increment'
+            generationStrategy: 'increment',
           },
           {
             name: 'name',
             type: 'varchar',
             length: '255',
-            isNullable: false
+            isNullable: false,
           },
           {
             name: 'email',
             type: 'varchar',
             length: '255',
             isNullable: false,
-            isUnique: true
+            isUnique: true,
           },
           {
             name: 'createdAt',
             type: 'timestamp',
-            default: 'CURRENT_TIMESTAMP'
+            default: 'CURRENT_TIMESTAMP',
           },
           {
             name: 'updatedAt',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP',
-            onUpdate: 'CURRENT_TIMESTAMP'
-          }
-        ]
+            onUpdate: 'CURRENT_TIMESTAMP',
+          },
+        ],
       })
     );
   }

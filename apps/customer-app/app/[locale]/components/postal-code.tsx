@@ -1,22 +1,22 @@
-import React, { useState } from "react"
-import postalCodes from "./postal-code/postal_code.json" // Adjust path if needed
+import React, { useState } from 'react';
+import postalCodes from './postal-code/postal_code.json'; // Adjust path if needed
 
 type PostalCodeEntry = {
-  name: string
-  canton: string
-  latitude: string
-  longitude: string
-}
+  name: string;
+  canton: string;
+  latitude: string;
+  longitude: string;
+};
 
 type Suggestion = {
-  code: string
-  name: string
-  label: string
-}
+  code: string;
+  name: string;
+  label: string;
+};
 
 export const PostalCodes: React.FC = () => {
-  const [addressInput, setAddressInput] = useState("")
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([])
+  const [addressInput, setAddressInput] = useState('');
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
 
   // Flatten postal codes for search
   const postalList: Suggestion[] = Object.entries(postalCodes).flatMap(
@@ -26,28 +26,28 @@ export const PostalCodes: React.FC = () => {
         name: entry.name,
         label: `${entry.name} (${code})`,
       }))
-  )
+  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setAddressInput(value)
+    const value = e.target.value;
+    setAddressInput(value);
     if (value.length > 1) {
       const filtered = postalList.filter(
         (item) =>
           item.code.startsWith(value) ||
           item.name.toLowerCase().includes(value.toLowerCase())
-      )
-      setSuggestions(filtered.slice(0, 10))
+      );
+      setSuggestions(filtered.slice(0, 10));
     } else {
-      setSuggestions([])
+      setSuggestions([]);
     }
-  }
+  };
 
   const handleSuggestionClick = (suggestion: Suggestion) => {
-    setAddressInput(suggestion.label)
-    setSuggestions([])
+    setAddressInput(suggestion.label);
+    setSuggestions([]);
     // Optionally, handle selection (e.g., update parent state)
-  }
+  };
 
   return (
     <div className="relative">
@@ -73,5 +73,5 @@ export const PostalCodes: React.FC = () => {
         </ul>
       )}
     </div>
-  )
-}
+  );
+};

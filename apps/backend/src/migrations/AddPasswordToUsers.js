@@ -13,7 +13,7 @@ class AddPasswordToUsers1720000000001 {
         name: 'password',
         type: 'varchar',
         length: '255',
-        isNullable: true
+        isNullable: true,
       })
     );
   }

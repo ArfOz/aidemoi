@@ -2,7 +2,7 @@ import {
   FastifyInstance,
   FastifyPluginOptions,
   FastifyRequest,
-  FastifyReply
+  FastifyReply,
 } from 'fastify';
 import { CompanyService } from '../services/CompanyService';
 
@@ -55,12 +55,12 @@ async function companyRoutes(
                 postalCode: { type: 'string' },
                 status: { type: 'string' },
                 createdAt: { type: 'string', format: 'date-time' },
-                updatedAt: { type: 'string', format: 'date-time' }
-              }
-            }
-          }
-        }
-      } as any
+                updatedAt: { type: 'string', format: 'date-time' },
+              },
+            },
+          },
+        },
+      } as any,
     },
     async (_request: FastifyRequest, _reply: FastifyReply) => {
       return await companyService.findAll();
@@ -78,11 +78,11 @@ async function companyRoutes(
         params: {
           type: 'object',
           properties: {
-            id: { type: 'integer' }
+            id: { type: 'integer' },
           },
-          required: ['id']
-        }
-      } as any
+          required: ['id'],
+        },
+      } as any,
     },
     async (
       request: FastifyRequest<{ Params: CompanyParams }>,
@@ -94,8 +94,8 @@ async function companyRoutes(
         return reply.status(400).send({
           error: {
             message: 'Invalid company ID',
-            statusCode: 400
-          }
+            statusCode: 400,
+          },
         });
       }
 
@@ -105,8 +105,8 @@ async function companyRoutes(
         return reply.status(404).send({
           error: {
             message: 'Company not found',
-            statusCode: 404
-          }
+            statusCode: 404,
+          },
         });
       }
 
@@ -136,10 +136,10 @@ async function companyRoutes(
             country: { type: 'string' },
             postalCode: { type: 'string' },
             status: { type: 'string' },
-            employeeCount: { type: 'integer', minimum: 0 }
-          }
-        }
-      } as any
+            employeeCount: { type: 'integer', minimum: 0 },
+          },
+        },
+      } as any,
     },
     async (
       request: FastifyRequest<{ Body: CreateCompanyBody }>,
@@ -152,8 +152,8 @@ async function companyRoutes(
         return reply.status(400).send({
           error: {
             message: error.message || 'Failed to create company',
-            statusCode: 400
-          }
+            statusCode: 400,
+          },
         });
       }
     }
@@ -170,9 +170,9 @@ async function companyRoutes(
         params: {
           type: 'object',
           properties: {
-            id: { type: 'integer' }
+            id: { type: 'integer' },
           },
-          required: ['id']
+          required: ['id'],
         },
         body: {
           type: 'object',
@@ -187,10 +187,10 @@ async function companyRoutes(
             country: { type: 'string' },
             postalCode: { type: 'string' },
             status: { type: 'string' },
-            employeeCount: { type: 'integer', minimum: 0 }
-          }
-        }
-      } as any
+            employeeCount: { type: 'integer', minimum: 0 },
+          },
+        },
+      } as any,
     },
     async (
       request: FastifyRequest<{
@@ -205,8 +205,8 @@ async function companyRoutes(
         return reply.status(400).send({
           error: {
             message: 'Invalid company ID',
-            statusCode: 400
-          }
+            statusCode: 400,
+          },
         });
       }
 
@@ -220,8 +220,8 @@ async function companyRoutes(
             return reply.status(400).send({
               error: {
                 message: 'Company with this email already exists',
-                statusCode: 400
-              }
+                statusCode: 400,
+              },
             });
           }
         }
@@ -232,8 +232,8 @@ async function companyRoutes(
           return reply.status(404).send({
             error: {
               message: 'Company not found',
-              statusCode: 404
-            }
+              statusCode: 404,
+            },
           });
         }
 
@@ -242,8 +242,8 @@ async function companyRoutes(
         return reply.status(400).send({
           error: {
             message: error.message || 'Failed to update company',
-            statusCode: 400
-          }
+            statusCode: 400,
+          },
         });
       }
     }
@@ -260,14 +260,14 @@ async function companyRoutes(
         params: {
           type: 'object',
           properties: {
-            id: { type: 'integer' }
+            id: { type: 'integer' },
           },
-          required: ['id']
+          required: ['id'],
         },
         response: {
           204: {
             type: 'null',
-            description: 'Company deleted successfully'
+            description: 'Company deleted successfully',
           },
           404: {
             type: 'object',
@@ -276,13 +276,13 @@ async function companyRoutes(
                 type: 'object',
                 properties: {
                   message: { type: 'string' },
-                  statusCode: { type: 'integer' }
-                }
-              }
-            }
-          }
-        }
-      } as any
+                  statusCode: { type: 'integer' },
+                },
+              },
+            },
+          },
+        },
+      } as any,
     },
     async (
       request: FastifyRequest<{ Params: CompanyParams }>,
@@ -294,8 +294,8 @@ async function companyRoutes(
         return reply.status(400).send({
           error: {
             message: 'Invalid company ID',
-            statusCode: 400
-          }
+            statusCode: 400,
+          },
         });
       }
 
@@ -305,8 +305,8 @@ async function companyRoutes(
         return reply.status(404).send({
           error: {
             message: 'Company not found',
-            statusCode: 404
-          }
+            statusCode: 404,
+          },
         });
       }
 

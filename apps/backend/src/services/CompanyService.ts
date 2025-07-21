@@ -14,13 +14,13 @@ export class CompanyService {
 
   async findById(id: number): Promise<Company | null> {
     return await this.companyRepository.findOne({
-      where: { id }
+      where: { id },
     });
   }
 
   async findByEmail(email: string): Promise<Company | null> {
     return await this.companyRepository.findOne({
-      where: { email }
+      where: { email },
     });
   }
 
@@ -44,13 +44,13 @@ export class CompanyService {
 
   async findCompanyUsers(id: number): Promise<Company | null> {
     return await this.companyRepository.findOne({
-      where: { id }
+      where: { id },
     });
   }
 
   async getCompanyStats(id: number): Promise<any> {
     const company = await this.companyRepository.findOne({
-      where: { id }
+      where: { id },
     });
     if (!company) return null;
 
@@ -58,7 +58,7 @@ export class CompanyService {
       id: company.id,
       name: company.name,
       status: company.status,
-      createdAt: company.createdAt
+      createdAt: company.createdAt,
     };
   }
 }

@@ -10,7 +10,7 @@ async function corsPlugin(
       process.env.NODE_ENV === 'production'
         ? ['https://yourdomain.com'] // Add your production domains
         : true, // Allow all origins in development
-    credentials: true
+    credentials: true,
   });
 }
 

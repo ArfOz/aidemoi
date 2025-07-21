@@ -10,7 +10,7 @@ async function swaggerPlugin(
       info: {
         title: 'Aide Moi Backend API',
         description: 'API documentation for Aide Moi Backend',
-        version: '1.0.0'
+        version: '1.0.0',
       },
       host: 'localhost:3300',
       schemes: ['http'],
@@ -19,16 +19,16 @@ async function swaggerPlugin(
       tags: [
         { name: 'health', description: 'Health check endpoints' },
         { name: 'users', description: 'User related endpoints' },
-        { name: 'companies', description: 'Company related endpoints' }
-      ]
-    }
+        { name: 'companies', description: 'Company related endpoints' },
+      ],
+    },
   });
 
   await fastify.register(require('@fastify/swagger-ui'), {
     routePrefix: '/docs',
     uiConfig: {
       docExpansion: 'full',
-      deepLinking: false
+      deepLinking: false,
     },
     uiHooks: {
       onRequest: function (request: any, reply: any, next: any) {
@@ -36,10 +36,10 @@ async function swaggerPlugin(
       },
       preHandler: function (request: any, reply: any, next: any) {
         next();
-      }
+      },
     },
     staticCSP: true,
-    transformStaticCSP: (header: string) => header
+    transformStaticCSP: (header: string) => header,
   });
 }
 

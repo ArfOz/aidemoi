@@ -16,85 +16,85 @@ class CreateCompanyTable1720000000000 {
             type: 'int',
             isPrimary: true,
             isGenerated: true,
-            generationStrategy: 'increment'
+            generationStrategy: 'increment',
           },
           {
             name: 'name',
             type: 'varchar',
             length: '255',
-            isNullable: false
+            isNullable: false,
           },
           {
             name: 'email',
             type: 'varchar',
             length: '255',
             isNullable: false,
-            isUnique: true
+            isUnique: true,
           },
           {
             name: 'description',
             type: 'text',
-            isNullable: true
+            isNullable: true,
           },
           {
             name: 'website',
             type: 'varchar',
             length: '255',
-            isNullable: true
+            isNullable: true,
           },
           {
             name: 'phone',
             type: 'varchar',
             length: '255',
-            isNullable: true
+            isNullable: true,
           },
           {
             name: 'address',
             type: 'varchar',
             length: '255',
-            isNullable: true
+            isNullable: true,
           },
           {
             name: 'city',
             type: 'varchar',
             length: '100',
-            isNullable: true
+            isNullable: true,
           },
           {
             name: 'country',
             type: 'varchar',
             length: '100',
-            isNullable: true
+            isNullable: true,
           },
           {
             name: 'postalCode',
             type: 'varchar',
             length: '20',
-            isNullable: true
+            isNullable: true,
           },
           {
             name: 'status',
             type: 'varchar',
             length: '50',
-            default: "'active'"
+            default: "'active'",
           },
           {
             name: 'employeeCount',
             type: 'int',
-            default: 0
+            default: 0,
           },
           {
             name: 'createdAt',
             type: 'timestamp',
-            default: 'CURRENT_TIMESTAMP'
+            default: 'CURRENT_TIMESTAMP',
           },
           {
             name: 'updatedAt',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP',
-            onUpdate: 'CURRENT_TIMESTAMP'
-          }
-        ]
+            onUpdate: 'CURRENT_TIMESTAMP',
+          },
+        ],
       })
     );
   }

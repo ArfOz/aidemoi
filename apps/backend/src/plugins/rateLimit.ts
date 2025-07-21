@@ -13,10 +13,10 @@ async function rateLimitPlugin(
         error: {
           message: 'Rate limit exceeded, retry in 1 minute',
           statusCode: 429,
-          retryAfter: Math.round(context.ttl / 1000)
-        }
+          retryAfter: Math.round(context.ttl / 1000),
+        },
       };
-    }
+    },
   });
 }
 

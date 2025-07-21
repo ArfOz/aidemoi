@@ -2,7 +2,7 @@ import {
   FastifyInstance,
   FastifyPluginOptions,
   FastifyRequest,
-  FastifyReply
+  FastifyReply,
 } from 'fastify';
 import userRoutes from './users';
 import companyRoutes from './company';
@@ -31,17 +31,17 @@ async function apiRoutes(
             properties: {
               message: { type: 'string' },
               version: { type: 'string' },
-              timestamp: { type: 'string' }
-            }
-          }
-        }
-      }
+              timestamp: { type: 'string' },
+            },
+          },
+        },
+      },
     },
     async (_request: FastifyRequest, _reply: FastifyReply) => {
       return {
         message: 'Welcome to Aide Moi Backend API',
         version: '1.0.0',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   );

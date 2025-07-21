@@ -24,27 +24,27 @@ export class UserService {
   async findAll(): Promise<User[]> {
     return await this.userRepository.find({
       select: ['id', 'username', 'email', 'createdAt', 'updatedAt'], // Exclude password
-      order: { id: 'ASC' }
+      order: { id: 'ASC' },
     });
   }
 
   async findById(id: number): Promise<User | null> {
     return await this.userRepository.findOne({
       where: { id },
-      select: ['id', 'username', 'email', 'createdAt', 'updatedAt'] // Exclude password
+      select: ['id', 'username', 'email', 'createdAt', 'updatedAt'], // Exclude password
     });
   }
 
   async findByEmail(email: string): Promise<User | null> {
     return await this.userRepository.findOne({
       where: { email },
-      select: ['id', 'username', 'email', 'createdAt', 'updatedAt'] // Exclude password
+      select: ['id', 'username', 'email', 'createdAt', 'updatedAt'], // Exclude password
     });
   }
 
   async findByEmailWithPassword(email: string): Promise<User | null> {
     return await this.userRepository.findOne({
-      where: { email }
+      where: { email },
       // Include password for authentication
     });
   }
@@ -65,7 +65,7 @@ export class UserService {
 
     const user = this.userRepository.create({
       ...userData,
-      password: hashedPassword
+      password: hashedPassword,
     });
 
     const savedUser = await this.userRepository.save(user);
