@@ -219,31 +219,26 @@ async function authRoutes(
             properties: {
               success: { type: 'boolean' },
               message: { type: 'string' },
-              data: {
+              tokens: {
                 type: 'object',
                 properties: {
-                  tokens: {
-                    type: 'object',
-                    properties: {
-                      token: { type: 'string' },
-                      refreshToken: { type: 'string' },
-                      expiresIn: { type: 'string' },
-                      expiresAt: { type: 'string', format: 'date-time' },
-                      refreshExpiresIn: { type: 'string' },
-                      refreshExpiresAt: { type: 'string', format: 'date-time' },
-                    },
-                  },
-                  user: {
-                    type: 'object',
-                    properties: {
-                      id: { type: 'string' },
-                      username: { type: 'string' },
-                      email: { type: 'string' },
-                      roles: {
-                        type: 'array',
-                        items: { type: 'string' },
-                      },
-                    },
+                  token: { type: 'string' },
+                  refreshToken: { type: 'string' },
+                  expiresIn: { type: 'string' },
+                  expiresAt: { type: 'string', format: 'date-time' },
+                  refreshExpiresIn: { type: 'string' },
+                  refreshExpiresAt: { type: 'string', format: 'date-time' },
+                },
+              },
+              user: {
+                type: 'object',
+                properties: {
+                  id: { type: 'string' },
+                  username: { type: 'string' },
+                  email: { type: 'string' },
+                  roles: {
+                    type: 'array',
+                    items: { type: 'string' },
                   },
                 },
               },
@@ -312,24 +307,22 @@ async function authRoutes(
         // Log successful login
         fastify.log.info(`User logged in: ${user.username}`);
 
-        const successResponse: LoginResponse = {
+        const successResponse = {
           success: true,
           message: 'Login successful',
-          data: {
-            tokens: {
-              token: accessToken,
-              refreshToken: refreshToken,
-              expiresIn: process.env.JWT_EXPIRES_IN || '24h',
-              expiresAt: accessTokenExpiresAt.toISOString(),
-              refreshExpiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN || '7d',
-              refreshExpiresAt: refreshTokenExpiresAt.toISOString(),
-            },
-            user: {
-              id: user.id.toString(),
-              username: user.username,
-              email: user.email,
-              roles: ['user'],
-            },
+          tokens: {
+            token: accessToken,
+            refreshToken: refreshToken,
+            expiresIn: process.env.JWT_EXPIRES_IN || '24h',
+            expiresAt: accessTokenExpiresAt.toISOString(),
+            refreshExpiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN || '7d',
+            refreshExpiresAt: refreshTokenExpiresAt.toISOString(),
+          },
+          user: {
+            id: user.id.toString(),
+            username: user.username,
+            email: user.email,
+            roles: ['user'],
           },
         };
 

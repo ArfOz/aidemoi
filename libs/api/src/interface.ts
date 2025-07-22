@@ -1,12 +1,4 @@
 // Base API Response interface
-export interface ApiResponse<T = any> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  message?: string;
-  // timestamp: string;
-  // statusCode: number;
-}
 
 // Base API Request interface
 export interface ApiRequest {
@@ -70,7 +62,7 @@ export interface AuthResponse {
 export interface User {
   id: string;
   email: string;
-  name: string;
+  username: string;
   // createdAt: string;
   // updatedAt: string;
 }
@@ -161,33 +153,33 @@ export interface AuthSession {
   expiresAt: string;
 }
 
-export interface LoginSuccessResponse {
-  success: true;
+export interface ApiError {
   message: string;
-  data: {
-    tokens: {
-      token: string;
-      refreshToken: string;
-      expiresIn: string;
-      expiresAt: string; // ISO string
-      refreshExpiresIn: string;
-      refreshExpiresAt: string; // ISO string
-    };
-    user: {
-      id: string;
-      username: string;
-      email: string;
-      roles?: string[];
-    };
+  statusCode: number;
+}
+
+export interface ApiResponse<T = any> {
+  success: boolean;
+  data?: T;
+  error?: ApiError;
+  message?: string;
+}
+
+export interface LoginSuccessResponse {
+  tokens: {
+    token: string;
+    refreshToken: string;
+    expiresIn: string;
+    expiresAt: string; // ISO string
+    refreshExpiresIn: string;
+    refreshExpiresAt: string; // ISO string
+  };
+  user: {
+    id: string;
+    username: string;
+    email: string;
+    roles?: string[];
   };
 }
 
-export interface LoginErrorResponse {
-  success: false;
-  error: {
-    message: string;
-    statusCode: number;
-  };
-}
-
-export type LoginResponse = LoginSuccessResponse | LoginErrorResponse;
+export type LoginResponse = ApiResponse<LoginSuccessResponse>;

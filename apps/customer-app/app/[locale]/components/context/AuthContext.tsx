@@ -11,7 +11,7 @@ import type {
   LoginSuccessResponse,
   User,
 } from '@api';
-import { LoginResponse } from '@api';
+import { LoginResponse, ApiResponse } from '@api';
 
 interface AuthContextType {
   user: AppUser | null;
@@ -76,7 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     try {
       // API call to backend server using api library
-      const response = await apiAideMoi.post<LoginResponse>(
+      const response = await apiAideMoi.post<LoginSuccessResponse>(
         '/auth/login',
         credentials
       );
@@ -91,7 +91,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         throw new Error(response.message || 'Login failed');
       }
 
-      const { user, tokens } = response.data;
+      // The LoginResponse has tokens and user directly under data
+      if (!response.data) {
+        throw new Error('No data in response');
+      }
+
+
+      const { user, tokens } = response.data
+  
 
       setUser(user);
       setTokens(tokens);
@@ -174,4 +181,5 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
 };
