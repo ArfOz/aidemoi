@@ -1,3 +1,4 @@
+import { LoginErrorResponse, LoginResponse } from '@api';
 import {
   FastifyInstance,
   FastifyPluginOptions,
@@ -218,26 +219,31 @@ async function authRoutes(
             properties: {
               success: { type: 'boolean' },
               message: { type: 'string' },
-              tokens: {
+              data: {
                 type: 'object',
                 properties: {
-                  token: { type: 'string' },
-                  refreshToken: { type: 'string' },
-                  expiresIn: { type: 'string' },
-                  expiresAt: { type: 'string', format: 'date-time' },
-                  refreshExpiresIn: { type: 'string' },
-                  refreshExpiresAt: { type: 'string', format: 'date-time' },
-                },
-              },
-              user: {
-                type: 'object',
-                properties: {
-                  id: { type: 'string' },
-                  username: { type: 'string' },
-                  email: { type: 'string' },
-                  roles: {
-                    type: 'array',
-                    items: { type: 'string' },
+                  tokens: {
+                    type: 'object',
+                    properties: {
+                      token: { type: 'string' },
+                      refreshToken: { type: 'string' },
+                      expiresIn: { type: 'string' },
+                      expiresAt: { type: 'string', format: 'date-time' },
+                      refreshExpiresIn: { type: 'string' },
+                      refreshExpiresAt: { type: 'string', format: 'date-time' },
+                    },
+                  },
+                  user: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string' },
+                      username: { type: 'string' },
+                      email: { type: 'string' },
+                      roles: {
+                        type: 'array',
+                        items: { type: 'string' },
+                      },
+                    },
                   },
                 },
               },
@@ -262,20 +268,21 @@ async function authRoutes(
     async (
       request: FastifyRequest<{ Body: LoginBody }>,
       reply: FastifyReply
-    ) => {
+    ): Promise<LoginResponse> => {
       const { email, password } = request.body;
 
       try {
         // Authenticate user
         const user = await userService.authenticateUser(email, password);
         if (!user) {
-          return reply.status(401).send({
+          const errorResponse: LoginErrorResponse = {
             success: false,
             error: {
               message: 'Invalid email or password',
               statusCode: 401,
             },
-          });
+          };
+          return reply.status(401).send(errorResponse);
         }
 
         // Generate JWT tokens
@@ -305,33 +312,40 @@ async function authRoutes(
         // Log successful login
         fastify.log.info(`User logged in: ${user.username}`);
 
-        return reply.status(200).send({
+        const successResponse: LoginResponse = {
           success: true,
           message: 'Login successful',
-          tokens: {
-            token: accessToken,
-            refreshToken: refreshToken,
-            expiresIn: accessTokenExpiresIn,
-            expiresAt: accessTokenExpiresAt.toISOString(),
-            refreshExpiresIn: refreshTokenExpiresIn,
-            refreshExpiresAt: refreshTokenExpiresAt.toISOString(),
+          data: {
+            tokens: {
+              token: accessToken,
+              refreshToken: refreshToken,
+              expiresIn: process.env.JWT_EXPIRES_IN || '24h',
+              expiresAt: accessTokenExpiresAt.toISOString(),
+              refreshExpiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN || '7d',
+              refreshExpiresAt: refreshTokenExpiresAt.toISOString(),
+            },
+            user: {
+              id: user.id.toString(),
+              username: user.username,
+              email: user.email,
+              roles: ['user'],
+            },
           },
-          user: {
-            id: user.id.toString(),
-            username: user.username,
-            email: user.email,
-            roles: ['user'], // Default role, you can expand this based on your user model
-          },
-        });
+        };
+
+        console.log('Login response:', successResponse);
+
+        return reply.status(200).send(successResponse);
       } catch (error) {
         fastify.log.error(error);
-        return reply.status(500).send({
+        const errorResponse: LoginErrorResponse = {
           success: false,
           error: {
             message: 'Login failed',
             statusCode: 500,
           },
-        });
+        };
+        return reply.status(500).send(errorResponse);
       }
     }
   );

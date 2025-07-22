@@ -74,8 +74,6 @@ async function apiRequest<T = unknown>(
 
     clearTimeout(timeoutId);
 
-    console.log('response', response);
-
     if (!response.ok) {
       throw new APIError(
         `HTTP error! status: ${response.status}`,
@@ -106,7 +104,10 @@ async function apiRequest<T = unknown>(
  * Convenience methods for common HTTP operations
  */
 export const apiAideMoi = {
-  get: <T>(endpoint: string, options?: Omit<RequestOptions, 'method'>) =>
+  get: <T>(
+    endpoint: string,
+    options?: Omit<RequestOptions, 'method'>
+  ): Promise<ApiResponse<T>> =>
     apiRequest<T>(endpoint, { ...options, method: 'GET' }),
 
   post: <T>(

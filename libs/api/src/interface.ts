@@ -2,10 +2,10 @@
 export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
-  message?: string;
   error?: string;
-  timestamp: string;
-  statusCode: number;
+  message?: string;
+  // timestamp: string;
+  // statusCode: number;
 }
 
 // Base API Request interface
@@ -71,28 +71,30 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  createdAt: string;
-  updatedAt: string;
+  // createdAt: string;
+  // updatedAt: string;
 }
 
 // Extended User interface for the app
 export interface AppUser extends User {
+  id: string;
   username: string;
-  role: 'customer' | 'repairman' | 'admin';
-  phone?: string;
-  avatar?: string;
-  isVerified: boolean;
+  email: string;
+  role?: string[];
+  // phone?: string;
+  // avatar?: string;
+  // isVerified?: boolean;
   // Customer specific fields
-  address?: string;
+  // address?: string;
   // Repairman specific fields
-  specialties?: string[];
-  hourlyRate?: number;
-  availability?: {
-    days: string[];
-    hours: { start: string; end: string };
-  };
-  rating?: number;
-  completedJobs?: number;
+  // specialties?: string[];
+  // hourlyRate?: number;
+  // availability?: {
+  //   days: string[];
+  //   hours: { start: string; end: string };
+  // };
+  // rating?: number;
+  // completedJobs?: number;
 }
 
 export interface Tokens {
@@ -108,14 +110,6 @@ export interface AppAuthResponse {
   user: AppUser;
   tokens: Tokens;
 }
-
-export interface LoginResponse {
-  success: boolean;
-  message: string;
-  data: Tokens;
-  user: AppUser;
-}
-
 export interface LoginCredentials {
   email: string;
   password: string;
@@ -166,3 +160,34 @@ export interface AuthSession {
   token: string;
   expiresAt: string;
 }
+
+export interface LoginSuccessResponse {
+  success: true;
+  message: string;
+  data: {
+    tokens: {
+      token: string;
+      refreshToken: string;
+      expiresIn: string;
+      expiresAt: string; // ISO string
+      refreshExpiresIn: string;
+      refreshExpiresAt: string; // ISO string
+    };
+    user: {
+      id: string;
+      username: string;
+      email: string;
+      roles?: string[];
+    };
+  };
+}
+
+export interface LoginErrorResponse {
+  success: false;
+  error: {
+    message: string;
+    statusCode: number;
+  };
+}
+
+export type LoginResponse = LoginSuccessResponse | LoginErrorResponse;

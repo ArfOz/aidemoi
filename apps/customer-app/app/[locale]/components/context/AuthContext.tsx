@@ -1,13 +1,15 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { apiAideMoi, ApiResponse } from '@api';
+import { apiAideMoi } from '@api';
 import type {
   AppUser,
   Tokens,
   AppAuthResponse,
   LoginCredentials,
   RegisterData,
+  LoginSuccessResponse,
+  User,
 } from '@api';
 import { LoginResponse } from '@api';
 
@@ -37,7 +39,7 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<AppUser | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [tokens, setTokens] = useState<Tokens | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -79,21 +81,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         credentials
       );
 
-      if (
-        !response.data ||
-        !response.data.success ||
-        !response.data.user ||
-        !response.data.tokens
-      ) {
-        throw new Error('Login failed');
+      console.log('Login response:', response);
+
+      if (!response) {
+        throw new Error('No response from server');
       }
 
-      const { user: userData, tokens: tokenData } = response.data;
+      if (!response.success) {
+        throw new Error(response.message || 'Login failed');
+      }
 
-      setUser(userData);
-      setTokens(tokenData);
-      localStorage.setItem('auth_user', JSON.stringify(userData));
-      localStorage.setItem('auth_tokens', JSON.stringify(tokenData));
+      const { user, tokens } = response.data;
+
+      setUser(user);
+      setTokens(tokens);
+
+      localStorage.setItem('auth_user', JSON.stringify(user));
+      localStorage.setItem('auth_tokens', JSON.stringify(tokens));
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Login failed';
       setError(errorMessage);
