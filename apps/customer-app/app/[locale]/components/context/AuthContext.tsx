@@ -96,9 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         throw new Error('No data in response');
       }
 
-
-      const { user, tokens } = response.data
-  
+      const { user, tokens } = response.data;
 
       setUser(user);
       setTokens(tokens);
@@ -120,18 +118,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     try {
       // API call to backend server using api library
-      const response = await apiAideMoi.post<AppAuthResponse>(
+      const response = await apiAideMoi.post<ApiResponse<LoginSuccessResponse>>(
         '/auth/register',
         data
       );
 
       if (!response.success || !response.data) {
         const errorMessage =
-          response.error ?? response.message ?? 'Registration failed';
+          typeof response.error === 'string'
+            ? response.error
+            : response.message ?? 'Registration failed';
         throw new Error(errorMessage);
       }
 
-      const { user: userData, tokens: tokenData } = response.data;
+      console.log('Register responseaaaaaaaaaaaaa:', response);
+
+      const { user: userData, tokens: tokenData } = response;
 
       setUser(userData);
       setTokens(tokenData);
@@ -181,5 +183,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
 };

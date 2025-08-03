@@ -71,7 +71,11 @@ export const requestApi = {
     );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || 'Failed to fetch requests');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to fetch requests'
+      );
     }
 
     return response.data;
@@ -84,7 +88,11 @@ export const requestApi = {
     const response = await apiAideMoi.get<ServiceRequest>(`/requests/${id}`);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || 'Failed to fetch request');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to fetch request'
+      );
     }
 
     return response.data;
@@ -97,7 +105,11 @@ export const requestApi = {
     const response = await apiAideMoi.post<ServiceRequest>('/requests', data);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || 'Failed to create request');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to create request'
+      );
     }
 
     return response.data;
@@ -116,7 +128,11 @@ export const requestApi = {
     );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || 'Failed to update request');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to update request'
+      );
     }
 
     return response.data;
@@ -129,7 +145,11 @@ export const requestApi = {
     const response = await apiAideMoi.delete(`/requests/${id}`);
 
     if (!response.success) {
-      throw new Error(response.error || 'Failed to delete request');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to delete request'
+      );
     }
   },
 
@@ -176,7 +196,11 @@ export const requestApi = {
     );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || 'Failed to fetch user requests');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to fetch user requests'
+      );
     }
 
     return response.data;
@@ -195,7 +219,11 @@ export const requestApi = {
     );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || 'Failed to search requests');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to search requests'
+      );
     }
 
     return response.data;

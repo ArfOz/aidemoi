@@ -58,6 +58,13 @@ export interface AuthResponse {
   expiresAt: string;
 }
 
+export interface RegisterUserResponse {
+  user: User;
+  token: string;
+  refreshToken?: string;
+  expiresAt: string;
+}
+
 // User interfaces
 export interface User {
   id: string;
@@ -72,7 +79,7 @@ export interface AppUser extends User {
   id: string;
   username: string;
   email: string;
-  role?: string[];
+  role?: string[]; // Ensure this is string[]
   // phone?: string;
   // avatar?: string;
   // isVerified?: boolean;
@@ -102,6 +109,7 @@ export interface AppAuthResponse {
   user: AppUser;
   tokens: Tokens;
 }
+
 export interface LoginCredentials {
   email: string;
   password: string;
@@ -153,19 +161,14 @@ export interface AuthSession {
   expiresAt: string;
 }
 
-export interface ApiError {
-  message: string;
-  statusCode: number;
-}
-
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T extends object = any> {
   success: boolean;
   data?: T;
   error?: ApiError;
   message?: string;
 }
 
-export interface LoginSuccessResponse {
+export interface LoginData {
   tokens: {
     token: string;
     refreshToken: string;
@@ -178,8 +181,63 @@ export interface LoginSuccessResponse {
     id: string;
     username: string;
     email: string;
-    roles?: string[];
+    roles?: string[]; // Ensure this is string[]
   };
 }
 
-export type LoginResponse = ApiResponse<LoginSuccessResponse>;
+// export type LoginResponse = ApiResponse<LoginSuccessResponse>;
+
+import { Type, Static } from '@sinclair/typebox';
+
+// --- TypeBox schemas ---
+export const LoginRequestSchema = Type.Object({
+  email: Type.String({ format: 'email' }),
+  password: Type.String(),
+});
+
+export const LoginSuccessResponseSchema = Type.Object({
+  success: Type.Boolean(),
+  data: Type.Object({
+    tokens: Type.Object({
+      token: Type.String(),
+      refreshToken: Type.String(),
+      expiresIn: Type.String(),
+      expiresAt: Type.String(),
+      refreshExpiresIn: Type.String(),
+      refreshExpiresAt: Type.String(),
+    }),
+    user: Type.Object({
+      id: Type.String(),
+      username: Type.String(),
+      email: Type.String(),
+      roles: Type.Optional(Type.Array(Type.String())),
+    }),
+  }),
+  error: Type.Optional(
+    Type.Object({
+      statusCode: Type.Number(),
+      message: Type.String(),
+      field: Type.Optional(Type.String()),
+      details: Type.Optional(Type.Any()),
+    })
+  ),
+  message: Type.Optional(Type.String()),
+});
+
+export const LoginErrorResponseSchema = Type.Object({
+  success: Type.Boolean(),
+  error: Type.Object({
+    statusCode: Type.Number(),
+    message: Type.String(),
+    field: Type.Optional(Type.String()),
+    details: Type.Optional(Type.Any()),
+  }),
+  message: Type.Optional(Type.String()),
+});
+
+// --- TypeScript interfaces for frontend/backend ---
+export type LoginRequest = Static<typeof LoginRequestSchema>;
+export type LoginSuccessResponseType = Static<
+  typeof LoginSuccessResponseSchema
+>;
+export type LoginErrorResponseType = Static<typeof LoginErrorResponseSchema>;

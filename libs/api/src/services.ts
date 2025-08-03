@@ -74,7 +74,11 @@ export const serviceApi = {
     );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || 'Failed to fetch services');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to fetch services'
+      );
     }
 
     return response.data;
@@ -87,7 +91,11 @@ export const serviceApi = {
     const response = await apiAideMoi.get<Service>(`/services/${id}`);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || 'Failed to fetch service');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to fetch service'
+      );
     }
 
     return response.data;
@@ -100,7 +108,11 @@ export const serviceApi = {
     const response = await apiAideMoi.post<Service>('/services', data);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || 'Failed to create service');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to create service'
+      );
     }
 
     return response.data;
@@ -113,7 +125,11 @@ export const serviceApi = {
     const response = await apiAideMoi.put<Service>(`/services/${id}`, data);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || 'Failed to update service');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to update service'
+      );
     }
 
     return response.data;
@@ -126,7 +142,11 @@ export const serviceApi = {
     const response = await apiAideMoi.delete(`/services/${id}`);
 
     if (!response.success) {
-      throw new Error(response.error || 'Failed to delete service');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to delete service'
+      );
     }
   },
 
@@ -173,7 +193,11 @@ export const serviceApi = {
     );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || 'Failed to fetch user services');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to fetch user services'
+      );
     }
 
     return response.data;
@@ -188,7 +212,11 @@ export const serviceApi = {
     );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || 'Failed to fetch categories');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to fetch categories'
+      );
     }
 
     return response.data;
@@ -207,7 +235,11 @@ export const serviceApi = {
     );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || 'Failed to search services');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to search services'
+      );
     }
 
     return response.data;

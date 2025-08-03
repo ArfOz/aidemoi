@@ -3,7 +3,12 @@
  */
 
 import { apiAideMoi } from './api';
-import { AuthResponse, User } from './interface';
+import {
+  ApiResponse,
+  AuthResponse,
+  RegisterUserResponse,
+  User,
+} from './interface';
 import {
   RegisterUserData,
   LoginUserData,
@@ -29,17 +34,23 @@ export const userApi = {
   /**
    * Register a new user
    */
-  async register(data: RegisterUserData): Promise<AuthResponse> {
+  async register(
+    data: RegisterUserData
+  ): Promise<ApiResponse<RegisterUserResponse>> {
     const response = await apiAideMoi.post<AuthResponse>(
       '/auth/register',
       data
     );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || 'Failed to register user');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to register user'
+      );
     }
 
-    return response.data;
+    return response;
   },
 
   /**
@@ -49,7 +60,11 @@ export const userApi = {
     const response = await apiAideMoi.post<AuthResponse>('/auth/login', data);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || 'Failed to login');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to login'
+      );
     }
 
     return response.data;
@@ -62,7 +77,11 @@ export const userApi = {
     const response = await apiAideMoi.post('/auth/logout');
 
     if (!response.success) {
-      throw new Error(response.error || 'Failed to logout');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to logout'
+      );
     }
   },
 
@@ -73,7 +92,11 @@ export const userApi = {
     const response = await apiAideMoi.get<User>('/auth/profile');
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || 'Failed to get profile');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to get profile'
+      );
     }
 
     return response.data;
@@ -86,7 +109,11 @@ export const userApi = {
     const response = await apiAideMoi.put<User>('/auth/profile', data);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || 'Failed to update profile');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to update profile'
+      );
     }
 
     return response.data;
@@ -105,7 +132,11 @@ export const userApi = {
     });
 
     if (!response.success) {
-      throw new Error(response.error || 'Failed to change password');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to change password'
+      );
     }
   },
 
@@ -116,7 +147,11 @@ export const userApi = {
     const response = await apiAideMoi.post('/auth/reset-password', { email });
 
     if (!response.success) {
-      throw new Error(response.error || 'Failed to request password reset');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to request password reset'
+      );
     }
   },
 
@@ -130,7 +165,11 @@ export const userApi = {
     });
 
     if (!response.success) {
-      throw new Error(response.error || 'Failed to reset password');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to reset password'
+      );
     }
   },
 
@@ -141,7 +180,11 @@ export const userApi = {
     const response = await apiAideMoi.post('/auth/verify-email', { token });
 
     if (!response.success) {
-      throw new Error(response.error || 'Failed to verify email');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to verify email'
+      );
     }
   },
 
@@ -152,7 +195,11 @@ export const userApi = {
     const response = await apiAideMoi.post('/auth/resend-verification');
 
     if (!response.success) {
-      throw new Error(response.error || 'Failed to resend verification');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to resend verification'
+      );
     }
   },
 
@@ -165,7 +212,11 @@ export const userApi = {
     });
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || 'Failed to refresh token');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to refresh token'
+      );
     }
 
     return response.data;
@@ -178,7 +229,11 @@ export const userApi = {
     const response = await apiAideMoi.get<User>(`/users/${id}`);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || 'Failed to get user');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to get user'
+      );
     }
 
     return response.data;
@@ -202,7 +257,11 @@ export const userApi = {
     );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error || 'Failed to upload avatar');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to upload avatar'
+      );
     }
 
     return response.data.url;
@@ -215,7 +274,11 @@ export const userApi = {
     const response = await apiAideMoi.delete('/users/account');
 
     if (!response.success) {
-      throw new Error(response.error || 'Failed to delete account');
+      throw new Error(
+        typeof response.error === 'string'
+          ? response.error
+          : response.error?.message || 'Failed to delete account'
+      );
     }
   },
 };

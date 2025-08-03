@@ -33,7 +33,7 @@ export interface RequestOptions {
 /**
  * Generic fetch wrapper with error handling and type safety
  */
-async function apiRequest<T = unknown>(
+async function apiRequest<T extends object = object>(
   endpoint: string,
   options: RequestOptions = {}
 ): Promise<ApiResponse<T>> {
@@ -104,28 +104,30 @@ async function apiRequest<T = unknown>(
  * Convenience methods for common HTTP operations
  */
 export const apiAideMoi = {
-  get: <T>(
+  get: <T extends object>(
     endpoint: string,
     options?: Omit<RequestOptions, 'method'>
   ): Promise<ApiResponse<T>> =>
     apiRequest<T>(endpoint, { ...options, method: 'GET' }),
 
-  post: <T>(
+  post: <T extends object>(
     endpoint: string,
     body?: unknown,
     options?: Omit<RequestOptions, 'method' | 'body'>
   ) => apiRequest<T>(endpoint, { ...options, method: 'POST', body }),
 
-  put: <T>(
+  put: <T extends object>(
     endpoint: string,
     body?: unknown,
     options?: Omit<RequestOptions, 'method' | 'body'>
   ) => apiRequest<T>(endpoint, { ...options, method: 'PUT', body }),
 
-  delete: <T>(endpoint: string, options?: Omit<RequestOptions, 'method'>) =>
-    apiRequest<T>(endpoint, { ...options, method: 'DELETE' }),
+  delete: <T extends object>(
+    endpoint: string,
+    options?: Omit<RequestOptions, 'method'>
+  ) => apiRequest<T>(endpoint, { ...options, method: 'DELETE' }),
 
-  patch: <T>(
+  patch: <T extends object>(
     endpoint: string,
     body?: unknown,
     options?: Omit<RequestOptions, 'method' | 'body'>

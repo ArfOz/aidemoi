@@ -4,16 +4,16 @@ import {
   FastifyRequest,
   FastifyReply,
 } from 'fastify';
-import userRoutes from './users';
+// import userRoutes from './users';
 import companyRoutes from './company';
-import authRoutes from './auth';
+import { authRoutes } from './auth';
 
 async function apiRoutes(
   fastify: FastifyInstance,
   _options: FastifyPluginOptions
 ) {
   // Register sub-routes
-  fastify.register(userRoutes, { prefix: '/users' });
+  // fastify.register(userRoutes, { prefix: '/users' });
   fastify.register(companyRoutes, { prefix: '/companies' });
   fastify.register(authRoutes, { prefix: '/auth' });
 

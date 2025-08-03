@@ -163,10 +163,7 @@ export function formatCurrency(amount: number, currency = 'EUR'): string {
 }
 
 // Format date
-export function formatDate(
-  date: string | Date,
-  locale: string = 'en-US'
-): string {
+export function formatDate(date: string | Date, locale = 'en-US'): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
 
   return new Intl.DateTimeFormat(locale, {
@@ -224,14 +221,18 @@ export function generateCacheKey(
 // Retry function for failed requests
 export async function retry<T>(
   fn: () => Promise<T>,
-  retries: number = 3,
-  delay: number = 1000
+  retries = 3,
+  delay = 1000
 ): Promise<T> {
   try {
     return await fn();
-  } catch (error) {
+  } catch (error: any) {
     if (retries <= 0) {
-      throw error;
+      throw typeof error === 'string'
+        ? new Error(error)
+        : error instanceof Error
+        ? error
+        : new Error(error?.message || 'Retry failed');
     }
 
     await new Promise((resolve) => setTimeout(resolve, delay));
