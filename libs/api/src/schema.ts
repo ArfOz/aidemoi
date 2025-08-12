@@ -104,3 +104,29 @@ export const ProfileSuccessResponseSchema = Type.Object({
     })
   ),
 });
+
+export const RefreshTokenRequestSchema = Type.Object({
+  refreshToken: Type.String(),
+});
+export const RefreshTokenSuccessResponseSchema = Type.Object({
+  success: Type.Boolean(),
+  message: Type.Optional(Type.String()),
+  data: Type.Object({
+    tokens: Type.Object({
+      token: Type.String(),
+      refreshToken: Type.String(),
+      expiresIn: Type.String(),
+      expiresAt: Type.String(),
+      refreshExpiresIn: Type.String(),
+      refreshExpiresAt: Type.String(),
+    }),
+  }),
+  error: Type.Optional(
+    Type.Object({
+      statusCode: Type.Number(),
+      message: Type.String(),
+      field: Type.Optional(Type.String()),
+      details: Type.Optional(Type.Any()),
+    })
+  ),
+});

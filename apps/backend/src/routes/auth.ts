@@ -20,8 +20,13 @@ import {
   parseExpirationTime,
   ProfileSuccessResponseSchema,
   ProfileSuccessResponseType,
+  RefreshSuccessResponse,
+  RefreshRequest,
+  RefreshTokenRequestSchema,
+  RefreshTokenSuccessResponseSchema,
 } from '@api';
 
+// Add Static for typing
 export async function authRoutes(
   fastify: FastifyInstance,
   _options: FastifyPluginOptions
@@ -246,69 +251,81 @@ export async function authRoutes(
     }
   );
 
+  // Refresh token schemas (ApiResponse<{ tokens: ... }>
+
   // Refresh token endpoint
-  // fastify.post<{ Body: RefreshTokenBody }>(
-  //   '/refresh',
-  //   {
-  //     schema: {
-  //       summary: 'Refresh access token',
-  //       description: 'Generate new access token using refresh token',
-  //       body: LoginBodySchema,
-  //       response: {
-  //         200: LoginSuccessResponseSchema,
-  //         401: LoginErrorResponseSchema,
-  //       },
-  //     } as any,
-  //   },
-  //   async (
-  //     request: FastifyRequest<{ Body: RefreshTokenBody }>,
-  //     reply: FastifyReply
-  //   ) => {
-  //     const { refreshToken } = request.body;
+  fastify.post<{
+    Body: RefreshRequest;
+    Reply: RefreshSuccessResponse | LoginErrorResponseType;
+  }>(
+    '/refresh',
+    {
+      schema: {
+        body: RefreshTokenRequestSchema,
+        response: {
+          200: RefreshTokenSuccessResponseSchema,
+          401: LoginErrorResponseSchema,
+          500: LoginErrorResponseSchema,
+        },
+      },
+    },
+    async (request, reply) => {
+      const { refreshToken } = request.body;
 
-  //     try {
-  //       const decoded = JwtService.verifyToken(refreshToken);
-  //       if (!decoded) {
-  //         return reply.status(401).send({
-  //           success: false,
-  //           error: {
-  //             message: 'Invalid refresh token',
-  //             statusCode: 401,
-  //           },
-  //         });
-  //       }
+      try {
+        const decoded = JwtService.verifyToken(refreshToken);
+        if (!decoded || !decoded.userId) {
+          return reply.status(401).send({
+            success: false,
+            error: { message: 'Invalid refresh token', statusCode: 401 },
+          });
+        }
 
-  //       // Generate new access token
-  //       const tokenPayload = {
-  //         userId: decoded.userId,
-  //         email: decoded.email,
-  //         username: decoded.username,
-  //       };
+        const payload = {
+          userId: decoded.userId,
+          email: decoded.email,
+          username: decoded.username,
+        };
 
-  //       const newAccessToken = JwtService.generateAccessToken(tokenPayload);
-  //       const expiresIn = process.env.JWT_EXPIRES_IN || '24h';
-  //       const expiresAt = new Date(Date.now() + parseExpirationTime(expiresIn));
+        // Issue a fresh pair
+        const { accessToken, refreshToken: newRefreshToken } =
+          JwtService.generateTokenPair(payload);
 
-  //       return reply.status(200).send({
-  //         success: true,
-  //         tokens: {
-  //           token: newAccessToken,
-  //           expiresIn: expiresIn,
-  //           expiresAt: expiresAt.toISOString(),
-  //         },
-  //       });
-  //     } catch (error) {
-  //       fastify.log.error(error);
-  //       return reply.status(500).send({
-  //         success: false,
-  //         error: {
-  //           message: 'Token refresh failed',
-  //           statusCode: 500,
-  //         },
-  //       });
-  //     }
-  //   }
-  // );
+        const accessTokenExpiresIn = process.env.JWT_EXPIRES_IN || '24h';
+        const refreshTokenExpiresIn =
+          process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
+
+        const now = new Date();
+        const accessTokenExpiresAt = new Date(
+          now.getTime() + parseExpirationTime(accessTokenExpiresIn)
+        );
+        const refreshTokenExpiresAt = new Date(
+          now.getTime() + parseExpirationTime(refreshTokenExpiresIn)
+        );
+
+        return reply.status(200).send({
+          success: true,
+          message: 'Token refreshed',
+          data: {
+            tokens: {
+              token: accessToken,
+              refreshToken: newRefreshToken,
+              expiresIn: accessTokenExpiresIn,
+              expiresAt: accessTokenExpiresAt.toISOString(),
+              refreshExpiresIn: refreshTokenExpiresIn,
+              refreshExpiresAt: refreshTokenExpiresAt.toISOString(),
+            },
+          },
+        });
+      } catch (error) {
+        fastify.log.error(error);
+        return reply.status(500).send({
+          success: false,
+          error: { message: 'Token refresh failed', statusCode: 500 },
+        });
+      }
+    }
+  );
 }
 
 //   // Logout endpoint (optional - for token blacklisting)

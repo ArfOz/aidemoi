@@ -4,6 +4,8 @@ import {
   LoginRequestSchema,
   LoginSuccessResponseSchema,
   ProfileSuccessResponseSchema,
+  RefreshTokenRequestSchema,
+  RefreshTokenSuccessResponseSchema,
   RegisterErrorResponseSchema,
   RegisterRequestSchema,
   RegisterSuccessResponseSchema,
@@ -43,4 +45,9 @@ export type RegisterErrorResponseType = Static<
 
 export type ProfileSuccessResponseType = Static<
   typeof ProfileSuccessResponseSchema
+>;
+
+export type RefreshRequest = Static<typeof RefreshTokenRequestSchema>;
+export type RefreshSuccessResponse = Static<
+  typeof RefreshTokenSuccessResponseSchema
 >;
