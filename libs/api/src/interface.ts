@@ -3,6 +3,7 @@ import {
   LoginErrorResponseSchema,
   LoginRequestSchema,
   LoginSuccessResponseSchema,
+  ProfileSuccessResponseSchema,
   RegisterErrorResponseSchema,
   RegisterRequestSchema,
   RegisterSuccessResponseSchema,
@@ -38,4 +39,8 @@ export type RegisterSuccessResponseType = Static<
 
 export type RegisterErrorResponseType = Static<
   typeof RegisterErrorResponseSchema
+>;
+
+export type ProfileSuccessResponseType = Static<
+  typeof ProfileSuccessResponseSchema
 >;

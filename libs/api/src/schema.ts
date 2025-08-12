@@ -82,3 +82,25 @@ export const RegisterErrorResponseSchema = Type.Object({
   }),
   message: Type.Optional(Type.String()),
 });
+
+// Profile success schema (ApiResponse<{ user: ... }>)
+export const ProfileSuccessResponseSchema = Type.Object({
+  success: Type.Boolean(),
+  message: Type.Optional(Type.String()),
+  data: Type.Object({
+    user: Type.Object({
+      id: Type.String(),
+      username: Type.String(),
+      email: Type.String(),
+      roles: Type.Optional(Type.Array(Type.String())),
+    }),
+  }),
+  error: Type.Optional(
+    Type.Object({
+      statusCode: Type.Number(),
+      message: Type.String(),
+      field: Type.Optional(Type.String()),
+      details: Type.Optional(Type.Any()),
+    })
+  ),
+});
