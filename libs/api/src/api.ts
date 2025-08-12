@@ -1,8 +1,8 @@
-import { ApiResponse, HttpMethod } from './interface';
-
 /**
  * API utilities for data fetching
  */
+
+import { ApiResponse, HttpMethod } from './interface';
 
 // Base configuration for API calls
 export const API_CONFIG = {

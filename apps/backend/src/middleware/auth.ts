@@ -1,53 +1,35 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { JwtService } from '../services/JwtService';
+import { parseBearerToken, TokenPayload } from '@api';
 
-export interface AuthenticatedRequest extends FastifyRequest {
-  user: {
-    userId: number;
-    email: string;
-    username: string;
-  };
-}
+export type AuthenticatedRequest = FastifyRequest & { user: TokenPayload };
 
 export async function authenticateToken(
   request: FastifyRequest,
   reply: FastifyReply
-): Promise<void> {
+) {
   try {
-    const authHeader = request.headers.authorization;
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
-
+    const token = parseBearerToken(request.headers.authorization);
     if (!token) {
       return reply.status(401).send({
-        error: {
-          message: 'Access token is required',
-          statusCode: 401,
-        },
+        success: false,
+        error: { message: 'No token provided', statusCode: 401 },
       });
     }
 
-    const decoded = JwtService.verifyToken(token);
+    const decoded = JwtService.verifyToken(token) as TokenPayload | null;
     if (!decoded) {
-      return reply.status(403).send({
-        error: {
-          message: 'Invalid or expired token',
-          statusCode: 403,
-        },
+      return reply.status(401).send({
+        success: false,
+        error: { message: 'Invalid token', statusCode: 401 },
       });
     }
 
-    // Add user info to request
-    (request as AuthenticatedRequest).user = {
-      userId: decoded.userId,
-      email: decoded.email,
-      username: decoded.username,
-    };
-  } catch (error) {
-    return reply.status(403).send({
-      error: {
-        message: 'Token verification failed',
-        statusCode: 403,
-      },
+    (request as AuthenticatedRequest).user = decoded;
+  } catch {
+    return reply.status(401).send({
+      success: false,
+      error: { message: 'Unauthorized', statusCode: 401 },
     });
   }
 }

@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import { UserService } from '../services/UserService';
 import { JwtService } from '../services/JwtService';
 import { AppDataSource } from '../config/database';
+import { Type } from '@sinclair/typebox';
 
 import {
   LoginErrorResponseSchema,
@@ -10,6 +11,12 @@ import {
   LoginRequestSchema,
   LoginSuccessResponseSchema,
   LoginSuccessResponseType,
+  RegisterRequest,
+  RegisterSuccessResponseSchema,
+  RegisterSuccessResponseType,
+  RegisterErrorResponseSchema,
+  RegisterErrorResponseType,
+  RegisterRequestSchema,
 } from '@api';
 
 export async function authRoutes(
@@ -98,6 +105,163 @@ export async function authRoutes(
     }
   );
 
+  // Register endpoint
+  fastify.post<{
+    Body: RegisterRequest;
+    Reply: RegisterSuccessResponseType | RegisterErrorResponseType;
+  }>(
+    '/register',
+    {
+      schema: {
+        body: RegisterRequestSchema,
+        response: {
+          201: RegisterSuccessResponseSchema,
+          400: RegisterErrorResponseSchema,
+          409: RegisterErrorResponseSchema,
+        },
+      },
+    },
+    async (request, reply) => {
+      const { username, email, password } = request.body;
+
+      try {
+        // Check if user already exists
+        const existingUser = await userService.findByEmail(email);
+        if (existingUser) {
+          return reply.status(409).send({
+            success: false,
+            error: {
+              message: 'User with this email already exists',
+              statusCode: 409,
+            },
+            message: 'User with this email already exists',
+          });
+        }
+
+        // Create new user
+        const newUser = await userService.create({ username, email, password });
+
+        // Log successful registration
+        fastify.log.info(`New user registered: ${newUser.username}`);
+
+        const response: RegisterSuccessResponseType = {
+          success: true,
+          message: 'Registration successful',
+          data: {
+            user: {
+              id: newUser.id.toString(),
+              username: newUser.username,
+              email: newUser.email,
+              roles: ['user'],
+            },
+          },
+        };
+
+        return reply.status(201).send(response);
+      } catch (error) {
+        fastify.log.error(error);
+        return reply.status(500).send({
+          success: false,
+          error: {
+            message: 'Registration failed',
+            statusCode: 500,
+          },
+          message: 'Registration failed',
+        });
+      }
+    }
+  );
+
+  // Profile success schema (ApiResponse<{ user: ... }>)
+  const ProfileSuccessResponseSchema = Type.Object({
+    success: Type.Boolean(),
+    message: Type.Optional(Type.String()),
+    data: Type.Object({
+      user: Type.Object({
+        id: Type.String(),
+        username: Type.String(),
+        email: Type.String(),
+        roles: Type.Optional(Type.Array(Type.String())),
+      }),
+    }),
+    error: Type.Optional(
+      Type.Object({
+        statusCode: Type.Number(),
+        message: Type.String(),
+        field: Type.Optional(Type.String()),
+        details: Type.Optional(Type.Any()),
+      })
+    ),
+  });
+
+  // Get current user profile
+  fastify.get(
+    '/profile',
+    {
+      schema: {
+        headers: Type.Object({
+          authorization: Type.String(),
+        }),
+        response: {
+          200: ProfileSuccessResponseSchema,
+          401: LoginErrorResponseSchema,
+          404: LoginErrorResponseSchema,
+          500: LoginErrorResponseSchema,
+        },
+      },
+    },
+    async (request, reply) => {
+      try {
+        const authHeader = request.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+          return reply.status(401).send({
+            success: false,
+            error: {
+              message: 'Missing or invalid Authorization header',
+              statusCode: 401,
+            },
+          });
+        }
+
+        const token = authHeader.split(' ')[1];
+        const decoded = JwtService.verifyToken(token);
+        if (!decoded || !decoded.userId) {
+          return reply.status(401).send({
+            success: false,
+            error: { message: 'Invalid token', statusCode: 401 },
+          });
+        }
+
+        const user = await userService.findById(decoded.userId);
+        if (!user) {
+          return reply.status(404).send({
+            success: false,
+            error: { message: 'User not found', statusCode: 404 },
+          });
+        }
+
+        return reply.status(200).send({
+          success: true,
+          message: 'Profile fetched',
+          data: {
+            user: {
+              id: user.id.toString(),
+              username: user.username,
+              email: user.email,
+              roles: ['user'],
+            },
+          },
+        });
+      } catch (error) {
+        fastify.log.error(error);
+        return reply.status(500).send({
+          success: false,
+          error: { message: 'Failed to get user profile', statusCode: 500 },
+        });
+      }
+    }
+  );
+
   function parseExpirationTime(expiresIn: string): number {
     const value = parseInt(expiresIn.slice(0, -1));
     const unit = expiresIn.slice(-1);
@@ -116,102 +280,6 @@ export async function authRoutes(
     }
   }
 }
-
-// // Register endpoint
-// fastify.post(
-//   '/register',
-//   {
-//     schema: {
-//       tags: ['auth'],
-//       summary: 'User registration',
-//       description: 'Register a new user and return JWT tokens',
-//       body: RegisterBodySchema,
-//       response: {
-//         201: RegisterSuccessResponseSchema,
-//         400: RegisterErrorResponseSchema,
-//         409: RegisterErrorResponseSchema,
-//       },
-//     },
-//   },
-//   async (
-//     request: FastifyRequest<{ Body: RegisterBody }>,
-//     reply: FastifyReply
-//   ) => {
-//     const { username, email, password } = request.body;
-
-//     try {
-//       // Check if user already exists
-//       const existingUser = await userService.findByEmail(email);
-//       if (existingUser) {
-//         return reply.status(409).send({
-//           success: false,
-//           error: {
-//             message: 'User with this email already exists',
-//             statusCode: 409,
-//           },
-//         });
-//       }
-
-//       // Create new user
-//       const newUser = await userService.create({ username, email, password });
-
-//       // Generate JWT tokens
-//       const tokenPayload = {
-//         userId: newUser.id,
-//         email: newUser.email,
-//         username: newUser.username,
-//       };
-
-//       const { accessToken, refreshToken } =
-//         JwtService.generateTokenPair(tokenPayload);
-
-//       // Calculate expiration times
-//       const accessTokenExpiresIn = process.env.JWT_EXPIRES_IN || '24h';
-//       const refreshTokenExpiresIn =
-//         process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
-
-//       // Calculate exact expiration dates
-//       const now = new Date();
-//       const accessTokenExpiresAt = new Date(
-//         now.getTime() + parseExpirationTime(accessTokenExpiresIn)
-//       );
-//       const refreshTokenExpiresAt = new Date(
-//         now.getTime() + parseExpirationTime(refreshTokenExpiresIn)
-//       );
-
-//       // Log successful registration
-//       fastify.log.info(`New user registered: ${newUser.username}`);
-
-//       return reply.status(201).send({
-//         success: true,
-//         message: 'Registration successful',
-//         tokens: {
-//           token: accessToken,
-//           refreshToken: refreshToken,
-//           expiresIn: accessTokenExpiresIn,
-//           expiresAt: accessTokenExpiresAt.toISOString(),
-//           refreshExpiresIn: refreshTokenExpiresIn,
-//           refreshExpiresAt: refreshTokenExpiresAt.toISOString(),
-//         },
-//         user: {
-//           id: newUser.id.toString(),
-//           username: newUser.username,
-//           email: newUser.email,
-//           roles: ['user'], // Default role for new users
-//         },
-//       });
-//     } catch (error) {
-//       fastify.log.error(error);
-//       return reply.status(500).send({
-//         success: false,
-//         error: {
-//           message: 'Registration failed',
-//           statusCode: 500,
-//         },
-//       });
-//     }
-//   }
-// );
 
 // // Refresh token endpoint
 // fastify.post<{ Body: RefreshTokenBody }>(
@@ -277,88 +345,6 @@ export async function authRoutes(
 //   }
 // );
 
-//   // Get current user profile (protected route)
-//   fastify.get(
-//     '/profile',
-//     {
-//       preHandler: authenticateToken,
-//       schema: {
-//         tags: ['auth'],
-//         summary: 'Get current user profile',
-//         description: 'Get authenticated user information',
-//         headers: {
-//           type: 'object',
-//           properties: {
-//             authorization: { type: 'string' },
-//           },
-//           required: ['authorization'],
-//         },
-//         response: {
-//           200: {
-//             type: 'object',
-//             properties: {
-//               success: { type: 'boolean' },
-//               user: {
-//                 type: 'object',
-//                 properties: {
-//                   id: { type: 'integer' },
-//                   username: { type: 'string' },
-//                   email: { type: 'string' },
-//                   createdAt: { type: 'string' },
-//                   updatedAt: { type: 'string' },
-//                 },
-//               },
-//             },
-//           },
-//           404: {
-//             type: 'object',
-//             properties: {
-//               success: { type: 'boolean' },
-//               error: {
-//                 type: 'object',
-//                 properties: {
-//                   message: { type: 'string' },
-//                   statusCode: { type: 'integer' },
-//                 },
-//               },
-//             },
-//           },
-//         },
-//       } as any,
-//     },
-//     async (request: FastifyRequest, reply: FastifyReply) => {
-//       try {
-//         // Type assertion after authentication middleware
-//         const authRequest = request as AuthenticatedRouteRequest;
-
-//         const user = await userService.findById(authRequest.user.userId);
-//         if (!user) {
-//           return reply.status(404).send({
-//             success: false,
-//             error: {
-//               message: 'User not found',
-//               statusCode: 404,
-//             },
-//           });
-//         }
-
-//         return reply.status(200).send({
-//           success: true,
-//           user,
-//         });
-//       } catch (error) {
-//         fastify.log.error(error);
-//         return reply.status(500).send({
-//           success: false,
-//           error: {
-//             message: 'Failed to get user profile',
-//             statusCode: 500,
-//           },
-//         });
-//       }
-//     }
-//   );
-
 //   // Logout endpoint (optional - for token blacklisting)
 //   fastify.post(
 //     '/logout',
@@ -410,6 +396,10 @@ export async function authRoutes(
 //       return timeValue * 60 * 60 * 1000; // hours
 //     case 'd':
 //       return timeValue * 24 * 60 * 60 * 1000; // days
+//     default:
+//       return 24 * 60 * 60 * 1000; // default to 24 hours
+//   }
+// }
 //     default:
 //       return 24 * 60 * 60 * 1000; // default to 24 hours
 //   }
