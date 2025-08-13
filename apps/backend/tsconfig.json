@@ -14,7 +14,8 @@
     "emitDecoratorMetadata": true,
     "strictPropertyInitialization": false,
     "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "noUnusedLocals": false
   },
   "include": ["src/**/*.ts", "../../libs/api/src/**/*.ts"],
   "exclude": ["node_modules", "dist", "tests"],
