@@ -3,6 +3,7 @@ import {
   LoginErrorResponseSchema,
   LoginRequestSchema,
   LoginSuccessResponseSchema,
+  LogoutSuccessResponseSchema,
   ProfileSuccessResponseSchema,
   RefreshTokenRequestSchema,
   RefreshTokenSuccessResponseSchema,
@@ -48,6 +49,16 @@ export type ProfileSuccessResponseType = Static<
 >;
 
 export type RefreshRequest = Static<typeof RefreshTokenRequestSchema>;
-export type RefreshSuccessResponse = Static<
+export type RefreshSuccessResponseType = Static<
   typeof RefreshTokenSuccessResponseSchema
 >;
+
+export type LogoutSuccessResponseType = Static<
+  typeof LogoutSuccessResponseSchema
+>;
+
+export interface LogoutHeaders {
+  authorization: string;
+}
+
+// export type LogoutRequest = Static<typeof LogoutRequestSchema>;

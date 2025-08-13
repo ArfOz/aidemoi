@@ -3,6 +3,7 @@ import { UserService } from '../services/UserService';
 import { JwtService } from '../services/JwtService';
 import { AppDataSource } from '../config/database';
 import { Type } from '@sinclair/typebox';
+import { authenticateToken } from '../middleware/auth';
 
 import {
   LoginErrorResponseSchema,
@@ -20,10 +21,13 @@ import {
   parseExpirationTime,
   ProfileSuccessResponseSchema,
   ProfileSuccessResponseType,
-  RefreshSuccessResponse,
-  RefreshRequest,
+  RefreshSuccessResponseType,
   RefreshTokenRequestSchema,
   RefreshTokenSuccessResponseSchema,
+  LogoutSuccessResponseSchema,
+  RefreshRequest,
+  LogoutSuccessResponseType,
+  LogoutHeaders,
 } from '@api';
 
 // Add Static for typing
@@ -256,7 +260,7 @@ export async function authRoutes(
   // Refresh token endpoint
   fastify.post<{
     Body: RefreshRequest;
-    Reply: RefreshSuccessResponse | LoginErrorResponseType;
+    Reply: RefreshSuccessResponseType | LoginErrorResponseType;
   }>(
     '/refresh',
     {
@@ -287,7 +291,7 @@ export async function authRoutes(
           username: decoded.username,
         };
 
-        // Issue a fresh pair
+        // Issue a fresh pair (no DB interaction)
         const { accessToken, refreshToken: newRefreshToken } =
           JwtService.generateTokenPair(payload);
 
@@ -326,64 +330,34 @@ export async function authRoutes(
       }
     }
   );
+
+  // Logout endpoint
+
+  fastify.post<{
+    Headers: LogoutHeaders;
+    Reply: LogoutSuccessResponseType | LoginErrorResponseType;
+  }>(
+    '/logout',
+    {
+      preHandler: authenticateToken,
+      schema: {
+        headers: Type.Object({
+          authorization: Type.String(),
+        }),
+        response: {
+          200: LogoutSuccessResponseSchema,
+          401: LoginErrorResponseSchema,
+          500: LoginErrorResponseSchema,
+        },
+      },
+    },
+    async (_request, reply) => {
+      // No DB revoke; reply success only
+      return reply.status(200).send({
+        success: true,
+        message: 'Logged out successfully',
+        data: { loggedOut: true },
+      });
+    }
+  );
 }
-
-//   // Logout endpoint (optional - for token blacklisting)
-//   fastify.post(
-//     '/logout',
-//     {
-//       preHandler: authenticateToken,
-//       schema: {
-//         tags: ['auth'],
-//         summary: 'User logout',
-//         description: 'Invalidate current token',
-//         headers: {
-//           type: 'object',
-//           properties: {
-//             authorization: { type: 'string' },
-//           },
-//           required: ['authorization'],
-//         },
-//         response: {
-//           200: {
-//             type: 'object',
-//             properties: {
-//               success: { type: 'boolean' },
-//               message: { type: 'string' },
-//             },
-//           },
-//         },
-//       } as any,
-//     },
-//     async (request: FastifyRequest, reply: FastifyReply) => {
-//       // In a real application, you would add the token to a blacklist
-//       // For now, we'll just return a success message
-//       return reply.status(200).send({
-//         success: true,
-//         message: 'Logged out successfully',
-//       });
-//     }
-//   );
-// }
-
-// function parseExpirationTime(expiresIn: string): number {
-//   const timeUnit = expiresIn.slice(-1);
-//   const timeValue = parseInt(expiresIn.slice(0, -1));
-
-//   switch (timeUnit) {
-//     case 's':
-//       return timeValue * 1000; // seconds
-//     case 'm':
-//       return timeValue * 60 * 1000; // minutes
-//     case 'h':
-//       return timeValue * 60 * 60 * 1000; // hours
-//     case 'd':
-//       return timeValue * 24 * 60 * 60 * 1000; // days
-//     default:
-//       return 24 * 60 * 60 * 1000; // default to 24 hours
-//   }
-// }
-//     default:
-//       return 24 * 60 * 60 * 1000; // default to 24 hours
-//   }
-// }

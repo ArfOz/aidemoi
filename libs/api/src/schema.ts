@@ -130,3 +130,24 @@ export const RefreshTokenSuccessResponseSchema = Type.Object({
     })
   ),
 });
+
+// Logout success schema (ApiResponse<{ loggedOut: boolean }>)
+export const LogoutSuccessResponseSchema = Type.Object({
+  success: Type.Boolean(),
+  message: Type.Optional(Type.String()),
+  data: Type.Object({
+    loggedOut: Type.Boolean(),
+  }),
+  error: Type.Optional(
+    Type.Object({
+      statusCode: Type.Number(),
+      message: Type.String(),
+      field: Type.Optional(Type.String()),
+      details: Type.Optional(Type.Any()),
+    })
+  ),
+});
+
+export const LogoutRequestSchema = Type.Object({
+  refreshToken: Type.String(),
+});
