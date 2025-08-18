@@ -20,8 +20,8 @@ export class Token {
   @Column({ type: 'varchar', unique: true, length: 512 })
   refreshToken: string;
 
-  // Numeric FK to match User.id
-  @Column({ type: 'int' })
+  // Ensure one row per user
+  @Column({ type: 'int', unique: true })
   userId: number;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })

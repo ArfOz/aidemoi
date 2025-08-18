@@ -91,7 +91,8 @@ export async function authRoutes(
           userId: user.id,
           token: accessToken,
           refreshToken: refreshToken,
-          expiresAtToken: refreshTokenExpiresAt,
+          // store the correct expiries for each token
+          expiresAtToken: accessTokenExpiresAt,
           expiresAtRefresh: refreshTokenExpiresAt,
         });
 
@@ -287,6 +288,16 @@ export async function authRoutes(
       const { refreshToken } = request.body;
 
       try {
+        // Verify the refresh token
+        const isExist = await tokenService.getValidTokenByValue(refreshToken);
+
+        if (!isExist) {
+          return reply.status(401).send({
+            success: false,
+            error: { message: 'Invalid refresh token', statusCode: 401 },
+          });
+        }
+
         const decoded = JwtService.verifyToken(refreshToken);
         if (!decoded || !decoded.userId) {
           return reply.status(401).send({
@@ -316,6 +327,14 @@ export async function authRoutes(
         const refreshTokenExpiresAt = new Date(
           now.getTime() + parseExpirationTime(refreshTokenExpiresIn)
         );
+
+        await tokenService.createToken({
+          userId: decoded.userId,
+          token: accessToken,
+          refreshToken: newRefreshToken,
+          expiresAtToken: accessTokenExpiresAt,
+          expiresAtRefresh: refreshTokenExpiresAt,
+        });
 
         return reply.status(200).send({
           success: true,

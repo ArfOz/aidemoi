@@ -5,10 +5,15 @@ export class TokenService {
   private tokenRepository: Repository<Token>;
 
   constructor(dataSource: DataSource) {
+    if (!dataSource.isInitialized) {
+      throw new Error(
+        'DataSource must be initialized before using TokenService'
+      );
+    }
     this.tokenRepository = dataSource.getRepository(Token);
   }
 
-  // Create and persist a token
+  // Upsert by userId (one row per user)
   async createToken(data: {
     userId: number;
     token: string;
@@ -16,37 +21,47 @@ export class TokenService {
     expiresAtToken: Date | null;
     expiresAtRefresh: Date | null;
   }): Promise<Token> {
-    const token = this.tokenRepository.create({
-      userId: data.userId,
-      token: data.token,
-      refreshToken: data.refreshToken,
-      expiresAtToken: data.expiresAtToken,
-      expiresAtRefresh: data.expiresAtRefresh,
+    await this.tokenRepository.upsert(
+      {
+        userId: data.userId,
+        token: data.token,
+        refreshToken: data.refreshToken,
+        expiresAtToken: data.expiresAtToken,
+        expiresAtRefresh: data.expiresAtRefresh,
+      },
+      ['userId']
+    );
+    const token = await this.tokenRepository.findOne({
+      where: { userId: data.userId },
     });
-    return await this.tokenRepository.save(token);
+    if (!token) {
+      throw new Error('Token not found after upsert');
+    }
+    return token;
   }
 
-  // Get token by exact value
-  async getTokenByValue(token: string): Promise<Token | null> {
-    return await this.tokenRepository.findOne({ where: { token } });
+  // Search by either access or refresh token
+  async getTokenByValue(value: string): Promise<Token | null> {
+    return await this.tokenRepository.findOne({
+      where: [{ token: value }, { refreshToken: value }],
+    });
   }
 
-  // Get token by value that is still valid (not expired)
+  // Validate access OR refresh token against its proper expiry
   async getValidTokenByValue(
-    token: string,
+    value: string,
     now: Date = new Date()
   ): Promise<Token | null> {
     return await this.tokenRepository.findOne({
       where: [
-        // expiresAt is null (no expiry)
-        { token, expiresAtToken: IsNull() },
-        // or expiresAt is in the future
-        { token, expiresAtToken: MoreThan(now) },
+        { token: value, expiresAtToken: IsNull() },
+        { token: value, expiresAtToken: MoreThan(now) },
+        { refreshToken: value, expiresAtRefresh: IsNull() },
+        { refreshToken: value, expiresAtRefresh: MoreThan(now) },
       ],
     });
   }
 
-  // Delete a specific token by value and return it
   async deleteToken(value: string): Promise<Token | null> {
     const token = await this.getTokenByValue(value);
     if (!token) return null;
@@ -54,13 +69,11 @@ export class TokenService {
     return token;
   }
 
-  // Delete all tokens for a user (useful for logout-all)
   async deleteTokensByUser(userId: number): Promise<number> {
     const result = await this.tokenRepository.delete({ userId });
     return result.affected ?? 0;
   }
 
-  // Remove expired tokens
   async deleteExpiredTokens(now: Date = new Date()): Promise<number> {
     const result = await this.tokenRepository.delete({
       expiresAtToken: LessThan(now),
@@ -68,7 +81,6 @@ export class TokenService {
     return result.affected ?? 0;
   }
 
-  // List tokens by user
   async getTokensByUser(userId: number): Promise<Token[]> {
     return await this.tokenRepository.find({
       where: { userId },
