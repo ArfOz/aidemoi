@@ -33,7 +33,8 @@
             "outExtension": {
               ".js": ".js"
             }
-          }
+          },
+          "outputPath": "dist/apps/backend-prod"
         }
       }
     },
@@ -41,7 +42,7 @@
       "continuous": true,
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
-      "dependsOn": ["build"],
+      "dependsOn": [],
       "options": {
         "buildTarget": "backend:build",
         "runBuildTargetDependencies": false
@@ -49,9 +50,6 @@
       "configurations": {
         "development": {
           "buildTarget": "backend:build:development"
-        },
-        "production": {
-          "buildTarget": "backend:build:production"
         }
       }
     }

@@ -29,6 +29,7 @@ import {
   LogoutSuccessResponseType,
   LogoutHeaders,
 } from '@api';
+import { TokenService } from '../services/TokenService';
 
 // Add Static for typing
 export async function authRoutes(
@@ -36,6 +37,7 @@ export async function authRoutes(
   _options: FastifyPluginOptions
 ) {
   const userService = new UserService(AppDataSource);
+  const tokenService = new TokenService(AppDataSource);
 
   fastify.post<{
     Body: LoginRequest;
@@ -84,6 +86,13 @@ export async function authRoutes(
         const refreshTokenExpiresAt = new Date(
           now.getTime() + parseExpirationTime(refreshTokenExpiresIn)
         );
+
+        await tokenService.createToken({
+          userId: user.id,
+          token: accessToken,
+          expiresAt: refreshTokenExpiresAt,
+          refreshToken: refreshToken,
+        });
 
         const response: LoginSuccessResponseType = {
           success: true,

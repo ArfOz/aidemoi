@@ -14,24 +14,26 @@ export class Token {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ unique: true })
-  value: string;
+  @Column({ type: 'varchar', unique: true, length: 512 })
+  token: string;
 
-  // Use numeric FK to match User.id (number)
-  @Column()
+  @Column({ type: 'varchar', unique: true, length: 512 })
+  refreshToken: string;
+
+  // Numeric FK to match User.id
+  @Column({ type: 'int' })
   userId: number;
 
-  // Establish relation with User; cascade delete tokens with user
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamptz', nullable: true })
   expiresAt: Date | null;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 }

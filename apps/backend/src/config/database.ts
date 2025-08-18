@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm';
 import { User } from '../entities/User';
+import { Token } from '../entities/Token';
 
 const config = {
   type: (process.env.DB_TYPE as any) || 'postgres',
@@ -27,7 +28,8 @@ const config = {
 
   synchronize: process.env.DB_SYNCHRONIZE === 'true',
   logging: process.env.DB_LOGGING === 'true',
-  entities: [User],
+  // Prefer explicit classes over globs to avoid path mismatches in dist
+  entities: [User, Token],
   migrations: ['src/migrations/*.ts'],
   subscribers: ['src/subscribers/*.ts'],
 };
