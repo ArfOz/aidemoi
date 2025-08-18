@@ -47,15 +47,13 @@ export class TokenService {
     });
   }
 
-  // Validate access OR refresh token against its proper expiry
+  // Validate only the refresh token against its expiry
   async getValidTokenByValue(
     value: string,
     now: Date = new Date()
   ): Promise<Token | null> {
     return await this.tokenRepository.findOne({
       where: [
-        { token: value, expiresAtToken: IsNull() },
-        { token: value, expiresAtToken: MoreThan(now) },
         { refreshToken: value, expiresAtRefresh: IsNull() },
         { refreshToken: value, expiresAtRefresh: MoreThan(now) },
       ],
