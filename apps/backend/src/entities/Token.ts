@@ -29,7 +29,10 @@ export class Token {
   user: User;
 
   @Column({ type: 'timestamptz', nullable: true })
-  expiresAt: Date | null;
+  expiresAtToken: Date | null;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  expiresAtRefresh: Date | null;
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;

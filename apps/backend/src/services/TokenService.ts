@@ -12,14 +12,16 @@ export class TokenService {
   async createToken(data: {
     userId: number;
     token: string;
-    expiresAt: Date | null;
     refreshToken: string;
+    expiresAtToken: Date | null;
+    expiresAtRefresh: Date | null;
   }): Promise<Token> {
     const token = this.tokenRepository.create({
       userId: data.userId,
       token: data.token,
-      expiresAt: data.expiresAt,
       refreshToken: data.refreshToken,
+      expiresAtToken: data.expiresAtToken,
+      expiresAtRefresh: data.expiresAtRefresh,
     });
     return await this.tokenRepository.save(token);
   }
@@ -37,9 +39,9 @@ export class TokenService {
     return await this.tokenRepository.findOne({
       where: [
         // expiresAt is null (no expiry)
-        { token, expiresAt: IsNull() },
+        { token, expiresAtToken: IsNull() },
         // or expiresAt is in the future
-        { token, expiresAt: MoreThan(now) },
+        { token, expiresAtToken: MoreThan(now) },
       ],
     });
   }
@@ -61,7 +63,7 @@ export class TokenService {
   // Remove expired tokens
   async deleteExpiredTokens(now: Date = new Date()): Promise<number> {
     const result = await this.tokenRepository.delete({
-      expiresAt: LessThan(now),
+      expiresAtToken: LessThan(now),
     });
     return result.affected ?? 0;
   }

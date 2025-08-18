@@ -90,8 +90,9 @@ export async function authRoutes(
         await tokenService.createToken({
           userId: user.id,
           token: accessToken,
-          expiresAt: refreshTokenExpiresAt,
           refreshToken: refreshToken,
+          expiresAtToken: refreshTokenExpiresAt,
+          expiresAtRefresh: refreshTokenExpiresAt,
         });
 
         const response: LoginSuccessResponseType = {
