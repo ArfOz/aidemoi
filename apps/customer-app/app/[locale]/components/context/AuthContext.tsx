@@ -1,28 +1,27 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { apiAideMoi } from '@api';
-import type {
-  AppUser,
-  Tokens,
-  AppAuthResponse,
-  LoginCredentials,
-  RegisterData,
-  LoginSuccessResponse,
+import {
+  apiAideMoi,
+  LoginRequestType,
+  LoginSuccessResponseType,
+  RegisterRequestType,
+  TokenType,
   User,
 } from '@api';
-import { LoginResponse, ApiResponse } from '@api';
+
+import { ApiResponse } from '@api';
 
 interface AuthContextType {
-  user: AppUser | null;
-  tokens: Tokens | null;
+  user: User | null;
+  tokens: any | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  login: (credentials: LoginCredentials) => Promise<void>;
-  register: (data: RegisterData) => Promise<void>;
+  login: (credentials: LoginRequestType) => Promise<LoginSuccessResponseType>; // return the data payload
+  register: (data: RegisterRequestType) => Promise<void>;
   logout: () => void;
-  updateUser: (data: Partial<AppUser>) => void;
+  updateUser: (data: Partial<User>) => void;
   clearError: () => void;
 }
 
@@ -40,7 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [tokens, setTokens] = useState<Tokens | null>(null);
+  const [tokens, setTokens] = useState<TokenType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -70,28 +69,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, []);
 
-  const login = async (credentials: LoginCredentials) => {
+  const login = async (credentials: LoginRequestType) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // API call to backend server using api library
-      const response = await apiAideMoi.post<LoginSuccessResponse>(
+      const response = await apiAideMoi.post<LoginSuccessResponseType>(
         '/auth/login',
-        credentials
+        credentials,
+        { cache: 'no-store' } as any
       );
-
-      console.log('Login response:', response);
 
       if (!response) {
         throw new Error('No response from server');
       }
-
       if (!response.success) {
         throw new Error(response.message || 'Login failed');
       }
-
-      // The LoginResponse has tokens and user directly under data
       if (!response.data) {
         throw new Error('No data in response');
       }
@@ -101,8 +95,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setUser(user);
       setTokens(tokens);
 
-      localStorage.setItem('auth_user', JSON.stringify(user));
-      localStorage.setItem('auth_tokens', JSON.stringify(tokens));
+      // Optional: set default Authorization for future calls
+      try {
+        (apiAideMoi as any).defaults ||= { headers: { common: {} } };
+        (apiAideMoi as any).defaults.headers.common[
+          'Authorization'
+        ] = `Bearer ${newTokens.token}`;
+      } catch {}
+
+      localStorage.setItem('auth_user', JSON.stringify(newUser));
+      localStorage.setItem('auth_tokens', JSON.stringify(newTokens));
+
+      return response.data; // return data so callers can do: const { tokens } = await login(...)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Login failed';
       setError(errorMessage);

@@ -10,12 +10,13 @@ import {
   RegisterErrorResponseSchema,
   RegisterRequestSchema,
   RegisterSuccessResponseSchema,
+  TokenSchema,
 } from './schema';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 export interface ApiError {
-  code: string;
+  code: number;
   message: string;
   field?: string;
   details?: any;
@@ -29,13 +30,17 @@ export interface ApiResponse<T extends object = any> {
 }
 
 // --- TypeScript interfaces for frontend/backend ---
-export type LoginRequest = Static<typeof LoginRequestSchema>;
+export type LoginRequestType = Static<typeof LoginRequestSchema>;
 export type LoginSuccessResponseType = Static<
   typeof LoginSuccessResponseSchema
 >;
 export type LoginErrorResponseType = Static<typeof LoginErrorResponseSchema>;
 
-export type RegisterRequest = Static<typeof RegisterRequestSchema>;
+export type LoginResponseType =
+  | LoginSuccessResponseType
+  | LoginErrorResponseType;
+
+export type RegisterRequestType = Static<typeof RegisterRequestSchema>;
 export type RegisterSuccessResponseType = Static<
   typeof RegisterSuccessResponseSchema
 >;
@@ -60,5 +65,7 @@ export type LogoutSuccessResponseType = Static<
 export interface LogoutHeaders {
   authorization: string;
 }
+
+export type TokenType = Static<typeof TokenSchema>;
 
 // export type LogoutRequest = Static<typeof LogoutRequestSchema>;

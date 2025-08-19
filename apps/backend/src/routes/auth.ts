@@ -8,11 +8,10 @@ import { authenticateToken } from '../middleware/auth';
 import {
   LoginErrorResponseSchema,
   LoginErrorResponseType,
-  LoginRequest,
   LoginRequestSchema,
   LoginSuccessResponseSchema,
   LoginSuccessResponseType,
-  RegisterRequest,
+  RegisterRequestType,
   RegisterSuccessResponseSchema,
   RegisterSuccessResponseType,
   RegisterErrorResponseSchema,
@@ -28,6 +27,8 @@ import {
   RefreshRequest,
   LogoutSuccessResponseType,
   LogoutHeaders,
+  LoginRequestType,
+  ApiResponse,
 } from '@api';
 import { TokenService } from '../services/TokenService';
 
@@ -40,8 +41,8 @@ export async function authRoutes(
   const tokenService = new TokenService(AppDataSource);
 
   fastify.post<{
-    Body: LoginRequest;
-    Reply: LoginSuccessResponseType | LoginErrorResponseType;
+    Body: LoginRequestType;
+    Reply: ApiResponse<LoginSuccessResponseType>;
   }>(
     '/login',
     {
@@ -62,7 +63,7 @@ export async function authRoutes(
         if (!user) {
           return reply.status(401).send({
             success: false,
-            error: { message: 'Invalid email or password', statusCode: 401 },
+            error: { message: 'Invalid email or password', code: 401 },
           });
         }
 
@@ -96,7 +97,7 @@ export async function authRoutes(
           expiresAtRefresh: refreshTokenExpiresAt,
         });
 
-        const response: LoginSuccessResponseType = {
+        const response: ApiResponse<LoginSuccessResponseType> = {
           success: true,
           message: 'Login successful',
           data: {
@@ -122,7 +123,7 @@ export async function authRoutes(
         fastify.log.error(error);
         return reply.status(500).send({
           success: false,
-          error: { message: 'Login failed', statusCode: 500 },
+          error: { message: 'Login failed', code: 500 },
         });
       }
     }
@@ -130,7 +131,7 @@ export async function authRoutes(
 
   // Register endpoint
   fastify.post<{
-    Body: RegisterRequest;
+    Body: RegisterRequestType;
     Reply: RegisterSuccessResponseType | RegisterErrorResponseType;
   }>(
     '/register',
@@ -202,6 +203,7 @@ export async function authRoutes(
   }>(
     '/profile',
     {
+      preHandler: authenticateToken, // use auth middleware
       schema: {
         headers: Type.Object({
           authorization: Type.String(),
@@ -216,31 +218,22 @@ export async function authRoutes(
     },
     async (request, reply) => {
       try {
-        const authHeader = request.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        // read user from middleware (support common shapes)
+        const anyReq = request as any;
+        const userId = anyReq.user?.userId ?? anyReq.user?.id ?? anyReq.userId;
+
+        if (!userId) {
           return reply.status(401).send({
             success: false,
-            error: {
-              message: 'Missing or invalid Authorization header',
-              statusCode: 401,
-            },
+            error: { message: 'Unauthorized', code: 401 },
           });
         }
 
-        const token = authHeader.split(' ')[1];
-        const decoded = JwtService.verifyToken(token);
-        if (!decoded || !decoded.userId) {
-          return reply.status(401).send({
-            success: false,
-            error: { message: 'Invalid token', statusCode: 401 },
-          });
-        }
-
-        const user = await userService.findById(decoded.userId);
+        const user = await userService.findById(Number(userId));
         if (!user) {
           return reply.status(404).send({
             success: false,
-            error: { message: 'User not found', statusCode: 404 },
+            error: { message: 'User not found', code: 404 },
           });
         }
 
@@ -260,7 +253,7 @@ export async function authRoutes(
         fastify.log.error(error);
         return reply.status(500).send({
           success: false,
-          error: { message: 'Failed to get user profile', statusCode: 500 },
+          error: { message: 'Failed to get user profile', code: 500 },
         });
       }
     }
@@ -294,7 +287,7 @@ export async function authRoutes(
         if (!isExist) {
           return reply.status(401).send({
             success: false,
-            error: { message: 'Invalid refresh token', statusCode: 401 },
+            error: { message: 'Invalid refresh token', code: 401 },
           });
         }
 
@@ -302,7 +295,7 @@ export async function authRoutes(
         if (!decoded || !decoded.userId) {
           return reply.status(401).send({
             success: false,
-            error: { message: 'Invalid refresh token', statusCode: 401 },
+            error: { message: 'Invalid refresh token', code: 401 },
           });
         }
 
@@ -354,7 +347,7 @@ export async function authRoutes(
         fastify.log.error(error);
         return reply.status(500).send({
           success: false,
-          error: { message: 'Token refresh failed', statusCode: 500 },
+          error: { message: 'Token refresh failed', code: 500 },
         });
       }
     }

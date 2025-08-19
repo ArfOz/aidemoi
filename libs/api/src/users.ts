@@ -5,15 +5,18 @@
 // User data types
 export interface User {
   id: string;
+  username: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  phoneNumber?: string;
-  postalCode: string;
-  avatar?: string;
-  isEmailVerified: boolean;
-  createdAt: string;
-  updatedAt: string;
+  roles?: string[];
+
+  // firstName: string;
+  // lastName: string;
+  // phoneNumber?: string;
+  // postalCode: string;
+  // avatar?: string;
+  // isEmailVerified: boolean;
+  // createdAt: string;
+  // updatedAt: string;
 }
 
 // // User API functions

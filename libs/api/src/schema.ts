@@ -5,39 +5,29 @@ export const LoginRequestSchema = Type.Object({
   password: Type.String(),
 });
 
+export const TokenSchema = Type.Object({
+  token: Type.String(),
+  refreshToken: Type.String(),
+  expiresIn: Type.String(),
+  expiresAt: Type.String(),
+  refreshExpiresIn: Type.String(),
+  refreshExpiresAt: Type.String(),
+});
+
 export const LoginSuccessResponseSchema = Type.Object({
-  success: Type.Boolean(),
-  data: Type.Object({
-    tokens: Type.Object({
-      token: Type.String(),
-      refreshToken: Type.String(),
-      expiresIn: Type.String(),
-      expiresAt: Type.String(),
-      refreshExpiresIn: Type.String(),
-      refreshExpiresAt: Type.String(),
-    }),
-    user: Type.Object({
-      id: Type.String(),
-      username: Type.String(),
-      email: Type.String(),
-      roles: Type.Optional(Type.Array(Type.String())),
-    }),
+  tokens: TokenSchema,
+  user: Type.Object({
+    id: Type.String(),
+    username: Type.String(),
+    email: Type.String(),
+    roles: Type.Optional(Type.Array(Type.String())),
   }),
-  error: Type.Optional(
-    Type.Object({
-      statusCode: Type.Number(),
-      message: Type.String(),
-      field: Type.Optional(Type.String()),
-      details: Type.Optional(Type.Any()),
-    })
-  ),
-  message: Type.Optional(Type.String()),
 });
 
 export const LoginErrorResponseSchema = Type.Object({
   success: Type.Boolean(),
   error: Type.Object({
-    statusCode: Type.Number(),
+    code: Type.Number(),
     message: Type.String(),
     field: Type.Optional(Type.String()),
     details: Type.Optional(Type.Any()),
