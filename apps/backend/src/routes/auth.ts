@@ -28,6 +28,7 @@ import {
   LogoutSuccessResponseType,
   LogoutHeaders,
   LoginRequestType,
+  ApiResponseSchema,
   ApiResponse,
 } from '@api';
 import { TokenService } from '../services/TokenService';
@@ -50,8 +51,8 @@ export async function authRoutes(
         body: LoginRequestSchema,
         response: {
           200: LoginSuccessResponseSchema,
-          401: LoginErrorResponseSchema,
-          500: LoginErrorResponseSchema,
+          401: ApiResponseSchema,
+          500: ApiResponseSchema,
         },
       },
     },

@@ -141,3 +141,17 @@ export const LogoutSuccessResponseSchema = Type.Object({
 export const LogoutRequestSchema = Type.Object({
   refreshToken: Type.String(),
 });
+
+export const ApiErrorSchema = Type.Object({
+  code: Type.Number(),
+  message: Type.String(),
+  // field: Type.Optional(Type.String()),
+  // details: Type.Optional(Type.Any()),
+});
+
+export const ApiResponseSchema = Type.Object({
+  success: Type.Boolean(),
+  data: Type.Optional(Type.Any()),
+  error: Type.Optional(ApiErrorSchema),
+  message: Type.Optional(Type.String()),
+});

@@ -1,35 +1,30 @@
 import { Static } from '@sinclair/typebox';
 import {
-  LoginErrorResponseSchema,
+  ApiResponseSchema,
+  ApiErrorSchema,
   LoginRequestSchema,
   LoginSuccessResponseSchema,
-  LogoutSuccessResponseSchema,
-  ProfileSuccessResponseSchema,
-  RefreshTokenRequestSchema,
-  RefreshTokenSuccessResponseSchema,
-  RegisterErrorResponseSchema,
+  LoginErrorResponseSchema,
   RegisterRequestSchema,
   RegisterSuccessResponseSchema,
+  RefreshTokenSuccessResponseSchema,
+  RegisterErrorResponseSchema,
+  ProfileSuccessResponseSchema,
+  RefreshTokenRequestSchema,
+  LogoutSuccessResponseSchema,
   TokenSchema,
 } from './schema';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
-export interface ApiError {
-  code: number;
-  message: string;
-  field?: string;
-  details?: any;
-}
+// Base (static) type from the runtime schema
+type ApiResponseBase = Static<typeof ApiResponseSchema>;
 
-export interface ApiResponse<T extends object = any> {
-  success: boolean;
+// Generic ApiResponse with typed data payload
+export type ApiResponse<T = unknown> = Omit<ApiResponseBase, 'data'> & {
   data?: T;
-  error?: ApiError;
-  message?: string;
-}
+};
 
-// --- TypeScript interfaces for frontend/backend ---
 export type LoginRequestType = Static<typeof LoginRequestSchema>;
 export type LoginSuccessResponseType = Static<
   typeof LoginSuccessResponseSchema
