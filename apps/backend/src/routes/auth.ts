@@ -256,8 +256,6 @@ export async function authRoutes(
     }
   );
 
-  // Refresh token schemas (ApiResponse<{ tokens: ... }>
-
   // Refresh token endpoint
   fastify.post<{
     Body: RefreshRequest;
