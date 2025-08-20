@@ -1,5 +1,12 @@
 import { Type } from '@sinclair/typebox';
 
+export const ErrorSchema = Type.Object({
+  code: Type.Number(),
+  message: Type.String(),
+  // field: Type.Optional(Type.String()),
+  // details: Type.Optional(Type.Any()),
+});
+
 export const LoginRequestSchema = Type.Object({
   email: Type.String({ format: 'email' }),
   password: Type.String(),
@@ -15,23 +22,17 @@ export const TokenSchema = Type.Object({
 });
 
 export const LoginSuccessResponseSchema = Type.Object({
-  tokens: TokenSchema,
-  user: Type.Object({
-    id: Type.String(),
-    username: Type.String(),
-    email: Type.String(),
-    roles: Type.Optional(Type.Array(Type.String())),
-  }),
-});
-
-export const LoginErrorResponseSchema = Type.Object({
   success: Type.Boolean(),
-  error: Type.Object({
-    code: Type.Number(),
-    message: Type.String(),
-    field: Type.Optional(Type.String()),
-    details: Type.Optional(Type.Any()),
+  data: Type.Object({
+    tokens: TokenSchema,
+    user: Type.Object({
+      id: Type.String(),
+      username: Type.String(),
+      email: Type.String(),
+      roles: Type.Optional(Type.Array(Type.String())),
+    }),
   }),
+  error: Type.Optional(ErrorSchema),
   message: Type.Optional(Type.String()),
 });
 
@@ -59,17 +60,6 @@ export const RegisterSuccessResponseSchema = Type.Object({
       details: Type.Optional(Type.Any()),
     })
   ),
-  message: Type.Optional(Type.String()),
-});
-
-export const RegisterErrorResponseSchema = Type.Object({
-  success: Type.Boolean(),
-  error: Type.Object({
-    statusCode: Type.Number(),
-    message: Type.String(),
-    field: Type.Optional(Type.String()),
-    details: Type.Optional(Type.Any()),
-  }),
   message: Type.Optional(Type.String()),
 });
 
@@ -142,16 +132,16 @@ export const LogoutRequestSchema = Type.Object({
   refreshToken: Type.String(),
 });
 
-export const ApiErrorSchema = Type.Object({
-  code: Type.Number(),
-  message: Type.String(),
-  // field: Type.Optional(Type.String()),
-  // details: Type.Optional(Type.Any()),
-});
-
 export const ApiResponseSchema = Type.Object({
   success: Type.Boolean(),
   data: Type.Optional(Type.Any()),
-  error: Type.Optional(ApiErrorSchema),
+  error: Type.Optional(ErrorSchema),
+  message: Type.Optional(Type.String()),
+});
+
+export const ApiErrorSchema = Type.Object({
+  success: Type.Boolean(),
+  data: Type.Optional(Type.Any()),
+  error: Type.Optional(ErrorSchema),
   message: Type.Optional(Type.String()),
 });

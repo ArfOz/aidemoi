@@ -4,11 +4,9 @@ import {
   ApiErrorSchema,
   LoginRequestSchema,
   LoginSuccessResponseSchema,
-  LoginErrorResponseSchema,
   RegisterRequestSchema,
   RegisterSuccessResponseSchema,
   RefreshTokenSuccessResponseSchema,
-  RegisterErrorResponseSchema,
   ProfileSuccessResponseSchema,
   RefreshTokenRequestSchema,
   LogoutSuccessResponseSchema,
@@ -24,24 +22,18 @@ type ApiResponseBase = Static<typeof ApiResponseSchema>;
 export type ApiResponse<T = unknown> = Omit<ApiResponseBase, 'data'> & {
   data?: T;
 };
-
-export type LoginRequestType = Static<typeof LoginRequestSchema>;
 export type LoginSuccessResponseType = Static<
   typeof LoginSuccessResponseSchema
 >;
-export type LoginErrorResponseType = Static<typeof LoginErrorResponseSchema>;
+export type LoginRequestType = Static<typeof LoginRequestSchema>;
 
-export type LoginResponseType =
-  | LoginSuccessResponseType
-  | LoginErrorResponseType;
+export type ApiErrorResponseType = Static<typeof ApiErrorSchema>;
+
+export type LoginResponseType = LoginSuccessResponseType | ApiErrorResponseType;
 
 export type RegisterRequestType = Static<typeof RegisterRequestSchema>;
 export type RegisterSuccessResponseType = Static<
   typeof RegisterSuccessResponseSchema
->;
-
-export type RegisterErrorResponseType = Static<
-  typeof RegisterErrorResponseSchema
 >;
 
 export type ProfileSuccessResponseType = Static<

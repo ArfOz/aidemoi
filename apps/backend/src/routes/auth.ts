@@ -6,16 +6,15 @@ import { Type } from '@sinclair/typebox';
 import { authenticateToken } from '../middleware/auth';
 
 import {
-  LoginErrorResponseSchema,
-  LoginErrorResponseType,
+  ApiErrorResponseType,
+  ApiErrorSchema,
+  LoginRequestType,
   LoginRequestSchema,
   LoginSuccessResponseSchema,
   LoginSuccessResponseType,
   RegisterRequestType,
   RegisterSuccessResponseSchema,
   RegisterSuccessResponseType,
-  RegisterErrorResponseSchema,
-  RegisterErrorResponseType,
   RegisterRequestSchema,
   parseExpirationTime,
   ProfileSuccessResponseSchema,
@@ -27,9 +26,6 @@ import {
   RefreshRequest,
   LogoutSuccessResponseType,
   LogoutHeaders,
-  LoginRequestType,
-  ApiResponseSchema,
-  ApiResponse,
 } from '@api';
 import { TokenService } from '../services/TokenService';
 
@@ -43,7 +39,7 @@ export async function authRoutes(
 
   fastify.post<{
     Body: LoginRequestType;
-    Reply: ApiResponse<LoginSuccessResponseType>;
+    Reply: LoginSuccessResponseType | ApiErrorResponseType;
   }>(
     '/login',
     {
@@ -51,8 +47,8 @@ export async function authRoutes(
         body: LoginRequestSchema,
         response: {
           200: LoginSuccessResponseSchema,
-          401: ApiResponseSchema,
-          500: ApiResponseSchema,
+          401: ApiErrorSchema,
+          500: ApiErrorSchema,
         },
       },
     },
@@ -98,7 +94,7 @@ export async function authRoutes(
           expiresAtRefresh: refreshTokenExpiresAt,
         });
 
-        const response: ApiResponse<LoginSuccessResponseType> = {
+        const response: LoginSuccessResponseType = {
           success: true,
           message: 'Login successful',
           data: {
@@ -133,7 +129,7 @@ export async function authRoutes(
   // Register endpoint
   fastify.post<{
     Body: RegisterRequestType;
-    Reply: RegisterSuccessResponseType | RegisterErrorResponseType;
+    Reply: RegisterSuccessResponseType | ApiErrorResponseType;
   }>(
     '/register',
     {
@@ -141,8 +137,8 @@ export async function authRoutes(
         body: RegisterRequestSchema,
         response: {
           201: RegisterSuccessResponseSchema,
-          400: RegisterErrorResponseSchema,
-          409: RegisterErrorResponseSchema,
+          400: ApiErrorSchema,
+          409: ApiErrorSchema,
         },
       },
     },
@@ -157,7 +153,7 @@ export async function authRoutes(
             success: false,
             error: {
               message: 'User with this email already exists',
-              statusCode: 409,
+              code: 409,
             },
             message: 'User with this email already exists',
           });
@@ -189,7 +185,7 @@ export async function authRoutes(
           success: false,
           error: {
             message: 'Registration failed',
-            statusCode: 500,
+            code: 500,
           },
           message: 'Registration failed',
         });
@@ -200,7 +196,7 @@ export async function authRoutes(
   // Get current user profile
   fastify.get<{
     Headers: { authorization: string };
-    Reply: ProfileSuccessResponseType | LoginErrorResponseType;
+    Reply: ProfileSuccessResponseType | ApiErrorResponseType;
   }>(
     '/profile',
     {
@@ -211,9 +207,9 @@ export async function authRoutes(
         }),
         response: {
           200: ProfileSuccessResponseSchema,
-          401: LoginErrorResponseSchema,
-          404: LoginErrorResponseSchema,
-          500: LoginErrorResponseSchema,
+          401: ApiErrorSchema,
+          404: ApiErrorSchema,
+          500: ApiErrorSchema,
         },
       },
     },
@@ -265,7 +261,7 @@ export async function authRoutes(
   // Refresh token endpoint
   fastify.post<{
     Body: RefreshRequest;
-    Reply: RefreshSuccessResponseType | LoginErrorResponseType;
+    Reply: RefreshSuccessResponseType | ApiErrorResponseType;
   }>(
     '/refresh',
     {
@@ -273,8 +269,8 @@ export async function authRoutes(
         body: RefreshTokenRequestSchema,
         response: {
           200: RefreshTokenSuccessResponseSchema,
-          401: LoginErrorResponseSchema,
-          500: LoginErrorResponseSchema,
+          401: ApiErrorSchema,
+          500: ApiErrorSchema,
         },
       },
     },
@@ -358,7 +354,7 @@ export async function authRoutes(
 
   fastify.post<{
     Headers: LogoutHeaders;
-    Reply: LogoutSuccessResponseType | LoginErrorResponseType;
+    Reply: LogoutSuccessResponseType | ApiErrorResponseType;
   }>(
     '/logout',
     {
@@ -369,8 +365,8 @@ export async function authRoutes(
         }),
         response: {
           200: LogoutSuccessResponseSchema,
-          401: LoginErrorResponseSchema,
-          500: LoginErrorResponseSchema,
+          401: ApiErrorSchema,
+          500: ApiErrorSchema,
         },
       },
     },
