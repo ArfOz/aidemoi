@@ -27,13 +27,9 @@ export const RegisterRequestSchema = Type.Object({
   password: Type.String(),
 });
 
-// Profile success schema (ApiResponse<{ user: ... }>)
-
 export const RefreshTokenRequestSchema = Type.Object({
   refreshToken: Type.String(),
 });
-
-// Logout success schema (ApiResponse<{ loggedOut: boolean }>)
 
 export const LogoutRequestSchema = Type.Object({
   refreshToken: Type.String(),
