@@ -110,7 +110,7 @@ export async function authRoutes(
               id: user.id.toString(),
               username: user.username,
               email: user.email,
-              roles: ['user'],
+              // roles: ['user'],
             },
           },
         };

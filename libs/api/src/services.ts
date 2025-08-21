@@ -71,186 +71,186 @@ function buildQueryParams(query?: Record<string, unknown>): URLSearchParams {
   return params;
 }
 
-// Service API functions
-export const serviceApi = {
-  /**
-   * Get all services with optional filtering
-   */
-  async getServices(query?: ServiceQueryData): Promise<PaginatedServices> {
-    const params = buildQueryParams(query);
-    const response = await apiAideMoi.get<PaginatedServices>(
-      `/services?${params.toString()}`
-    );
+// // Service API functions
+// export const serviceApi = {
+//   /**
+//    * Get all services with optional filtering
+//    */
+//   async getServices(query?: ServiceQueryData): Promise<PaginatedServices> {
+//     const params = buildQueryParams(query);
+//     const response = await apiAideMoi.get<PaginatedServices>(
+//       `/services?${params.toString()}`
+//     );
 
-    if (!response.success || !response.data) {
-      throw new Error(
-        typeof response.error === 'string'
-          ? response.error
-          : response.error?.message || 'Failed to fetch services'
-      );
-    }
+//     if (!response.success || !response.data) {
+//       throw new Error(
+//         typeof response.error === 'string'
+//           ? response.error
+//           : response.error?.message || 'Failed to fetch services'
+//       );
+//     }
 
-    return response.data;
-  },
+//     return response.data;
+//   },
 
-  /**
-   * Get a single service by ID
-   */
-  async getService(id: string): Promise<Service> {
-    const response = await apiAideMoi.get<Service>(`/services/${id}`);
+//   /**
+//    * Get a single service by ID
+//    */
+//   async getService(id: string): Promise<Service> {
+//     const response = await apiAideMoi.get<Service>(`/services/${id}`);
 
-    if (!response.success || !response.data) {
-      throw new Error(
-        typeof response.error === 'string'
-          ? response.error
-          : response.error?.message || 'Failed to fetch service'
-      );
-    }
+//     if (!response.success || !response.data) {
+//       throw new Error(
+//         typeof response.error === 'string'
+//           ? response.error
+//           : response.error?.message || 'Failed to fetch service'
+//       );
+//     }
 
-    return response.data;
-  },
+//     return response.data;
+//   },
 
-  /**
-   * Create a new service
-   */
-  async createService(data: CreateServiceData): Promise<Service> {
-    const response = await apiAideMoi.post<Service>('/services', data);
+//   /**
+//    * Create a new service
+//    */
+//   async createService(data: CreateServiceData): Promise<Service> {
+//     const response = await apiAideMoi.post<Service>('/services', data);
 
-    if (!response.success || !response.data) {
-      throw new Error(
-        typeof response.error === 'string'
-          ? response.error
-          : response.error?.message || 'Failed to create service'
-      );
-    }
+//     if (!response.success || !response.data) {
+//       throw new Error(
+//         typeof response.error === 'string'
+//           ? response.error
+//           : response.error?.message || 'Failed to create service'
+//       );
+//     }
 
-    return response.data;
-  },
+//     return response.data;
+//   },
 
-  /**
-   * Update an existing service
-   */
-  async updateService(id: string, data: UpdateServiceData): Promise<Service> {
-    const response = await apiAideMoi.put<Service>(`/services/${id}`, data);
+//   /**
+//    * Update an existing service
+//    */
+//   async updateService(id: string, data: UpdateServiceData): Promise<Service> {
+//     const response = await apiAideMoi.put<Service>(`/services/${id}`, data);
 
-    if (!response.success || !response.data) {
-      throw new Error(
-        typeof response.error === 'string'
-          ? response.error
-          : response.error?.message || 'Failed to update service'
-      );
-    }
+//     if (!response.success || !response.data) {
+//       throw new Error(
+//         typeof response.error === 'string'
+//           ? response.error
+//           : response.error?.message || 'Failed to update service'
+//       );
+//     }
 
-    return response.data;
-  },
+//     return response.data;
+//   },
 
-  /**
-   * Delete a service
-   */
-  async deleteService(id: string): Promise<void> {
-    const response = await apiAideMoi.delete(`/services/${id}`);
+//   /**
+//    * Delete a service
+//    */
+//   async deleteService(id: string): Promise<void> {
+//     const response = await apiAideMoi.delete(`/services/${id}`);
 
-    if (!response.success) {
-      throw new Error(
-        typeof response.error === 'string'
-          ? response.error
-          : response.error?.message || 'Failed to delete service'
-      );
-    }
-  },
+//     if (!response.success) {
+//       throw new Error(
+//         typeof response.error === 'string'
+//           ? response.error
+//           : response.error?.message || 'Failed to delete service'
+//       );
+//     }
+//   },
 
-  /**
-   * Get services by category
-   */
-  async getServicesByCategory(
-    category: string,
-    query?: Omit<ServiceQueryData, 'category'>
-  ): Promise<PaginatedServices> {
-    return this.getServices({ ...query, category });
-  },
+//   /**
+//    * Get services by category
+//    */
+//   async getServicesByCategory(
+//     category: string,
+//     query?: Omit<ServiceQueryData, 'category'>
+//   ): Promise<PaginatedServices> {
+//     return this.getServices({ ...query, category });
+//   },
 
-  /**
-   * Get services by location
-   */
-  async getServicesByLocation(
-    location: string,
-    query?: Omit<ServiceQueryData, 'location'>
-  ): Promise<PaginatedServices> {
-    return this.getServices({ ...query, location });
-  },
+//   /**
+//    * Get services by location
+//    */
+//   async getServicesByLocation(
+//     location: string,
+//     query?: Omit<ServiceQueryData, 'location'>
+//   ): Promise<PaginatedServices> {
+//     return this.getServices({ ...query, location });
+//   },
 
-  /**
-   * Get services by postal code
-   */
-  async getServicesByPostalCode(
-    postalCode: string,
-    query?: Omit<ServiceQueryData, 'postalCode'>
-  ): Promise<PaginatedServices> {
-    return this.getServices({ ...query, postalCode });
-  },
+//   /**
+//    * Get services by postal code
+//    */
+//   async getServicesByPostalCode(
+//     postalCode: string,
+//     query?: Omit<ServiceQueryData, 'postalCode'>
+//   ): Promise<PaginatedServices> {
+//     return this.getServices({ ...query, postalCode });
+//   },
 
-  /**
-   * Get user's services
-   */
-  async getUserServices(
-    userId: string,
-    query?: ServiceQueryData
-  ): Promise<PaginatedServices> {
-    const params = buildQueryParams(query);
-    const response = await apiAideMoi.get<PaginatedServices>(
-      `/users/${userId}/services?${params.toString()}`
-    );
+//   /**
+//    * Get user's services
+//    */
+//   async getUserServices(
+//     userId: string,
+//     query?: ServiceQueryData
+//   ): Promise<PaginatedServices> {
+//     const params = buildQueryParams(query);
+//     const response = await apiAideMoi.get<PaginatedServices>(
+//       `/users/${userId}/services?${params.toString()}`
+//     );
 
-    if (!response.success || !response.data) {
-      throw new Error(
-        typeof response.error === 'string'
-          ? response.error
-          : response.error?.message || 'Failed to fetch user services'
-      );
-    }
+//     if (!response.success || !response.data) {
+//       throw new Error(
+//         typeof response.error === 'string'
+//           ? response.error
+//           : response.error?.message || 'Failed to fetch user services'
+//       );
+//     }
 
-    return response.data;
-  },
+//     return response.data;
+//   },
 
-  /**
-   * Get all service categories
-   */
-  async getCategories(): Promise<ServiceCategory[]> {
-    const response = await apiAideMoi.get<ServiceCategory[]>(
-      '/services/categories'
-    );
+//   /**
+//    * Get all service categories
+//    */
+//   async getCategories(): Promise<ServiceCategory[]> {
+//     const response = await apiAideMoi.get<ServiceCategory[]>(
+//       '/services/categories'
+//     );
 
-    if (!response.success || !response.data) {
-      throw new Error(
-        typeof response.error === 'string'
-          ? response.error
-          : response.error?.message || 'Failed to fetch categories'
-      );
-    }
+//     if (!response.success || !response.data) {
+//       throw new Error(
+//         typeof response.error === 'string'
+//           ? response.error
+//           : response.error?.message || 'Failed to fetch categories'
+//       );
+//     }
 
-    return response.data;
-  },
+//     return response.data;
+//   },
 
-  /**
-   * Search services
-   */
-  async searchServices(
-    searchTerm: string,
-    query?: ServiceQueryData
-  ): Promise<PaginatedServices> {
-    const params = buildQueryParams({ ...query, search: searchTerm });
-    const response = await apiAideMoi.get<PaginatedServices>(
-      `/services/search?${params.toString()}`
-    );
+//   /**
+//    * Search services
+//    */
+//   async searchServices(
+//     searchTerm: string,
+//     query?: ServiceQueryData
+//   ): Promise<PaginatedServices> {
+//     const params = buildQueryParams({ ...query, search: searchTerm });
+//     const response = await apiAideMoi.get<PaginatedServices>(
+//       `/services/search?${params.toString()}`
+//     );
 
-    if (!response.success || !response.data) {
-      throw new Error(
-        typeof response.error === 'string'
-          ? response.error
-          : response.error?.message || 'Failed to search services'
-      );
-    }
+//     if (!response.success || !response.data) {
+//       throw new Error(
+//         typeof response.error === 'string'
+//           ? response.error
+//           : response.error?.message || 'Failed to search services'
+//       );
+//     }
 
-    return response.data;
-  },
-};
+//     return response.data;
+//   },
+// };

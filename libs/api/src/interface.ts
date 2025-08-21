@@ -15,13 +15,8 @@ import {
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
-// Base (static) type from the runtime schema
-type ApiResponseBase = Static<typeof ApiResponseSchema>;
+export type ApiResponseType = Static<typeof ApiResponseSchema>;
 
-// Generic ApiResponse with typed data payload
-export type ApiResponse<T = unknown> = Omit<ApiResponseBase, 'data'> & {
-  data?: T;
-};
 export type LoginSuccessResponseType = Static<
   typeof LoginSuccessResponseSchema
 >;

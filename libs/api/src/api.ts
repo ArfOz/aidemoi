@@ -2,7 +2,7 @@
  * API utilities for data fetching
  */
 
-import { ApiResponse, HttpMethod } from './interface';
+import { ApiResponseType, HttpMethod } from './interface';
 
 // Base configuration for API calls
 export const API_CONFIG = {
@@ -36,7 +36,7 @@ export interface RequestOptions {
 async function apiRequest<T extends object = object>(
   endpoint: string,
   options: RequestOptions = {}
-): Promise<ApiResponse<T>> {
+): Promise<T> {
   const {
     method = 'GET',
     headers = {},
@@ -107,8 +107,7 @@ export const apiAideMoi = {
   get: <T extends object>(
     endpoint: string,
     options?: Omit<RequestOptions, 'method'>
-  ): Promise<ApiResponse<T>> =>
-    apiRequest<T>(endpoint, { ...options, method: 'GET' }),
+  ): Promise<T> => apiRequest<T>(endpoint, { ...options, method: 'GET' }),
 
   post: <T extends object>(
     endpoint: string,

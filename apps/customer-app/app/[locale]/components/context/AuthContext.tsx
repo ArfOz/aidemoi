@@ -6,11 +6,10 @@ import {
   LoginRequestType,
   LoginSuccessResponseType,
   RegisterRequestType,
+  RegisterSuccessResponseType,
   TokenType,
   User,
 } from '@api';
-
-import { ApiResponse } from '@api';
 
 interface AuthContextType {
   user: User | null;
@@ -18,8 +17,12 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  login: (credentials: LoginRequestType) => Promise<LoginSuccessResponseType>; // return the data payload
-  register: (data: RegisterRequestType) => Promise<void>;
+  login: (
+    credentials: LoginRequestType
+  ) => Promise<LoginSuccessResponseType['data']>;
+  register: (
+    data: RegisterRequestType
+  ) => Promise<RegisterSuccessResponseType['data']>;
   logout: () => void;
   updateUser: (data: Partial<User>) => void;
   clearError: () => void;
@@ -80,16 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         { cache: 'no-store' } as any
       );
 
-      if (!response) {
-        throw new Error('No response from server');
-      }
-      if (!response.success) {
-        throw new Error(response.message || 'Login failed');
-      }
-      if (!response.data) {
-        throw new Error('No data in response');
-      }
-
+      if (!response.success) throw new Error(response.message);
       const { user, tokens } = response.data;
 
       setUser(user);
@@ -100,11 +94,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         (apiAideMoi as any).defaults ||= { headers: { common: {} } };
         (apiAideMoi as any).defaults.headers.common[
           'Authorization'
-        ] = `Bearer ${newTokens.token}`;
-      } catch {}
+        ] = `Bearer ${tokens.token}`;
+      } catch {
+        console.error('Failed to set default Authorization header');
+      }
 
-      localStorage.setItem('auth_user', JSON.stringify(newUser));
-      localStorage.setItem('auth_tokens', JSON.stringify(newTokens));
+      localStorage.setItem('auth_user', JSON.stringify(user));
+      localStorage.setItem('auth_tokens', JSON.stringify(tokens));
 
       return response.data; // return data so callers can do: const { tokens } = await login(...)
     } catch (err) {
@@ -116,13 +112,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const register = async (data: RegisterData) => {
+  const register = async (data: RegisterRequestType) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // API call to backend server using api library
-      const response = await apiAideMoi.post<ApiResponse<LoginSuccessResponse>>(
+      const response = await apiAideMoi.post<RegisterSuccessResponseType>(
         '/auth/register',
         data
       );
@@ -135,14 +130,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         throw new Error(errorMessage);
       }
 
-      console.log('Register responseaaaaaaaaaaaaa:', response);
+      const newUser = response.data.user; // sadece user var
+      setUser(newUser);
+      // tokens yok, yani oturum açılmayacak
+      localStorage.setItem('auth_user', JSON.stringify(newUser));
 
-      const { user: userData, tokens: tokenData } = response;
-
-      setUser(userData);
-      setTokens(tokenData);
-      localStorage.setItem('auth_user', JSON.stringify(userData));
-      localStorage.setItem('auth_tokens', JSON.stringify(tokenData));
+      return response.data;
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Registration failed';
@@ -161,7 +154,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.removeItem('auth_tokens');
   };
 
-  const updateUser = (data: Partial<AppUser>) => {
+  const updateUser = (data: Partial<User>) => {
     if (user) {
       const updatedUser = { ...user, ...data };
       setUser(updatedUser);

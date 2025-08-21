@@ -1,4 +1,4 @@
-import { Type } from '@sinclair/typebox';
+import { Static, Type } from '@sinclair/typebox';
 
 export const ErrorSchema = Type.Object({
   code: Type.Number(),
@@ -21,6 +21,12 @@ export const TokenSchema = Type.Object({
   refreshExpiresAt: Type.String(),
 });
 
+export const UserSchema = Type.Object({
+  id: Type.String(),
+  username: Type.String(),
+  email: Type.String(),
+  // roles opsiyonel değil, tamamen kaldırdık
+});
 export const RegisterRequestSchema = Type.Object({
   username: Type.String(),
   email: Type.String({ format: 'email' }),
@@ -37,16 +43,13 @@ export const LogoutRequestSchema = Type.Object({
 
 export const ApiResponseSchema = Type.Object({
   success: Type.Boolean(),
-  data: Type.Optional(Type.Any()),
-  error: Type.Optional(ErrorSchema),
-  message: Type.Optional(Type.String()),
-});
-
-export const ApiErrorSchema = Type.Object({
-  success: Type.Boolean(),
-  data: Type.Optional(Type.Any()),
-  error: Type.Optional(ErrorSchema),
-  message: Type.Optional(Type.String()),
+  message: Type.String(),
+  error: Type.Optional(
+    Type.Object({
+      code: Type.Number(),
+      message: Type.String(),
+    })
+  ),
 });
 
 export const LoginSuccessResponseSchema = Type.Intersect([
@@ -54,15 +57,18 @@ export const LoginSuccessResponseSchema = Type.Intersect([
   Type.Object({
     data: Type.Object({
       tokens: TokenSchema,
-      user: Type.Object({
-        id: Type.String(),
-        username: Type.String(),
-        email: Type.String(),
-        roles: Type.Optional(Type.Array(Type.String())),
-      }),
+      user: UserSchema,
     }),
   }),
 ]);
+
+// export type ApiResponseType = Static<typeof ApiResponseSchema>;
+export const ApiErrorSchema = Type.Object({
+  success: Type.Boolean(),
+  data: Type.Optional(Type.Any()),
+  error: Type.Optional(ErrorSchema),
+  message: Type.Optional(Type.String()),
+});
 
 export const LogoutSuccessResponseSchema = Type.Intersect([
   ApiResponseSchema,
