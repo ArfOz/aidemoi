@@ -1,5 +1,6 @@
 'use client';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import Link from 'next/link';
 import React from 'react';
 
 interface Specialty {
@@ -16,6 +17,7 @@ interface Category {
 }
 export default function MovingPage() {
   const t = useTranslations();
+  const locale = useLocale();
   // Get the categories array from the translation file
   const categoriesArr = t.raw('categories') as Category[];
   // Find the moving category by id
@@ -31,10 +33,15 @@ export default function MovingPage() {
           Object.entries(moving.specialties).map(
             ([key, spec]: [string, Specialty]) => (
               <li key={key} style={{ marginBottom: '1rem' }}>
-                <div style={{ fontWeight: 'bold' }}>
-                  {spec.icon} {spec.name}
-                </div>
-                <div style={{ color: '#555' }}>{spec.description}</div>
+                <Link
+                  href={`/${locale}/moving/${key}`}
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  <div style={{ fontWeight: 'bold' }}>
+                    {spec.icon} {spec.name}
+                  </div>
+                  <div style={{ color: '#555' }}>{spec.description}</div>
+                </Link>
               </li>
             )
           )}

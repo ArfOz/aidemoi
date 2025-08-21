@@ -1,9 +1,11 @@
 'use client';
-import { useTranslations } from 'next-intl';
+import React from 'react';
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { ReactNode } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
+
 interface Specialty {
-  icon: ReactNode;
+  icon: React.ReactNode;
   name: string;
   description: string;
 }
@@ -12,40 +14,48 @@ interface Category {
   id: string;
   name: string;
   description: string;
-  specialties?: Specialty[];
+  specialties?: Record<string, Specialty>;
 }
 
 export default function CategoryPage() {
   const t = useTranslations();
-  const params = useParams();
-  const categoryId = params.category as string;
+  const locale = useLocale();
+  const { category } = useParams<{ category: string }>();
 
-  // Get the categories array from translations
-  const categories = t.raw('categories') as Array<Category>;
-  const category = categories.find((cat) => cat.id === categoryId);
+  const categoriesArr = t.raw('categories') as Category[];
+  const active = categoriesArr.find((c) => c.id === category);
 
-  if (!category) {
-    return <div>Category not found</div>;
+  if (!active) {
+    return (
+      <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
+        <h1>Not found</h1>
+        <p>{`Category ${category} does not exist.`}</p>
+      </main>
+    );
   }
-
-  console.log('Category:', category);
 
   return (
     <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>{category.name}</h1>
-      <p>{category.description}</p>
+      <h1>{active.name}</h1>
+      <p>{active.description}</p>
 
-      {category?.specialties &&
-        Object.entries(category.specialties).map(
-          ([key, spec]: [string, Specialty]) => (
+      <h2>Specialties</h2>
+      <ul>
+        {active.specialties &&
+          Object.entries(active.specialties).map(([key, spec]) => (
             <li key={key} style={{ marginBottom: '1rem' }}>
-              <div style={{ fontWeight: 'bold' }}>
-                {spec.icon} {spec.name}
-              </div>
-              <div style={{ color: '#555' }}>{spec.description}</div>
+              <Link
+                href={`/${locale}/${category}/${key}`}
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                <div style={{ fontWeight: 'bold' }}>
+                  {spec.icon} {spec.name}
+                </div>
+                <div style={{ color: '#555' }}>{spec.description}</div>
+              </Link>
             </li>
-          )
-        )}
+          ))}
+      </ul>
     </main>
   );
 }
