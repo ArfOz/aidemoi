@@ -1,317 +1,297 @@
-/**
- * React hooks for data fetching
- */
+// 'use client';
 
-import { useState, useEffect, useCallback } from "react"
-import {
-  serviceApi,
-  Service,
-  PaginatedServices,
-  ServiceQueryData,
-} from "./services"
-import { userApi, User } from "./users"
-import {
-  requestApi,
-  ServiceRequest,
-  PaginatedRequests,
-  RequestQuery,
-} from "./requests"
-import { cache, generateCacheKey } from "./utils"
+// import { useState, useEffect, useCallback } from 'react';
+// import {
+//   serviceApi,
+//   Service,
+//   PaginatedServices,
+//   ServiceCategory,
+//   CreateServiceData,
+//   UpdateServiceData,
+//   ServiceQueryData,
+//   APIError,
+// } from '@api';
 
-// Generic hook state
-interface UseDataState<T> {
-  data: T | null
-  loading: boolean
-  error: string | null
-  refetch: () => Promise<void>
-}
+// // Hook for getting all services
+// export function useServices(query?: ServiceQueryData) {
+//   const [services, setServices] = useState<PaginatedServices | null>(null);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState<string | null>(null);
 
-// Generic hook for data fetching with caching
-function useData<T>(
-  fetchFn: () => Promise<T>,
-  cacheKey?: string,
-  cacheTtl?: number
-): UseDataState<T> {
-  const [data, setData] = useState<T | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+//   const fetchServices = useCallback(async () => {
+//     try {
+//       setLoading(true);
+//       setError(null);
+//       const data = await serviceApi.getServices(query);
+//       setServices(data);
+//     } catch (err) {
+//       const errorMessage =
+//         err instanceof APIError
+//           ? err.message
+//           : err instanceof Error
+//           ? err.message
+//           : 'Failed to fetch services';
+//       setError(errorMessage);
+//     } finally {
+//       setLoading(false);
+//     }
+//   }, [query]);
 
-  const fetchData = useCallback(async () => {
-    try {
-      setLoading(true)
-      setError(null)
+//   useEffect(() => {
+//     fetchServices();
+//   }, [fetchServices]);
 
-      // Check cache first
-      if (cacheKey) {
-        const cachedData = cache.get<T>(cacheKey)
-        if (cachedData) {
-          setData(cachedData)
-          setLoading(false)
-          return
-        }
-      }
+//   return {
+//     services,
+//     loading,
+//     error,
+//     refetch: fetchServices,
+//   };
+// }
 
-      const result = await fetchFn()
-      setData(result)
+// // Hook for getting a single service
+// export function useService(id: string) {
+//   const [service, setService] = useState<Service | null>(null);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState<string | null>(null);
 
-      // Cache the result
-      if (cacheKey) {
-        cache.set(cacheKey, result, cacheTtl)
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-    } finally {
-      setLoading(false)
-    }
-  }, [fetchFn, cacheKey, cacheTtl])
+//   const fetchService = useCallback(async () => {
+//     if (!id) return;
 
-  useEffect(() => {
-    fetchData()
-  }, [fetchData])
+//     try {
+//       setLoading(true);
+//       setError(null);
+//       const data = await serviceApi.getService(id);
+//       setService(data);
+//     } catch (err) {
+//       const errorMessage =
+//         err instanceof APIError
+//           ? err.message
+//           : err instanceof Error
+//           ? err.message
+//           : 'Failed to fetch service';
+//       setError(errorMessage);
+//     } finally {
+//       setLoading(false);
+//     }
+//   }, [id]);
 
-  return { data, loading, error, refetch: fetchData }
-}
+//   useEffect(() => {
+//     fetchService();
+//   }, [fetchService]);
 
-// Service hooks
-export function useServices(query?: ServiceQueryData) {
-  const cacheKey = generateCacheKey("/services", query)
-  return useData<PaginatedServices>(
-    () => serviceApi.getServices(query),
-    cacheKey
-  )
-}
+//   return {
+//     service,
+//     loading,
+//     error,
+//     refetch: fetchService,
+//   };
+// }
 
-export function useService(id: string) {
-  const cacheKey = generateCacheKey(`/services/${id}`)
-  return useData<Service>(() => serviceApi.getService(id), cacheKey)
-}
+// // Hook for service categories
+// export function useServiceCategories() {
+//   const [categories, setCategories] = useState<ServiceCategory[]>([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState<string | null>(null);
 
-export function useServiceCategories() {
-  const cacheKey = "/services/categories"
-  return useData(() => serviceApi.getCategories(), cacheKey, 10 * 60 * 1000) // 10 minutes
-}
+//   const fetchCategories = useCallback(async () => {
+//     try {
+//       setLoading(true);
+//       setError(null);
+//       const data = await serviceApi.getCategories();
+//       setCategories(data);
+//     } catch (err) {
+//       const errorMessage =
+//         err instanceof APIError
+//           ? err.message
+//           : err instanceof Error
+//           ? err.message
+//           : 'Failed to fetch categories';
+//       setError(errorMessage);
+//     } finally {
+//       setLoading(false);
+//     }
+//   }, []);
 
-export function useUserServices(userId: string, query?: ServiceQueryData) {
-  const cacheKey = generateCacheKey(`/users/${userId}/services`, query)
-  return useData<PaginatedServices>(
-    () => serviceApi.getUserServices(userId, query),
-    cacheKey
-  )
-}
+//   useEffect(() => {
+//     fetchCategories();
+//   }, [fetchCategories]);
 
-// User hooks
-export function useProfile() {
-  const cacheKey = "/auth/profile"
-  return useData<User>(() => userApi.getProfile(), cacheKey)
-}
+//   return {
+//     categories,
+//     loading,
+//     error,
+//     refetch: fetchCategories,
+//   };
+// }
 
-export function useUser(id: string) {
-  const cacheKey = generateCacheKey(`/users/${id}`)
-  return useData<User>(() => userApi.getUser(id), cacheKey)
-}
+// // Hook for user's services
+// export function useUserServices(userId: string, query?: ServiceQueryData) {
+//   const [services, setServices] = useState<PaginatedServices | null>(null);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState<string | null>(null);
 
-// Request hooks
-export function useRequests(query?: RequestQuery) {
-  const cacheKey = generateCacheKey(
-    "/requests",
-    query as Record<string, unknown>
-  )
-  return useData<PaginatedRequests>(
-    () => requestApi.getRequests(query),
-    cacheKey
-  )
-}
+//   const fetchUserServices = useCallback(async () => {
+//     if (!userId) return;
 
-export function useRequest(id: string) {
-  const cacheKey = generateCacheKey(`/requests/${id}`)
-  return useData<ServiceRequest>(() => requestApi.getRequest(id), cacheKey)
-}
+//     try {
+//       setLoading(true);
+//       setError(null);
+//       const data = await serviceApi.getUserServices(userId, query);
+//       setServices(data);
+//     } catch (err) {
+//       const errorMessage =
+//         err instanceof APIError
+//           ? err.message
+//           : err instanceof Error
+//           ? err.message
+//           : 'Failed to fetch user services';
+//       setError(errorMessage);
+//     } finally {
+//       setLoading(false);
+//     }
+//   }, [userId, query]);
 
-export function useUserRequests(userId: string, query?: RequestQuery) {
-  const cacheKey = generateCacheKey(
-    `/users/${userId}/requests`,
-    query as Record<string, unknown>
-  )
-  return useData<PaginatedRequests>(
-    () => requestApi.getUserRequests(userId, query),
-    cacheKey
-  )
-}
+//   useEffect(() => {
+//     fetchUserServices();
+//   }, [fetchUserServices]);
 
-// Mutation hooks
-export function useCreateService() {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+//   return {
+//     services,
+//     loading,
+//     error,
+//     refetch: fetchUserServices,
+//   };
+// }
 
-  const createService = useCallback(
-    async (data: Parameters<typeof serviceApi.createService>[0]) => {
-      try {
-        setLoading(true)
-        setError(null)
-        const result = await serviceApi.createService(data)
-        // Clear relevant caches
-        cache.clear()
-        return result
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "Failed to create service"
-        setError(message)
-        throw err
-      } finally {
-        setLoading(false)
-      }
-    },
-    []
-  )
+// // Hook for service mutations (create, update, delete)
+// export function useServiceMutations() {
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState<string | null>(null);
 
-  return { createService, loading, error }
-}
+//   const createService = useCallback(
+//     async (data: CreateServiceData): Promise<Service | null> => {
+//       try {
+//         setLoading(true);
+//         setError(null);
+//         const service = await serviceApi.createService(data);
+//         return service;
+//       } catch (err) {
+//         const errorMessage =
+//           err instanceof APIError
+//             ? err.message
+//             : err instanceof Error
+//             ? err.message
+//             : 'Failed to create service';
+//         setError(errorMessage);
+//         return null;
+//       } finally {
+//         setLoading(false);
+//       }
+//     },
+//     []
+//   );
 
-export function useUpdateService() {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+//   const updateService = useCallback(
+//     async (id: string, data: UpdateServiceData): Promise<Service | null> => {
+//       try {
+//         setLoading(true);
+//         setError(null);
+//         const service = await serviceApi.updateService(id, data);
+//         return service;
+//       } catch (err) {
+//         const errorMessage =
+//           err instanceof APIError
+//             ? err.message
+//             : err instanceof Error
+//             ? err.message
+//             : 'Failed to update service';
+//         setError(errorMessage);
+//         return null;
+//       } finally {
+//         setLoading(false);
+//       }
+//     },
+//     []
+//   );
 
-  const updateService = useCallback(
-    async (
-      id: string,
-      data: Parameters<typeof serviceApi.updateService>[1]
-    ) => {
-      try {
-        setLoading(true)
-        setError(null)
-        const result = await serviceApi.updateService(id, data)
-        // Clear relevant caches
-        cache.delete(`/services/${id}`)
-        cache.clear() // Clear all for now, can be more specific
-        return result
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "Failed to update service"
-        setError(message)
-        throw err
-      } finally {
-        setLoading(false)
-      }
-    },
-    []
-  )
+//   const deleteService = useCallback(async (id: string): Promise<boolean> => {
+//     try {
+//       setLoading(true);
+//       setError(null);
+//       await serviceApi.deleteService(id);
+//       return true;
+//     } catch (err) {
+//       const errorMessage =
+//         err instanceof APIError
+//           ? err.message
+//           : err instanceof Error
+//           ? err.message
+//           : 'Failed to delete service';
+//       setError(errorMessage);
+//       return false;
+//     } finally {
+//       setLoading(false);
+//     }
+//   }, []);
 
-  return { updateService, loading, error }
-}
+//   const clearError = useCallback(() => {
+//     setError(null);
+//   }, []);
 
-export function useDeleteService() {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+//   return {
+//     createService,
+//     updateService,
+//     deleteService,
+//     loading,
+//     error,
+//     clearError,
+//   };
+// }
 
-  const deleteService = useCallback(async (id: string) => {
-    try {
-      setLoading(true)
-      setError(null)
-      await serviceApi.deleteService(id)
-      // Clear relevant caches
-      cache.delete(`/services/${id}`)
-      cache.clear() // Clear all for now, can be more specific
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Failed to delete service"
-      setError(message)
-      throw err
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+// // Hook for searching services
+// export function useServiceSearch() {
+//   const [results, setResults] = useState<PaginatedServices | null>(null);
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState<string | null>(null);
 
-  return { deleteService, loading, error }
-}
+//   const searchServices = useCallback(
+//     async (searchTerm: string, query?: ServiceQueryData) => {
+//       if (!searchTerm.trim()) {
+//         setResults(null);
+//         return;
+//       }
 
-export function useCreateRequest() {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+//       try {
+//         setLoading(true);
+//         setError(null);
+//         const data = await serviceApi.searchServices(searchTerm, query);
+//         setResults(data);
+//       } catch (err) {
+//         const errorMessage =
+//           err instanceof APIError
+//             ? err.message
+//             : err instanceof Error
+//             ? err.message
+//             : 'Failed to search services';
+//         setError(errorMessage);
+//       } finally {
+//         setLoading(false);
+//       }
+//     },
+//     []
+//   );
 
-  const createRequest = useCallback(
-    async (data: Parameters<typeof requestApi.createRequest>[0]) => {
-      try {
-        setLoading(true)
-        setError(null)
-        const result = await requestApi.createRequest(data)
-        // Clear relevant caches
-        cache.clear()
-        return result
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "Failed to create request"
-        setError(message)
-        throw err
-      } finally {
-        setLoading(false)
-      }
-    },
-    []
-  )
+//   const clearSearch = useCallback(() => {
+//     setResults(null);
+//     setError(null);
+//   }, []);
 
-  return { createRequest, loading, error }
-}
-
-export function useAuth() {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const login = useCallback(
-    async (data: Parameters<typeof userApi.login>[0]) => {
-      try {
-        setLoading(true)
-        setError(null)
-        const result = await userApi.login(data)
-        // Clear caches on login
-        cache.clear()
-        return result
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to login"
-        setError(message)
-        throw err
-      } finally {
-        setLoading(false)
-      }
-    },
-    []
-  )
-
-  const register = useCallback(
-    async (data: Parameters<typeof userApi.register>[0]) => {
-      try {
-        setLoading(true)
-        setError(null)
-        const result = await userApi.register(data)
-        // Clear caches on register
-        cache.clear()
-        return result
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "Failed to register"
-        setError(message)
-        throw err
-      } finally {
-        setLoading(false)
-      }
-    },
-    []
-  )
-
-  const logout = useCallback(async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      await userApi.logout()
-      // Clear all caches on logout
-      cache.clear()
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to logout"
-      setError(message)
-      throw err
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  return { login, register, logout, loading, error }
-}
+//   return {
+//     results,
+//     loading,
+//     error,
+//     searchServices,
+//     clearSearch,
+//   };
+// }

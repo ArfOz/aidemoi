@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useAuth } from '@aidemoi-monorepo/shared-auth';
+import { useAuth } from '../components/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -45,9 +45,9 @@ const ProfilePage: React.FC<{ params: Promise<{ locale: string }> }> = ({
             <div className="space-y-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Username
+                  Name
                 </label>
-                <p className="text-lg text-gray-900">{user.name}</p>
+                <p className="text-lg text-gray-900">{user.username}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">

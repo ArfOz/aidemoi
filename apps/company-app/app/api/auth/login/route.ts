@@ -24,7 +24,7 @@ const mockUsers = [
     rating: 4.8,
     completedJobs: 156,
     createdAt: new Date().toISOString(),
-  }
+  },
 ];
 
 export async function POST(request: NextRequest) {
@@ -32,13 +32,10 @@ export async function POST(request: NextRequest) {
     const { email, password } = await request.json();
 
     // Find user by email
-    const user = mockUsers.find(u => u.email === email);
-    
+    const user = mockUsers.find((u) => u.email === email);
+
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     // Check password
@@ -56,14 +53,13 @@ export async function POST(request: NextRequest) {
     const tokens = {
       accessToken: `mock-token-${user.id}-${Date.now()}`,
       refreshToken: `mock-refresh-${user.id}-${Date.now()}`,
-      expiresIn: '7d'
+      expiresIn: '7d',
     };
 
     return NextResponse.json({
       user: userWithoutPassword,
-      tokens
+      tokens,
     });
-
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json(

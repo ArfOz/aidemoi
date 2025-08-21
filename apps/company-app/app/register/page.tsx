@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@aidemoi-monorepo/shared-auth';
+import { useAuth } from '@aidemoi/shared-auth';
 import Link from 'next/link';
 
 const specialtyOptions = [
@@ -35,13 +35,13 @@ export default function RegisterPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
     // Clear error when user starts typing
     if (formErrors[name]) {
-      setFormErrors(prev => ({
+      setFormErrors((prev) => ({
         ...prev,
         [name]: '',
       }));
@@ -49,10 +49,10 @@ export default function RegisterPage() {
   };
 
   const handleSpecialtyChange = (specialty: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       specialties: prev.specialties.includes(specialty)
-        ? prev.specialties.filter(s => s !== specialty)
+        ? prev.specialties.filter((s) => s !== specialty)
         : [...prev.specialties, specialty],
     }));
   };
@@ -139,7 +139,10 @@ export default function RegisterPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Name Field */}
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Full Name *
               </label>
               <input
@@ -161,7 +164,10 @@ export default function RegisterPage() {
 
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Email Address *
               </label>
               <input
@@ -185,7 +191,10 @@ export default function RegisterPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Password *
               </label>
               <input
@@ -201,13 +210,18 @@ export default function RegisterPage() {
                 required
               />
               {formErrors.password && (
-                <p className="text-red-500 text-sm mt-1">{formErrors.password}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {formErrors.password}
+                </p>
               )}
             </div>
 
             {/* Phone Field */}
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="phone"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Phone Number *
               </label>
               <input
@@ -230,7 +244,10 @@ export default function RegisterPage() {
 
           {/* Hourly Rate */}
           <div>
-            <label htmlFor="hourlyRate" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="hourlyRate"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Hourly Rate ($) *
             </label>
             <input
@@ -248,7 +265,9 @@ export default function RegisterPage() {
               required
             />
             {formErrors.hourlyRate && (
-              <p className="text-red-500 text-sm mt-1">{formErrors.hourlyRate}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {formErrors.hourlyRate}
+              </p>
             )}
           </div>
 
@@ -259,7 +278,10 @@ export default function RegisterPage() {
             </label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {specialtyOptions.map((specialty) => (
-                <label key={specialty} className="flex items-center cursor-pointer">
+                <label
+                  key={specialty}
+                  className="flex items-center cursor-pointer"
+                >
                   <input
                     type="checkbox"
                     checked={formData.specialties.includes(specialty)}
@@ -271,7 +293,9 @@ export default function RegisterPage() {
               ))}
             </div>
             {formErrors.specialties && (
-              <p className="text-red-500 text-sm mt-1">{formErrors.specialties}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {formErrors.specialties}
+              </p>
             )}
           </div>
 

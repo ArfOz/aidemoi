@@ -62,7 +62,7 @@ const filteredServices = await serviceApi.getServices({
   category: 'cleaning',
   location: 'zurich',
   page: 1,
-  limit: 10
+  limit: 10,
 });
 
 // Get single service
@@ -74,7 +74,7 @@ const newService = await serviceApi.createService({
   description: 'Professional cleaning service',
   category: 'cleaning',
   location: 'Zurich',
-  postalCode: '8000'
+  postalCode: '8000',
 });
 ```
 
@@ -86,7 +86,7 @@ import { userApi } from '@/lib/users';
 // Login
 const authResponse = await userApi.login({
   email: 'user@example.com',
-  password: 'password123'
+  password: 'password123',
 });
 
 // Register
@@ -95,7 +95,7 @@ const authResponse = await userApi.register({
   password: 'password123',
   firstName: 'John',
   lastName: 'Doe',
-  postalCode: '8000'
+  postalCode: '8000',
 });
 
 // Get profile
@@ -105,18 +105,12 @@ const profile = await userApi.getProfile();
 ### React Hooks
 
 ```typescript
-import { 
-  useServices, 
-  useService, 
-  useProfile, 
-  useCreateService,
-  useAuth 
-} from '@/lib/hooks';
+import { useServices, useService, useProfile, useCreateService, useAuth } from '@/lib/hooks';
 
 function ServicesPage() {
   const { data: services, loading, error, refetch } = useServices();
   const { createService, loading: creating } = useCreateService();
-  
+
   const handleCreate = async (data) => {
     try {
       await createService(data);
@@ -125,13 +119,13 @@ function ServicesPage() {
       console.error('Failed to create service:', error);
     }
   };
-  
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
-  
+
   return (
     <div>
-      {services?.services.map(service => (
+      {services?.services.map((service) => (
         <div key={service.id}>{service.title}</div>
       ))}
     </div>
@@ -190,12 +184,7 @@ try {
 All functions and hooks are fully typed with TypeScript. Import the types you need:
 
 ```typescript
-import type { 
-  Service, 
-  ServiceQueryData, 
-  User, 
-  ServiceRequest 
-} from '@/lib';
+import type { Service, ServiceQueryData, User, ServiceRequest } from '@/lib';
 ```
 
 ## Best Practices

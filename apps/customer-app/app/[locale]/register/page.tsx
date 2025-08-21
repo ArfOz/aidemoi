@@ -3,12 +3,13 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@aidemoi-monorepo/shared-auth';
+import { useAuth } from '../components/context/AuthContext';
 
 interface CreateUserData {
   name: string;
   email: string;
   password: string;
+  role: 'customer' | 'repairman';
 }
 
 const RegisterPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
@@ -21,6 +22,7 @@ const RegisterPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
     name: '',
     email: '',
     password: '',
+    role: 'customer',
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -80,15 +82,12 @@ const RegisterPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
 
     try {
       console.log('Submitting registration data:', formData);
-      await register({
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        role: 'customer',
-      });
 
-      // Redirect to home page after successful registration
-      router.push(`/${resolvedParams.locale}`);
+      // Use the AuthContext register function
+      await register(formData);
+
+      // Redirect to login page after successful registration
+      router.push(`/${resolvedParams.locale}/login?registered=true`);
     } catch (error) {
       console.error('Registration error:', error);
       const errorMessage =
@@ -129,7 +128,7 @@ const RegisterPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
               htmlFor="name"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Full Name *
+              Name *
             </label>
             <input
               type="text"
@@ -140,7 +139,7 @@ const RegisterPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
               className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 transition-colors ${
                 errors.name ? 'border-red-300' : 'border-gray-300'
               }`}
-              placeholder="Enter your full name"
+              placeholder="Enter your name"
               required
             />
             {errors.name && (

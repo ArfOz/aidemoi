@@ -6,8 +6,8 @@ import { FaLanguage, FaSignInAlt, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import React from 'react';
-import { useAuth } from '@aidemoi-monorepo/shared-auth';
 import { PostalCodes } from './postal-code';
+import { useAuth } from './context/AuthContext';
 
 const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
   const router = useRouter();
@@ -15,7 +15,6 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
   const params = useParams();
   const t = useTranslations();
   const { user, isAuthenticated, logout } = useAuth();
-  const locale = (params.locale as string) || currentLang;
   // Get the categories array directly
   const categories = t.raw('categories') as Array<{ id: string; name: string }>;
 
@@ -28,6 +27,8 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
     logout();
     router.push(`/${locale}`);
   };
+
+  const locale = (params.locale as string) || currentLang;
 
   return (
     <nav className="flex items-center justify-between px-8 py-6 bg-gradient-to-r from-purple-800 via-fuchsia-700 to-pink-600 shadow-lg mb-8">
@@ -68,10 +69,10 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
               <Link
                 href={`/${locale}/profile`}
                 className="flex items-center gap-2 px-4 py-2 bg-white text-purple-700 rounded-lg font-semibold hover:bg-purple-100 transition-colors duration-200 shadow-md"
-                title={`Welcome, ${user.name}`}
+                title={`Welcome, ${user.username}`}
               >
                 <FaUser className="text-lg" />
-                <span className="hidden sm:inline">{user.name}</span>
+                <span className="hidden sm:inline">{user.username}</span>
               </Link>
               <button
                 onClick={handleLogout}
@@ -111,6 +112,13 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
           </button>
         ))}
       </div>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap');
+        .font-logo {
+          font-family: 'Montserrat', 'Arial Black', Arial, sans-serif;
+          letter-spacing: 0.05em;
+        }
+      `}</style>
     </nav>
   );
 };

@@ -1,7 +1,7 @@
 interface Service {
-  title: string
-  description: string
-  price: number
+  title: string;
+  description: string;
+  price: number;
 }
 
 export function ServiceCard({ service }: { service: Service }) {
@@ -11,5 +11,5 @@ export function ServiceCard({ service }: { service: Service }) {
       <p>{service.description}</p>
       <span>{service.price} CHF</span>
     </div>
-  )
+  );
 }

@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
     const { name, email, password, role, phone, specialties } = userData;
 
     // Check if user already exists
-    const existingUser = mockUsers.find(u => u.email === email);
+    const existingUser = mockUsers.find((u) => u.email === email);
     if (existingUser) {
       return NextResponse.json(
         { error: 'User already exists' },
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
         hourlyRate: 50, // Default rate
         rating: 0,
         completedJobs: 0,
-      })
+      }),
     };
 
     // Add to mock storage
@@ -44,14 +44,13 @@ export async function POST(request: NextRequest) {
     const tokens = {
       accessToken: `mock-token-${newUser.id}-${Date.now()}`,
       refreshToken: `mock-refresh-${newUser.id}-${Date.now()}`,
-      expiresIn: '7d'
+      expiresIn: '7d',
     };
 
     return NextResponse.json({
       user: userWithoutPassword,
-      tokens
+      tokens,
     });
-
   } catch (error) {
     console.error('Registration error:', error);
     return NextResponse.json(
