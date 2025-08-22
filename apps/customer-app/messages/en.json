@@ -13,32 +13,320 @@
         "local": {
           "name": "Local Moves",
           "description": "Short-distance moves within the same city or metro area",
-          "icon": "🏠"
+          "icon": "🏠",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "longDistance": {
           "name": "Long Distance",
           "description": "Cross-state or cross-country relocations",
-          "icon": "🛣️"
+          "icon": "🛣️",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "packing": {
           "name": "Packing Services",
           "description": "Professional packing of furniture, fragile items, and boxes",
-          "icon": "📦"
+          "icon": "📦",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "unpacking": {
           "name": "Unpacking & Setup",
           "description": "Unpacking, arranging, and setting up furniture at destination",
-          "icon": "📬"
+          "icon": "📬",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "furnitureAssembly": {
           "name": "Furniture Assembly",
           "description": "Disassembly and reassembly of furniture pieces",
-          "icon": "🪑"
+          "icon": "🪑",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "storage": {
           "name": "Short-Term Storage",
           "description": "Secure storage solutions for items between moves",
-          "icon": "📦🔒"
+          "icon": "📦🔒",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         }
       }
     },
@@ -51,27 +339,267 @@
         "residential": {
           "name": "Residential Cleaning",
           "description": "Cleaning homes, apartments, and condos",
-          "icon": "🏠"
+          "icon": "🏠",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "commercial": {
           "name": "Commercial Cleaning",
           "description": "Cleaning offices, retail, and industrial spaces",
-          "icon": "🏢"
+          "icon": "🏢",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "deepCleaning": {
           "name": "Deep Cleaning",
           "description": "Thorough cleaning of high-traffic and hard-to-reach areas",
-          "icon": "🧽"
+          "icon": "🧽",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "moveInOut": {
           "name": "Move In/Out Cleaning",
           "description": "Cleaning before move-in or after move-out",
-          "icon": "📦"
+          "icon": "📦",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "windowCleaning": {
           "name": "Window Cleaning",
           "description": "Interior and exterior window washing",
-          "icon": "🪟"
+          "icon": "🪟",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         }
       }
     },
@@ -84,17 +612,161 @@
         "leakRepair": {
           "name": "Leak Repair",
           "description": "Fixing pipe and faucet leaks",
-          "icon": "💧"
+          "icon": "💧",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "fixtureInstall": {
           "name": "Fixture Installation",
           "description": "Sinks, toilets, showers and dishwashers",
-          "icon": "🚿"
+          "icon": "🚿",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "pipeReplacement": {
           "name": "Pipe Replacement",
           "description": "Repiping and sewer line services",
-          "icon": "🔩"
+          "icon": "🔩",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         }
       }
     },
@@ -107,17 +779,161 @@
         "rewiring": {
           "name": "Rewiring",
           "description": "Home and commercial rewiring services",
-          "icon": "⚡"
+          "icon": "⚡",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "lighting": {
           "name": "Lighting Installation",
           "description": "Indoor and outdoor lighting setups",
-          "icon": "💡"
+          "icon": "💡",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "safetyInspections": {
           "name": "Safety Inspections",
           "description": "Code compliance and safety checks",
-          "icon": "🔍"
+          "icon": "🔍",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         }
       }
     },
@@ -130,17 +946,161 @@
         "interior": {
           "name": "Interior Painting",
           "description": "Walls, ceilings, trim and cabinets",
-          "icon": "🖌️"
+          "icon": "🖌️",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "exterior": {
           "name": "Exterior Painting",
           "description": "Siding, fences, decks and exterior trim",
-          "icon": "🌳"
+          "icon": "🌳",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "colorConsult": {
           "name": "Color Consultation",
           "description": "Professional advice on color schemes and finishes",
-          "icon": "🖍️"
+          "icon": "🖍️",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         }
       }
     },
@@ -153,27 +1113,267 @@
         "furnitureAssembly": {
           "name": "Furniture Assembly",
           "description": "Building and assembling furniture pieces",
-          "icon": "🪑"
+          "icon": "🪑",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "installation": {
           "name": "Minor Installations",
           "description": "Installing shelves, blinds, and fixtures",
-          "icon": "🔩"
+          "icon": "🔩",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "paintingTouchUps": {
           "name": "Painting Touch-Ups",
           "description": "Small painting and touch-up jobs",
-          "icon": "🎨"
+          "icon": "🎨",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "oddJobs": {
           "name": "Odd Jobs",
           "description": "Various small repairs and tasks around the home",
-          "icon": "🔨"
+          "icon": "🔨",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "doorInstallation": {
           "name": "Door & Window Installation",
           "description": "Hanging doors and mounting windows",
-          "icon": "🚪"
+          "icon": "🚪",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         }
       }
     },
@@ -186,27 +1386,267 @@
         "applianceRepair": {
           "name": "Appliance Repair",
           "description": "Fixing refrigerators, ovens, washers, and dryers",
-          "icon": "🍽️"
+          "icon": "🍽️",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "electricalRepair": {
           "name": "Electrical Repairs",
           "description": "Troubleshooting and repairing electrical issues",
-          "icon": "💡"
+          "icon": "💡",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "plumbingRepair": {
           "name": "Plumbing Repairs",
           "description": "Repairing pipes, faucets, and leaks",
-          "icon": "🚰"
+          "icon": "🚰",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "carpentryRepair": {
           "name": "Carpentry Repairs",
           "description": "Fixing cabinets, doors, and wood fixtures",
-          "icon": "🪚"
+          "icon": "🪚",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "drywallRepair": {
           "name": "Drywall Repair",
           "description": "Patching holes and fixing wall damage",
-          "icon": "🧱"
+          "icon": "🧱",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         }
       }
     },
@@ -219,17 +1659,161 @@
         "lawnMowing": {
           "name": "Lawn Mowing",
           "description": "Regular mowing and edging",
-          "icon": "🚜"
+          "icon": "🚜",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "planting": {
           "name": "Planting & Weeding",
           "description": "Flower beds, shrubs and vegetable gardens",
-          "icon": "🌷"
+          "icon": "🌷",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         },
         "landscapeDesign": {
           "name": "Landscape Design",
           "description": "Hardscaping and garden planning",
-          "icon": "🏡"
+          "icon": "🏡",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "What is the job size?",
+              "required": true,
+              "placeholder": "Select job size",
+              "options": [
+                { "value": "small", "label": "Small" },
+                { "value": "medium", "label": "Medium" },
+                { "value": "large", "label": "Large" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "When do you need the service?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Preferred time",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Where will the service take place?",
+              "placeholder": "Neighborhood, district or full address",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "What's your estimated budget? (optional)",
+              "required": false,
+              "min": 0,
+              "unit": "TL"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Additional details",
+              "placeholder": "Describe details that matter",
+              "required": false
+            }
+          ]
         }
       }
     }
