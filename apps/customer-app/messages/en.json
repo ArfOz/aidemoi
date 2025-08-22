@@ -16,15 +16,17 @@
           "icon": "🏠",
           "questions": [
             {
-              "id": "jobSize",
+              "id": "homeSize",
               "type": "select",
-              "text": "What is the job size?",
+              "text": "What is the home size?",
               "required": true,
-              "placeholder": "Select job size",
+              "placeholder": "Select home size",
               "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
+                { "value": "studio", "label": "Studio" },
+                { "value": "1br", "label": "1 bedroom" },
+                { "value": "2br", "label": "2 bedrooms" },
+                { "value": "3br", "label": "3 bedrooms" },
+                { "value": "4brPlus", "label": "4+ bedrooms" }
               ]
             },
             {
@@ -69,15 +71,16 @@
           "icon": "🛣️",
           "questions": [
             {
-              "id": "jobSize",
+              "id": "distanceBand",
               "type": "select",
-              "text": "What is the job size?",
+              "text": "What is the approximate distance?",
               "required": true,
-              "placeholder": "Select job size",
+              "placeholder": "Select distance",
               "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
+                { "value": "<200km", "label": "Under 200 km" },
+                { "value": "200-500km", "label": "200–500 km" },
+                { "value": "500-1000km", "label": "500–1000 km" },
+                { "value": "1000kmPlus", "label": "1000+ km" }
               ]
             },
             {
@@ -122,15 +125,16 @@
           "icon": "📦",
           "questions": [
             {
-              "id": "jobSize",
+              "id": "boxesCount",
               "type": "select",
-              "text": "What is the job size?",
+              "text": "How many boxes need packing?",
               "required": true,
-              "placeholder": "Select job size",
+              "placeholder": "Select box count",
               "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
+                { "value": "0-10", "label": "0–10 boxes" },
+                { "value": "11-25", "label": "11–25 boxes" },
+                { "value": "26-50", "label": "26–50 boxes" },
+                { "value": "50Plus", "label": "50+ boxes" }
               ]
             },
             {
@@ -175,15 +179,16 @@
           "icon": "📬",
           "questions": [
             {
-              "id": "jobSize",
+              "id": "boxesToUnpack",
               "type": "select",
-              "text": "What is the job size?",
+              "text": "How many boxes to unpack?",
               "required": true,
-              "placeholder": "Select job size",
+              "placeholder": "Select box count",
               "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
+                { "value": "0-10", "label": "0–10 boxes" },
+                { "value": "11-25", "label": "11–25 boxes" },
+                { "value": "26-50", "label": "26–50 boxes" },
+                { "value": "50Plus", "label": "50+ boxes" }
               ]
             },
             {
@@ -228,16 +233,12 @@
           "icon": "🪑",
           "questions": [
             {
-              "id": "jobSize",
-              "type": "select",
-              "text": "What is the job size?",
+              "id": "itemsCount",
+              "type": "number",
+              "text": "How many items should be assembled?",
+              "placeholder": "Enter number of items",
               "required": true,
-              "placeholder": "Select job size",
-              "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
-              ]
+              "min": 1
             },
             {
               "id": "jobDate",
@@ -281,15 +282,16 @@
           "icon": "📦🔒",
           "questions": [
             {
-              "id": "jobSize",
+              "id": "volume",
               "type": "select",
-              "text": "What is the job size?",
+              "text": "What is the estimated storage volume?",
               "required": true,
-              "placeholder": "Select job size",
+              "placeholder": "Select volume",
               "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
+                { "value": "<5m3", "label": "< 5 m³" },
+                { "value": "5-10m3", "label": "5–10 m³" },
+                { "value": "10-20m3", "label": "10–20 m³" },
+                { "value": "20m3Plus", "label": "20+ m³" }
               ]
             },
             {
@@ -342,50 +344,13 @@
           "icon": "🏠",
           "questions": [
             {
-              "id": "jobSize",
-              "type": "select",
-              "text": "What is the job size?",
-              "required": true,
-              "placeholder": "Select job size",
-              "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
-              ]
-            },
-            {
-              "id": "jobDate",
-              "type": "date",
-              "text": "When do you need the service?",
-              "required": true
-            },
-            {
-              "id": "jobTime",
-              "type": "time",
-              "text": "Preferred time",
-              "required": false
-            },
-            {
-              "id": "address",
-              "type": "text",
-              "text": "Where will the service take place?",
-              "placeholder": "Neighborhood, district or full address",
-              "required": true
-            },
-            {
-              "id": "budget",
+              "id": "areaM2",
               "type": "number",
-              "text": "What's your estimated budget? (optional)",
-              "required": false,
-              "min": 0,
-              "unit": "TL"
-            },
-            {
-              "id": "details",
-              "type": "text",
-              "text": "Additional details",
-              "placeholder": "Describe details that matter",
-              "required": false
+              "text": "How many square meters is the place?",
+              "placeholder": "Enter area in m²",
+              "required": true,
+              "min": 1,
+              "unit": "m²"
             }
           ]
         },
@@ -395,50 +360,13 @@
           "icon": "🏢",
           "questions": [
             {
-              "id": "jobSize",
-              "type": "select",
-              "text": "What is the job size?",
-              "required": true,
-              "placeholder": "Select job size",
-              "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
-              ]
-            },
-            {
-              "id": "jobDate",
-              "type": "date",
-              "text": "When do you need the service?",
-              "required": true
-            },
-            {
-              "id": "jobTime",
-              "type": "time",
-              "text": "Preferred time",
-              "required": false
-            },
-            {
-              "id": "address",
-              "type": "text",
-              "text": "Where will the service take place?",
-              "placeholder": "Neighborhood, district or full address",
-              "required": true
-            },
-            {
-              "id": "budget",
+              "id": "areaM2",
               "type": "number",
-              "text": "What's your estimated budget? (optional)",
-              "required": false,
-              "min": 0,
-              "unit": "TL"
-            },
-            {
-              "id": "details",
-              "type": "text",
-              "text": "Additional details",
-              "placeholder": "Describe details that matter",
-              "required": false
+              "text": "What is the workspace size (m²)?",
+              "placeholder": "Enter area in m²",
+              "required": true,
+              "min": 1,
+              "unit": "m²"
             }
           ]
         },
@@ -448,50 +376,13 @@
           "icon": "🧽",
           "questions": [
             {
-              "id": "jobSize",
-              "type": "select",
-              "text": "What is the job size?",
-              "required": true,
-              "placeholder": "Select job size",
-              "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
-              ]
-            },
-            {
-              "id": "jobDate",
-              "type": "date",
-              "text": "When do you need the service?",
-              "required": true
-            },
-            {
-              "id": "jobTime",
-              "type": "time",
-              "text": "Preferred time",
-              "required": false
-            },
-            {
-              "id": "address",
-              "type": "text",
-              "text": "Where will the service take place?",
-              "placeholder": "Neighborhood, district or full address",
-              "required": true
-            },
-            {
-              "id": "budget",
+              "id": "areaM2",
               "type": "number",
-              "text": "What's your estimated budget? (optional)",
-              "required": false,
-              "min": 0,
-              "unit": "TL"
-            },
-            {
-              "id": "details",
-              "type": "text",
-              "text": "Additional details",
-              "placeholder": "Describe details that matter",
-              "required": false
+              "text": "What is the property size (m²)?",
+              "placeholder": "Enter area in m²",
+              "required": true,
+              "min": 1,
+              "unit": "m²"
             }
           ]
         },
@@ -501,50 +392,13 @@
           "icon": "📦",
           "questions": [
             {
-              "id": "jobSize",
-              "type": "select",
-              "text": "What is the job size?",
-              "required": true,
-              "placeholder": "Select job size",
-              "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
-              ]
-            },
-            {
-              "id": "jobDate",
-              "type": "date",
-              "text": "When do you need the service?",
-              "required": true
-            },
-            {
-              "id": "jobTime",
-              "type": "time",
-              "text": "Preferred time",
-              "required": false
-            },
-            {
-              "id": "address",
-              "type": "text",
-              "text": "Where will the service take place?",
-              "placeholder": "Neighborhood, district or full address",
-              "required": true
-            },
-            {
-              "id": "budget",
+              "id": "areaM2",
               "type": "number",
-              "text": "What's your estimated budget? (optional)",
-              "required": false,
-              "min": 0,
-              "unit": "TL"
-            },
-            {
-              "id": "details",
-              "type": "text",
-              "text": "Additional details",
-              "placeholder": "Describe details that matter",
-              "required": false
+              "text": "How many square meters is the place?",
+              "placeholder": "Enter area in m²",
+              "required": true,
+              "min": 1,
+              "unit": "m²"
             }
           ]
         },
@@ -554,50 +408,13 @@
           "icon": "🪟",
           "questions": [
             {
-              "id": "jobSize",
-              "type": "select",
-              "text": "What is the job size?",
-              "required": true,
-              "placeholder": "Select job size",
-              "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
-              ]
-            },
-            {
-              "id": "jobDate",
-              "type": "date",
-              "text": "When do you need the service?",
-              "required": true
-            },
-            {
-              "id": "jobTime",
-              "type": "time",
-              "text": "Preferred time",
-              "required": false
-            },
-            {
-              "id": "address",
-              "type": "text",
-              "text": "Where will the service take place?",
-              "placeholder": "Neighborhood, district or full address",
-              "required": true
-            },
-            {
-              "id": "budget",
+              "id": "areaM2",
               "type": "number",
-              "text": "What's your estimated budget? (optional)",
-              "required": false,
-              "min": 0,
-              "unit": "TL"
-            },
-            {
-              "id": "details",
-              "type": "text",
-              "text": "Additional details",
-              "placeholder": "Describe details that matter",
-              "required": false
+              "text": "How many square meters is the place?",
+              "placeholder": "Enter area in m²",
+              "required": true,
+              "min": 1,
+              "unit": "m²"
             }
           ]
         }
@@ -615,15 +432,16 @@
           "icon": "💧",
           "questions": [
             {
-              "id": "jobSize",
-              "type": "select",
-              "text": "What is the job size?",
+              "id": "leakLocation",
+              "type": "single",
+              "text": "Where is the leak?",
               "required": true,
-              "placeholder": "Select job size",
               "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
+                { "value": "faucet", "label": "Faucet" },
+                { "value": "underSink", "label": "Under-sink pipe" },
+                { "value": "toilet", "label": "Toilet" },
+                { "value": "radiator", "label": "Radiator" },
+                { "value": "ceilingWall", "label": "Ceiling/Wall" }
               ]
             },
             {
@@ -668,15 +486,17 @@
           "icon": "🚿",
           "questions": [
             {
-              "id": "jobSize",
-              "type": "select",
-              "text": "What is the job size?",
+              "id": "fixtureType",
+              "type": "single",
+              "text": "Which fixture needs installation?",
               "required": true,
-              "placeholder": "Select job size",
               "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
+                { "value": "sink", "label": "Sink" },
+                { "value": "toilet", "label": "Toilet" },
+                { "value": "shower", "label": "Shower" },
+                { "value": "dishwasher", "label": "Dishwasher" },
+                { "value": "washer", "label": "Washing machine" },
+                { "value": "waterHeater", "label": "Water heater" }
               ]
             },
             {
@@ -721,15 +541,16 @@
           "icon": "🔩",
           "questions": [
             {
-              "id": "jobSize",
+              "id": "lengthBand",
               "type": "select",
-              "text": "What is the job size?",
+              "text": "Approximate pipe length to replace?",
               "required": true,
-              "placeholder": "Select job size",
+              "placeholder": "Select length",
               "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
+                { "value": "<2m", "label": "< 2 m" },
+                { "value": "2-5m", "label": "2–5 m" },
+                { "value": "5-10m", "label": "5–10 m" },
+                { "value": "10mPlus", "label": "10+ m" }
               ]
             },
             {
@@ -782,15 +603,16 @@
           "icon": "⚡",
           "questions": [
             {
-              "id": "jobSize",
+              "id": "areaM2",
               "type": "select",
-              "text": "What is the job size?",
+              "text": "What is the property size to rewire?",
               "required": true,
-              "placeholder": "Select job size",
+              "placeholder": "Select size",
               "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
+                { "value": "<80", "label": "< 80 m²" },
+                { "value": "80-150", "label": "80–150 m²" },
+                { "value": "150-250", "label": "150–250 m²" },
+                { "value": "250Plus", "label": "250+ m²" }
               ]
             },
             {
@@ -835,16 +657,12 @@
           "icon": "💡",
           "questions": [
             {
-              "id": "jobSize",
-              "type": "select",
-              "text": "What is the job size?",
+              "id": "fixturesCount",
+              "type": "number",
+              "text": "How many lighting fixtures to install?",
+              "placeholder": "Enter number of fixtures",
               "required": true,
-              "placeholder": "Select job size",
-              "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
-              ]
+              "min": 1
             },
             {
               "id": "jobDate",
@@ -888,15 +706,14 @@
           "icon": "🔍",
           "questions": [
             {
-              "id": "jobSize",
-              "type": "select",
-              "text": "What is the job size?",
+              "id": "propertyType",
+              "type": "single",
+              "text": "What is the property type?",
               "required": true,
-              "placeholder": "Select job size",
               "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
+                { "value": "apartment", "label": "Apartment" },
+                { "value": "house", "label": "House" },
+                { "value": "commercial", "label": "Commercial" }
               ]
             },
             {
@@ -949,15 +766,16 @@
           "icon": "🖌️",
           "questions": [
             {
-              "id": "jobSize",
+              "id": "roomsBand",
               "type": "select",
-              "text": "What is the job size?",
+              "text": "How many rooms need painting?",
               "required": true,
-              "placeholder": "Select job size",
+              "placeholder": "Select rooms",
               "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
+                { "value": "1", "label": "1 room" },
+                { "value": "2-3", "label": "2–3 rooms" },
+                { "value": "4-6", "label": "4–6 rooms" },
+                { "value": "wholeHome", "label": "Whole home" }
               ]
             },
             {
@@ -1002,16 +820,13 @@
           "icon": "🌳",
           "questions": [
             {
-              "id": "jobSize",
-              "type": "select",
-              "text": "What is the job size?",
+              "id": "facadeArea",
+              "type": "number",
+              "text": "What is the approximate façade area (m²)?",
+              "placeholder": "Enter area in m²",
               "required": true,
-              "placeholder": "Select job size",
-              "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
-              ]
+              "min": 1,
+              "unit": "m²"
             },
             {
               "id": "jobDate",
@@ -1055,15 +870,15 @@
           "icon": "🖍️",
           "questions": [
             {
-              "id": "jobSize",
+              "id": "roomsConsult",
               "type": "select",
-              "text": "What is the job size?",
+              "text": "How many rooms for consultation?",
               "required": true,
-              "placeholder": "Select job size",
+              "placeholder": "Select rooms",
               "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
+                { "value": "1-2", "label": "1–2 rooms" },
+                { "value": "3-5", "label": "3–5 rooms" },
+                { "value": "6Plus", "label": "6+ rooms" }
               ]
             },
             {
@@ -1116,16 +931,12 @@
           "icon": "🪑",
           "questions": [
             {
-              "id": "jobSize",
-              "type": "select",
-              "text": "What is the job size?",
+              "id": "itemsCount",
+              "type": "number",
+              "text": "How many items should be assembled?",
+              "placeholder": "Enter number of items",
               "required": true,
-              "placeholder": "Select job size",
-              "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
-              ]
+              "min": 1
             },
             {
               "id": "jobDate",
@@ -1169,16 +980,12 @@
           "icon": "🔩",
           "questions": [
             {
-              "id": "jobSize",
-              "type": "select",
-              "text": "What is the job size?",
+              "id": "installCount",
+              "type": "number",
+              "text": "How many items to install?",
+              "placeholder": "Enter number of items",
               "required": true,
-              "placeholder": "Select job size",
-              "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
-              ]
+              "min": 1
             },
             {
               "id": "jobDate",
@@ -1222,15 +1029,15 @@
           "icon": "🎨",
           "questions": [
             {
-              "id": "jobSize",
-              "type": "select",
-              "text": "What is the job size?",
+              "id": "touchupType",
+              "type": "single",
+              "text": "What needs touch-up?",
               "required": true,
-              "placeholder": "Select job size",
               "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
+                { "value": "walls", "label": "Wall(s)" },
+                { "value": "doors", "label": "Door(s)" },
+                { "value": "trim", "label": "Trim" },
+                { "value": "ceiling", "label": "Ceiling" }
               ]
             },
             {
@@ -1275,16 +1082,19 @@
           "icon": "🔨",
           "questions": [
             {
-              "id": "jobSize",
-              "type": "select",
-              "text": "What is the job size?",
+              "id": "jobKind",
+              "type": "single",
+              "text": "What kind of job is this?",
               "required": true,
-              "placeholder": "Select job size",
               "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
-              ]
+                { "value": "repair", "label": "Repair" },
+                { "value": "install", "label": "Install" },
+                { "value": "mount", "label": "Mount/Hang" },
+                { "value": "other", "label": "Other" }
+              ],
+              "allowOther": true,
+              "otherLabel": "Other (specify)",
+              "placeholder": "Describe the job"
             },
             {
               "id": "jobDate",
@@ -1328,16 +1138,12 @@
           "icon": "🚪",
           "questions": [
             {
-              "id": "jobSize",
-              "type": "select",
-              "text": "What is the job size?",
+              "id": "unitsCount",
+              "type": "number",
+              "text": "How many doors/windows to install?",
+              "placeholder": "Enter number of units",
               "required": true,
-              "placeholder": "Select job size",
-              "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
-              ]
+              "min": 1
             },
             {
               "id": "jobDate",
@@ -1662,15 +1468,16 @@
           "icon": "🚜",
           "questions": [
             {
-              "id": "jobSize",
+              "id": "lawnSize",
               "type": "select",
-              "text": "What is the job size?",
+              "text": "What is the lawn size?",
               "required": true,
-              "placeholder": "Select job size",
+              "placeholder": "Select size",
               "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
+                { "value": "<100", "label": "< 100 m²" },
+                { "value": "100-300", "label": "100–300 m²" },
+                { "value": "300-600", "label": "300–600 m²" },
+                { "value": "600Plus", "label": "600+ m²" }
               ]
             },
             {
@@ -1715,15 +1522,15 @@
           "icon": "🌷",
           "questions": [
             {
-              "id": "jobSize",
+              "id": "plantsBand",
               "type": "select",
-              "text": "What is the job size?",
+              "text": "How many plants or meters of bed?",
               "required": true,
-              "placeholder": "Select job size",
+              "placeholder": "Select amount",
               "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
+                { "value": "upTo10", "label": "Up to 10 plants" },
+                { "value": "10-30", "label": "10–30 plants" },
+                { "value": "30Plus", "label": "30+ plants" }
               ]
             },
             {
@@ -1768,15 +1575,15 @@
           "icon": "🏡",
           "questions": [
             {
-              "id": "jobSize",
+              "id": "gardenSize",
               "type": "select",
-              "text": "What is the job size?",
+              "text": "What is the garden size?",
               "required": true,
-              "placeholder": "Select job size",
+              "placeholder": "Select size",
               "options": [
-                { "value": "small", "label": "Small" },
-                { "value": "medium", "label": "Medium" },
-                { "value": "large", "label": "Large" }
+                { "value": "<200", "label": "< 200 m²" },
+                { "value": "200-500", "label": "200–500 m²" },
+                { "value": "500Plus", "label": "500+ m²" }
               ]
             },
             {
@@ -1822,5 +1629,368 @@
     "login": "Login",
     "register": "Register",
     "logout": "Logout"
+  },
+  "questions": {
+    "moving": {
+      "local": [
+        {
+          "id": "homeSize",
+          "type": "select",
+          "text": "What is the home size?",
+          "required": true,
+          "placeholder": "Select home size",
+          "options": [
+            { "value": "studio", "label": "Studio" },
+            { "value": "1br", "label": "1 bedroom" },
+            { "value": "2br", "label": "2 bedrooms" },
+            { "value": "3br", "label": "3 bedrooms" },
+            { "value": "4brPlus", "label": "4+ bedrooms" }
+          ]
+        }
+      ],
+      "longDistance": [
+        {
+          "id": "distanceBand",
+          "type": "select",
+          "text": "What is the approximate distance?",
+          "required": true,
+          "placeholder": "Select distance",
+          "options": [
+            { "value": "<200km", "label": "Under 200 km" },
+            { "value": "200-500km", "label": "200–500 km" },
+            { "value": "500-1000km", "label": "500–1000 km" },
+            { "value": "1000kmPlus", "label": "1000+ km" }
+          ]
+        }
+      ],
+      "packing": [
+        {
+          "id": "boxesCount",
+          "type": "select",
+          "text": "How many boxes need packing?",
+          "required": true,
+          "placeholder": "Select box count",
+          "options": [
+            { "value": "0-10", "label": "0–10 boxes" },
+            { "value": "11-25", "label": "11–25 boxes" },
+            { "value": "26-50", "label": "26–50 boxes" },
+            { "value": "50Plus", "label": "50+ boxes" }
+          ]
+        }
+      ],
+      "unpacking": [
+        {
+          "id": "boxesToUnpack",
+          "type": "select",
+          "text": "How many boxes to unpack?",
+          "required": true,
+          "placeholder": "Select box count",
+          "options": [
+            { "value": "0-10", "label": "0–10 boxes" },
+            { "value": "11-25", "label": "11–25 boxes" },
+            { "value": "26-50", "label": "26–50 boxes" },
+            { "value": "50Plus", "label": "50+ boxes" }
+          ]
+        }
+      ],
+      "furnitureAssembly": [
+        {
+          "id": "itemsCount",
+          "type": "number",
+          "text": "How many items should be assembled?",
+          "placeholder": "Enter number of items",
+          "required": true,
+          "min": 1
+        }
+      ],
+      "storage": [
+        {
+          "id": "volume",
+          "type": "select",
+          "text": "What is the estimated storage volume?",
+          "required": true,
+          "placeholder": "Select volume",
+          "options": [
+            { "value": "<5m3", "label": "< 5 m³" },
+            { "value": "5-10m3", "label": "5–10 m³" },
+            { "value": "10-20m3", "label": "10–20 m³" },
+            { "value": "20m3Plus", "label": "20+ m³" }
+          ]
+        }
+      ]
+    },
+    "cleaning": {
+      "residential": [
+        {
+          "id": "areaM2",
+          "type": "number",
+          "text": "How many square meters is the place?",
+          "placeholder": "Enter area in m²",
+          "required": true,
+          "min": 1,
+          "unit": "m²"
+        }
+      ],
+      "commercial": [
+        {
+          "id": "areaM2",
+          "type": "number",
+          "text": "What is the workspace size (m²)?",
+          "placeholder": "Enter area in m²",
+          "required": true,
+          "min": 1,
+          "unit": "m²"
+        }
+      ],
+      "deepCleaning": [
+        {
+          "id": "areaM2",
+          "type": "number",
+          "text": "What is the property size (m²)?",
+          "placeholder": "Enter area in m²",
+          "required": true,
+          "min": 1,
+          "unit": "m²"
+        }
+      ]
+    },
+    "plumbing": {
+      "leakRepair": [
+        {
+          "id": "leakLocation",
+          "type": "single",
+          "text": "Where is the leak?",
+          "required": true,
+          "options": [
+            { "value": "faucet", "label": "Faucet" },
+            { "value": "underSink", "label": "Under-sink pipe" },
+            { "value": "toilet", "label": "Toilet" },
+            { "value": "radiator", "label": "Radiator" },
+            { "value": "ceilingWall", "label": "Ceiling/Wall" }
+          ]
+        }
+      ],
+      "fixtureInstall": [
+        {
+          "id": "fixtureType",
+          "type": "single",
+          "text": "Which fixture needs installation?",
+          "required": true,
+          "options": [
+            { "value": "sink", "label": "Sink" },
+            { "value": "toilet", "label": "Toilet" },
+            { "value": "shower", "label": "Shower" },
+            { "value": "dishwasher", "label": "Dishwasher" },
+            { "value": "washer", "label": "Washing machine" },
+            { "value": "waterHeater", "label": "Water heater" }
+          ]
+        }
+      ],
+      "pipeReplacement": [
+        {
+          "id": "lengthBand",
+          "type": "select",
+          "text": "Approximate pipe length to replace?",
+          "required": true,
+          "placeholder": "Select length",
+          "options": [
+            { "value": "<2m", "label": "< 2 m" },
+            { "value": "2-5m", "label": "2–5 m" },
+            { "value": "5-10m", "label": "5–10 m" },
+            { "value": "10mPlus", "label": "10+ m" }
+          ]
+        }
+      ]
+    },
+    "electrical": {
+      "rewiring": [
+        {
+          "id": "areaM2",
+          "type": "select",
+          "text": "What is the property size to rewire?",
+          "required": true,
+          "placeholder": "Select size",
+          "options": [
+            { "value": "<80", "label": "< 80 m²" },
+            { "value": "80-150", "label": "80–150 m²" },
+            { "value": "150-250", "label": "150–250 m²" },
+            { "value": "250Plus", "label": "250+ m²" }
+          ]
+        }
+      ],
+      "lighting": [
+        {
+          "id": "fixturesCount",
+          "type": "number",
+          "text": "How many lighting fixtures to install?",
+          "placeholder": "Enter number of fixtures",
+          "required": true,
+          "min": 1
+        }
+      ],
+      "safetyInspections": [
+        {
+          "id": "propertyType",
+          "type": "single",
+          "text": "What is the property type?",
+          "required": true,
+          "options": [
+            { "value": "apartment", "label": "Apartment" },
+            { "value": "house", "label": "House" },
+            { "value": "commercial", "label": "Commercial" }
+          ]
+        }
+      ]
+    },
+    "painting": {
+      "interior": [
+        {
+          "id": "roomsBand",
+          "type": "select",
+          "text": "How many rooms need painting?",
+          "required": true,
+          "placeholder": "Select rooms",
+          "options": [
+            { "value": "1", "label": "1 room" },
+            { "value": "2-3", "label": "2–3 rooms" },
+            { "value": "4-6", "label": "4–6 rooms" },
+            { "value": "wholeHome", "label": "Whole home" }
+          ]
+        }
+      ],
+      "exterior": [
+        {
+          "id": "facadeArea",
+          "type": "number",
+          "text": "What is the approximate façade area (m²)?",
+          "placeholder": "Enter area in m²",
+          "required": true,
+          "min": 1,
+          "unit": "m²"
+        }
+      ],
+      "colorConsult": [
+        {
+          "id": "roomsConsult",
+          "type": "select",
+          "text": "How many rooms for consultation?",
+          "required": true,
+          "placeholder": "Select rooms",
+          "options": [
+            { "value": "1-2", "label": "1–2 rooms" },
+            { "value": "3-5", "label": "3–5 rooms" },
+            { "value": "6Plus", "label": "6+ rooms" }
+          ]
+        }
+      ]
+    },
+    "handyman": {
+      "furnitureAssembly": [
+        {
+          "id": "itemsCount",
+          "type": "number",
+          "text": "How many items should be assembled?",
+          "placeholder": "Enter number of items",
+          "required": true,
+          "min": 1
+        }
+      ],
+      "installation": [
+        {
+          "id": "installCount",
+          "type": "number",
+          "text": "How many items to install?",
+          "placeholder": "Enter number of items",
+          "required": true,
+          "min": 1
+        }
+      ],
+      "paintingTouchUps": [
+        {
+          "id": "touchupType",
+          "type": "single",
+          "text": "What needs touch-up?",
+          "required": true,
+          "options": [
+            { "value": "walls", "label": "Wall(s)" },
+            { "value": "doors", "label": "Door(s)" },
+            { "value": "trim", "label": "Trim" },
+            { "value": "ceiling", "label": "Ceiling" }
+          ]
+        }
+      ],
+      "oddJobs": [
+        {
+          "id": "jobKind",
+          "type": "single",
+          "text": "What kind of job is this?",
+          "required": true,
+          "options": [
+            { "value": "repair", "label": "Repair" },
+            { "value": "install", "label": "Install" },
+            { "value": "mount", "label": "Mount/Hang" },
+            { "value": "other", "label": "Other" }
+          ],
+          "allowOther": true,
+          "otherLabel": "Other (specify)",
+          "placeholder": "Describe the job"
+        }
+      ],
+      "doorInstallation": [
+        {
+          "id": "unitsCount",
+          "type": "number",
+          "text": "How many doors/windows to install?",
+          "placeholder": "Enter number of units",
+          "required": true,
+          "min": 1
+        }
+      ]
+    },
+    "gardening": {
+      "lawnMowing": [
+        {
+          "id": "lawnSize",
+          "type": "select",
+          "text": "What is the lawn size?",
+          "required": true,
+          "placeholder": "Select size",
+          "options": [
+            { "value": "<100", "label": "< 100 m²" },
+            { "value": "100-300", "label": "100–300 m²" },
+            { "value": "300-600", "label": "300–600 m²" },
+            { "value": "600Plus", "label": "600+ m²" }
+          ]
+        }
+      ],
+      "planting": [
+        {
+          "id": "plantsBand",
+          "type": "select",
+          "text": "How many plants or meters of bed?",
+          "required": true,
+          "placeholder": "Select amount",
+          "options": [
+            { "value": "upTo10", "label": "Up to 10 plants" },
+            { "value": "10-30", "label": "10–30 plants" },
+            { "value": "30Plus", "label": "30+ plants" }
+          ]
+        }
+      ],
+      "landscapeDesign": [
+        {
+          "id": "gardenSize",
+          "type": "select",
+          "text": "What is the garden size?",
+          "required": true,
+          "placeholder": "Select size",
+          "options": [
+            { "value": "<200", "label": "< 200 m²" },
+            { "value": "200-500", "label": "200–500 m²" },
+            { "value": "500Plus", "label": "500+ m²" }
+          ]
+        }
+      ]
+    }
   }
 }

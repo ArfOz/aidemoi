@@ -1822,5 +1822,42 @@
     "login": "Connexion",
     "register": "S'inscrire",
     "logout": "Déconnexion"
+  },
+  "questions": {
+    "cleaning": {
+      "houseCleaning": [
+        {
+          "id": "areaM2",
+          "type": "number",
+          "text": "Quelle est la superficie en mètres carrés ?",
+          "placeholder": "Saisir la surface en m²",
+          "required": true,
+          "min": 1,
+          "unit": "m²"
+        }
+      ],
+      "officeCleaning": [
+        {
+          "id": "areaM2",
+          "type": "number",
+          "text": "Quelle est la superficie du bureau (m²) ?",
+          "placeholder": "Saisir la surface en m²",
+          "required": true,
+          "min": 1,
+          "unit": "m²"
+        }
+      ],
+      "deepCleaning": [
+        {
+          "id": "areaM2",
+          "type": "number",
+          "text": "Quelle est la superficie en mètres carrés ?",
+          "placeholder": "Saisir la surface en m²",
+          "required": true,
+          "min": 1,
+          "unit": "m²"
+        }
+      ]
+    }
   }
 }

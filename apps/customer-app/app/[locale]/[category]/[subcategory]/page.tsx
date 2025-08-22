@@ -2,7 +2,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale, useTranslations, useMessages } from 'next-intl';
 
 type QuestionType =
   | 'single'
@@ -49,6 +49,7 @@ interface Category {
 export default function SubcategoryPage() {
   const t = useTranslations();
   const locale = useLocale();
+  const messages = useMessages() as Record<string, any>;
   const { category, subcategory } = useParams<{
     category: string;
     subcategory: string;
@@ -58,7 +59,19 @@ export default function SubcategoryPage() {
   const active = categoriesArr.find((c) => c.id === category);
   const spec = active?.specialties?.[subcategory];
 
-  const questions = useMemo(() => spec?.questions ?? [], [spec?.questions]);
+  // Replace t.raw lookup with a safe read from messages
+  const localizedQuestions = useMemo(() => {
+    const qns =
+      messages?.questions &&
+      (messages.questions as any)[category] &&
+      (messages.questions as any)[category][subcategory];
+    return Array.isArray(qns) ? (qns as Question[]) : null;
+  }, [messages, category, subcategory]);
+
+  const questions = useMemo(
+    () => localizedQuestions ?? spec?.questions ?? [],
+    [localizedQuestions, spec?.questions]
+  );
   const total = questions.length;
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
@@ -159,7 +172,7 @@ export default function SubcategoryPage() {
     setStep(0);
     setAnswers({});
     setError(null);
-  }, [subcategory, spec?.questions?.length]);
+  }, [subcategory, questions.length]);
 
   if (!active || !spec) {
     return (
