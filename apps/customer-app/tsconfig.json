@@ -22,10 +22,12 @@
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
   "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
     "../../apps/customer-app/.next/types/**/*.ts",
     "../../dist/apps/customer-app/.next/types/**/*.ts",
     "../../libs/api/src/**/*.ts",
-    "next-env.d.ts",
     "app/**/*.js",
     "app/**/*.jsx",
     "app/**/*.ts",

@@ -32,7 +32,7 @@ interface Question {
 }
 
 interface Subcategory {
-  icon: React.ReactNode;
+  icon?: string; // from en/fr messages
   name: string;
   description: string;
   questions?: Question[];
@@ -46,6 +46,9 @@ interface Category {
   specialties?: Record<string, Subcategory>;
 }
 
+const titleFromSlug = (s: string) =>
+  s.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+
 export default function SubcategoryPage() {
   const t = useTranslations();
   const locale = useLocale();
@@ -55,9 +58,16 @@ export default function SubcategoryPage() {
     subcategory: string;
   }>();
 
-  const categoriesArr = t.raw('categories') as Category[];
+  // Use categories from locale messages, fallback to t.raw
+  const categoriesArr = useMemo(() => {
+    const raw = (messages?.categories as unknown) ?? t.raw('categories');
+    return Array.isArray(raw) ? (raw as Category[]) : [];
+  }, [messages, t]);
+
   const active = categoriesArr.find((c) => c.id === category);
-  const spec = active?.specialties?.[subcategory];
+
+  // Simplified: resolve spec directly by key
+  const spec = active?.specialties?.[subcategory as string];
 
   // Replace t.raw lookup with a safe read from messages
   const localizedQuestions = useMemo(() => {
@@ -68,10 +78,13 @@ export default function SubcategoryPage() {
     return Array.isArray(qns) ? (qns as Question[]) : null;
   }, [messages, category, subcategory]);
 
-  const questions = useMemo(
-    () => localizedQuestions ?? spec?.questions ?? [],
-    [localizedQuestions, spec?.questions]
-  );
+  const questions = useMemo(() => {
+    if (localizedQuestions && localizedQuestions.length)
+      return localizedQuestions;
+    if (spec?.questions && spec.questions.length) return spec.questions;
+    return [];
+  }, [localizedQuestions, spec?.questions]);
+
   const total = questions.length;
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
@@ -174,7 +187,11 @@ export default function SubcategoryPage() {
     setError(null);
   }, [subcategory, questions.length]);
 
-  if (!active || !spec) {
+  // Only 404 when both spec and questions are missing
+  if (
+    !active ||
+    (!spec && (!localizedQuestions || !localizedQuestions.length))
+  ) {
     return (
       <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
         <h1>Not found</h1>
@@ -189,7 +206,7 @@ export default function SubcategoryPage() {
   }
 
   const progress = total > 0 ? Math.round(((step + 1) / total) * 100) : 0;
-  const currency = spec.priceRange?.currency ?? 'TL';
+  const currency = spec?.priceRange?.currency ?? 'TL';
 
   return (
     <main
@@ -211,7 +228,9 @@ export default function SubcategoryPage() {
         <div
           style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #e5e7eb' }}
         >
-          <div style={{ fontSize: 18, fontWeight: 700 }}>{spec.name}</div>
+          <div style={{ fontSize: 18, fontWeight: 700 }}>
+            {spec?.name || titleFromSlug(subcategory as string)}
+          </div>
           <div
             style={{
               height: 6,
@@ -229,7 +248,7 @@ export default function SubcategoryPage() {
               }}
             />
           </div>
-          {spec.priceRange && (
+          {spec?.priceRange && (
             <div
               style={{
                 display: 'flex',

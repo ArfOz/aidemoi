@@ -9,6 +9,11 @@
       "name": "Déménagement",
       "description": "Services de déménagement de maisons et de bureaux",
       "icon": "🚚",
+      "cover": "https://images.unsplash.com/photo-1600585154084-4e5fe7c39198?w=1600&q=80&auto=format&fit=crop",
+      "stats": {
+        "professionals": 5200,
+        "rating": { "value": 4.8, "reviews": 35699 }
+      },
       "specialties": {
         "local": {
           "name": "Déménagement local",
@@ -335,6 +340,11 @@
       "name": "Nettoyage",
       "description": "Nettoyage résidentiel et commercial",
       "icon": "🧼",
+      "cover": "https://images.unsplash.com/photo-1581579188871-45ea61f2a0c8?w=1600&q=80&auto=format&fit=crop",
+      "stats": {
+        "professionals": 6031,
+        "rating": { "value": 4.7, "reviews": 20540 }
+      },
       "specialties": {
         "residential": {
           "name": "Nettoyage résidentiel",
@@ -608,6 +618,11 @@
       "name": "Plomberie",
       "description": "Réparations, installations et entretien des systèmes de plomberie",
       "icon": "🚰",
+      "cover": "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?w=1600&q=80&auto=format&fit=crop",
+      "stats": {
+        "professionals": 3320,
+        "rating": { "value": 4.6, "reviews": 11728 }
+      },
       "specialties": {
         "leakRepair": {
           "name": "Réparation de fuites",
@@ -775,6 +790,11 @@
       "name": "Électricité",
       "description": "Câblage électrique, éclairage et inspections de sécurité",
       "icon": "💡",
+      "cover": "https://images.unsplash.com/photo-1581093588401-16e0e5b2c1d3?w=1600&q=80&auto=format&fit=crop",
+      "stats": {
+        "professionals": 2890,
+        "rating": { "value": 4.7, "reviews": 985 }
+      },
       "specialties": {
         "rewiring": {
           "name": "Re-câblage",
@@ -942,6 +962,11 @@
       "name": "Peinture",
       "description": "Peinture intérieure et extérieure pour maisons et bureaux",
       "icon": "🎨",
+      "cover": "https://images.unsplash.com/photo-1507668077129-56e32842fceb?w=1600&q=80&auto=format&fit=crop",
+      "stats": {
+        "professionals": 9698,
+        "rating": { "value": 4.9, "reviews": 104226 }
+      },
       "specialties": {
         "interior": {
           "name": "Peinture intérieure",
@@ -1109,6 +1134,11 @@
       "name": "Bricoleur",
       "description": "Petits travaux et installations",
       "icon": "🔧",
+      "cover": "https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=1600&q=80&auto=format&fit=crop",
+      "stats": {
+        "professionals": 4645,
+        "rating": { "value": 4.6, "reviews": 14925 }
+      },
       "specialties": {
         "furnitureAssembly": {
           "name": "Montage de meubles",
@@ -1382,6 +1412,11 @@
       "name": "Réparation",
       "description": "Réparations d'appareils et de la maison",
       "icon": "🛠️",
+      "cover": "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=1600&q=80&auto=format&fit=crop",
+      "stats": {
+        "professionals": 4353,
+        "rating": { "value": 4.6, "reviews": 5319 }
+      },
       "specialties": {
         "applianceRepair": {
           "name": "Réparation d'appareils",
@@ -1655,6 +1690,11 @@
       "name": "Jardinage",
       "description": "Entretien de pelouse, plantation et aménagement paysager",
       "icon": "🌿",
+      "cover": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1600&q=80&auto=format&fit=crop",
+      "stats": {
+        "professionals": 5426,
+        "rating": { "value": 4.7, "reviews": 14925 }
+      },
       "specialties": {
         "lawnMowing": {
           "name": "Tonte de pelouse",

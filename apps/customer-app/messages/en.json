@@ -10,325 +10,60 @@
       "description": "House and office relocation services",
       "icon": "🚚",
       "specialties": {
-        "local": {
-          "name": "Local Moves",
-          "description": "Short-distance moves within the same city or metro area",
-          "icon": "🏠",
-          "questions": [
-            {
-              "id": "homeSize",
-              "type": "select",
-              "text": "What is the home size?",
-              "required": true,
-              "placeholder": "Select home size",
-              "options": [
-                { "value": "studio", "label": "Studio" },
-                { "value": "1br", "label": "1 bedroom" },
-                { "value": "2br", "label": "2 bedrooms" },
-                { "value": "3br", "label": "3 bedrooms" },
-                { "value": "4brPlus", "label": "4+ bedrooms" }
-              ]
-            },
-            {
-              "id": "jobDate",
-              "type": "date",
-              "text": "When do you need the service?",
-              "required": true
-            },
-            {
-              "id": "jobTime",
-              "type": "time",
-              "text": "Preferred time",
-              "required": false
-            },
-            {
-              "id": "address",
-              "type": "text",
-              "text": "Where will the service take place?",
-              "placeholder": "Neighborhood, district or full address",
-              "required": true
-            },
-            {
-              "id": "budget",
-              "type": "number",
-              "text": "What's your estimated budget? (optional)",
-              "required": false,
-              "min": 0,
-              "unit": "TL"
-            },
-            {
-              "id": "details",
-              "type": "text",
-              "text": "Additional details",
-              "placeholder": "Describe details that matter",
-              "required": false
-            }
-          ]
+        "homeToHome": {
+          "name": "Home to Home Moving",
+          "description": "Apartment or house moving within the city",
+          "icon": "🏠📦"
         },
-        "longDistance": {
-          "name": "Long Distance",
-          "description": "Cross-state or cross-country relocations",
-          "icon": "🛣️",
-          "questions": [
-            {
-              "id": "distanceBand",
-              "type": "select",
-              "text": "What is the approximate distance?",
-              "required": true,
-              "placeholder": "Select distance",
-              "options": [
-                { "value": "<200km", "label": "Under 200 km" },
-                { "value": "200-500km", "label": "200–500 km" },
-                { "value": "500-1000km", "label": "500–1000 km" },
-                { "value": "1000kmPlus", "label": "1000+ km" }
-              ]
-            },
-            {
-              "id": "jobDate",
-              "type": "date",
-              "text": "When do you need the service?",
-              "required": true
-            },
-            {
-              "id": "jobTime",
-              "type": "time",
-              "text": "Preferred time",
-              "required": false
-            },
-            {
-              "id": "address",
-              "type": "text",
-              "text": "Where will the service take place?",
-              "placeholder": "Neighborhood, district or full address",
-              "required": true
-            },
-            {
-              "id": "budget",
-              "type": "number",
-              "text": "What's your estimated budget? (optional)",
-              "required": false,
-              "min": 0,
-              "unit": "TL"
-            },
-            {
-              "id": "details",
-              "type": "text",
-              "text": "Additional details",
-              "placeholder": "Describe details that matter",
-              "required": false
-            }
-          ]
+        "intercity": {
+          "name": "Intercity Moving",
+          "description": "City-to-city relocations",
+          "icon": "🛣️"
         },
-        "packing": {
-          "name": "Packing Services",
-          "description": "Professional packing of furniture, fragile items, and boxes",
-          "icon": "📦",
-          "questions": [
-            {
-              "id": "boxesCount",
-              "type": "select",
-              "text": "How many boxes need packing?",
-              "required": true,
-              "placeholder": "Select box count",
-              "options": [
-                { "value": "0-10", "label": "0–10 boxes" },
-                { "value": "11-25", "label": "11–25 boxes" },
-                { "value": "26-50", "label": "26–50 boxes" },
-                { "value": "50Plus", "label": "50+ boxes" }
-              ]
-            },
-            {
-              "id": "jobDate",
-              "type": "date",
-              "text": "When do you need the service?",
-              "required": true
-            },
-            {
-              "id": "jobTime",
-              "type": "time",
-              "text": "Preferred time",
-              "required": false
-            },
-            {
-              "id": "address",
-              "type": "text",
-              "text": "Where will the service take place?",
-              "placeholder": "Neighborhood, district or full address",
-              "required": true
-            },
-            {
-              "id": "budget",
-              "type": "number",
-              "text": "What's your estimated budget? (optional)",
-              "required": false,
-              "min": 0,
-              "unit": "TL"
-            },
-            {
-              "id": "details",
-              "type": "text",
-              "text": "Additional details",
-              "placeholder": "Describe details that matter",
-              "required": false
-            }
-          ]
+        "itemMoving": {
+          "name": "Item Transport",
+          "description": "Single or few items moving",
+          "icon": "📦➡️"
         },
-        "unpacking": {
-          "name": "Unpacking & Setup",
-          "description": "Unpacking, arranging, and setting up furniture at destination",
-          "icon": "📬",
-          "questions": [
-            {
-              "id": "boxesToUnpack",
-              "type": "select",
-              "text": "How many boxes to unpack?",
-              "required": true,
-              "placeholder": "Select box count",
-              "options": [
-                { "value": "0-10", "label": "0–10 boxes" },
-                { "value": "11-25", "label": "11–25 boxes" },
-                { "value": "26-50", "label": "26–50 boxes" },
-                { "value": "50Plus", "label": "50+ boxes" }
-              ]
-            },
-            {
-              "id": "jobDate",
-              "type": "date",
-              "text": "When do you need the service?",
-              "required": true
-            },
-            {
-              "id": "jobTime",
-              "type": "time",
-              "text": "Preferred time",
-              "required": false
-            },
-            {
-              "id": "address",
-              "type": "text",
-              "text": "Where will the service take place?",
-              "placeholder": "Neighborhood, district or full address",
-              "required": true
-            },
-            {
-              "id": "budget",
-              "type": "number",
-              "text": "What's your estimated budget? (optional)",
-              "required": false,
-              "min": 0,
-              "unit": "TL"
-            },
-            {
-              "id": "details",
-              "type": "text",
-              "text": "Additional details",
-              "placeholder": "Describe details that matter",
-              "required": false
-            }
-          ]
+        "sofaMoving": {
+          "name": "Sofa/Couch Moving",
+          "description": "Moving couches and armchairs",
+          "icon": "🛋️"
         },
-        "furnitureAssembly": {
-          "name": "Furniture Assembly",
-          "description": "Disassembly and reassembly of furniture pieces",
-          "icon": "🪑",
-          "questions": [
-            {
-              "id": "itemsCount",
-              "type": "number",
-              "text": "How many items should be assembled?",
-              "placeholder": "Enter number of items",
-              "required": true,
-              "min": 1
-            },
-            {
-              "id": "jobDate",
-              "type": "date",
-              "text": "When do you need the service?",
-              "required": true
-            },
-            {
-              "id": "jobTime",
-              "type": "time",
-              "text": "Preferred time",
-              "required": false
-            },
-            {
-              "id": "address",
-              "type": "text",
-              "text": "Where will the service take place?",
-              "placeholder": "Neighborhood, district or full address",
-              "required": true
-            },
-            {
-              "id": "budget",
-              "type": "number",
-              "text": "What's your estimated budget? (optional)",
-              "required": false,
-              "min": 0,
-              "unit": "TL"
-            },
-            {
-              "id": "details",
-              "type": "text",
-              "text": "Additional details",
-              "placeholder": "Describe details that matter",
-              "required": false
-            }
-          ]
+        "porter": {
+          "name": "Porter (Labor Only)",
+          "description": "Helpers for loading and unloading",
+          "icon": "💪"
         },
-        "storage": {
-          "name": "Short-Term Storage",
-          "description": "Secure storage solutions for items between moves",
-          "icon": "📦🔒",
-          "questions": [
-            {
-              "id": "volume",
-              "type": "select",
-              "text": "What is the estimated storage volume?",
-              "required": true,
-              "placeholder": "Select volume",
-              "options": [
-                { "value": "<5m3", "label": "< 5 m³" },
-                { "value": "5-10m3", "label": "5–10 m³" },
-                { "value": "10-20m3", "label": "10–20 m³" },
-                { "value": "20m3Plus", "label": "20+ m³" }
-              ]
-            },
-            {
-              "id": "jobDate",
-              "type": "date",
-              "text": "When do you need the service?",
-              "required": true
-            },
-            {
-              "id": "jobTime",
-              "type": "time",
-              "text": "Preferred time",
-              "required": false
-            },
-            {
-              "id": "address",
-              "type": "text",
-              "text": "Where will the service take place?",
-              "placeholder": "Neighborhood, district or full address",
-              "required": true
-            },
-            {
-              "id": "budget",
-              "type": "number",
-              "text": "What's your estimated budget? (optional)",
-              "required": false,
-              "min": 0,
-              "unit": "TL"
-            },
-            {
-              "id": "details",
-              "type": "text",
-              "text": "Additional details",
-              "placeholder": "Describe details that matter",
-              "required": false
-            }
-          ]
+        "minivan": {
+          "name": "Minivan Moving",
+          "description": "Small-volume moves by minivan",
+          "icon": "🚐"
+        },
+        "transfer": {
+          "name": "Transfer",
+          "description": "Passenger transfers between locations",
+          "icon": "🚌"
+        },
+        "intercityItem": {
+          "name": "Intercity Item Transport",
+          "description": "Single item transport between cities",
+          "icon": "🚚🛣️"
+        },
+        "chauffeurCar": {
+          "name": "Chauffeur Car Rental",
+          "description": "Car with driver for your route",
+          "icon": "🚗👨‍✈️"
+        },
+        "towTruck": {
+          "name": "Tow Truck",
+          "description": "Vehicle towing and roadside assistance",
+          "icon": "🛻🆘"
+        },
+        "fridgeMoving": {
+          "name": "Refrigerator Moving",
+          "description": "Moving refrigerators and large appliances",
+          "icon": "🧊📦"
         }
       }
     },
@@ -1632,7 +1367,7 @@
   },
   "questions": {
     "moving": {
-      "local": [
+      "homeToHome": [
         {
           "id": "homeSize",
           "type": "select",
@@ -1648,7 +1383,7 @@
           ]
         }
       ],
-      "longDistance": [
+      "intercity": [
         {
           "id": "distanceBand",
           "type": "select",
@@ -1663,58 +1398,146 @@
           ]
         }
       ],
-      "packing": [
+      "itemMoving": [
         {
-          "id": "boxesCount",
-          "type": "select",
-          "text": "How many boxes need packing?",
+          "id": "itemType",
+          "type": "single",
+          "text": "What item(s) need moving?",
           "required": true,
-          "placeholder": "Select box count",
           "options": [
-            { "value": "0-10", "label": "0–10 boxes" },
-            { "value": "11-25", "label": "11–25 boxes" },
-            { "value": "26-50", "label": "26–50 boxes" },
-            { "value": "50Plus", "label": "50+ boxes" }
+            { "value": "furniture", "label": "Furniture" },
+            { "value": "appliance", "label": "Appliance" },
+            { "value": "boxes", "label": "Boxes" },
+            { "value": "piano", "label": "Piano" },
+            { "value": "other", "label": "Other" }
+          ],
+          "allowOther": true,
+          "otherLabel": "Other (specify)",
+          "placeholder": "Describe the item"
+        }
+      ],
+      "sofaMoving": [
+        {
+          "id": "sofaType",
+          "type": "select",
+          "text": "What type of sofa is it?",
+          "required": true,
+          "placeholder": "Select sofa type",
+          "options": [
+            { "value": "armchair", "label": "Armchair" },
+            { "value": "2seater", "label": "2-seater" },
+            { "value": "3seater", "label": "3-seater" },
+            { "value": "corner", "label": "Corner/L-shaped" },
+            { "value": "sofabed", "label": "Sofa-bed" }
           ]
         }
       ],
-      "unpacking": [
+      "porter": [
         {
-          "id": "boxesToUnpack",
+          "id": "workersCount",
           "type": "select",
-          "text": "How many boxes to unpack?",
+          "text": "How many porters do you need?",
           "required": true,
-          "placeholder": "Select box count",
+          "placeholder": "Select count",
           "options": [
-            { "value": "0-10", "label": "0–10 boxes" },
-            { "value": "11-25", "label": "11–25 boxes" },
-            { "value": "26-50", "label": "26–50 boxes" },
-            { "value": "50Plus", "label": "50+ boxes" }
+            { "value": "1", "label": "1 porter" },
+            { "value": "2", "label": "2 porters" },
+            { "value": "3", "label": "3 porters" },
+            { "value": "4Plus", "label": "4+ porters" }
           ]
         }
       ],
-      "furnitureAssembly": [
+      "minivan": [
         {
-          "id": "itemsCount",
-          "type": "number",
-          "text": "How many items should be assembled?",
-          "placeholder": "Enter number of items",
-          "required": true,
-          "min": 1
-        }
-      ],
-      "storage": [
-        {
-          "id": "volume",
+          "id": "loadVolume",
           "type": "select",
-          "text": "What is the estimated storage volume?",
+          "text": "What is the load volume?",
           "required": true,
           "placeholder": "Select volume",
           "options": [
-            { "value": "<5m3", "label": "< 5 m³" },
-            { "value": "5-10m3", "label": "5–10 m³" },
-            { "value": "10-20m3", "label": "10–20 m³" },
-            { "value": "20m3Plus", "label": "20+ m³" }
+            { "value": "<3m3", "label": "< 3 m³" },
+            { "value": "3-6m3", "label": "3–6 m³" },
+            { "value": "6-10m3", "label": "6–10 m³" },
+            { "value": "10m3Plus", "label": "10+ m³" }
+          ]
+        }
+      ],
+      "transfer": [
+        {
+          "id": "passengers",
+          "type": "select",
+          "text": "How many passengers?",
+          "required": true,
+          "placeholder": "Select passengers",
+          "options": [
+            { "value": "1-2", "label": "1–2" },
+            { "value": "3-4", "label": "3–4" },
+            { "value": "5-8", "label": "5–8 (minivan)" },
+            { "value": "9Plus", "label": "9+ (minibus/bus)" }
+          ]
+        }
+      ],
+      "intercityItem": [
+        {
+          "id": "itemType",
+          "type": "single",
+          "text": "What item will be transported?",
+          "required": true,
+          "options": [
+            { "value": "furniture", "label": "Furniture" },
+            { "value": "appliance", "label": "Appliance" },
+            { "value": "boxes", "label": "Boxes" },
+            { "value": "other", "label": "Other" }
+          ],
+          "allowOther": true,
+          "otherLabel": "Other (specify)",
+          "placeholder": "Describe the item"
+        }
+      ],
+      "chauffeurCar": [
+        {
+          "id": "duration",
+          "type": "select",
+          "text": "How long do you need the car?",
+          "required": true,
+          "placeholder": "Select duration",
+          "options": [
+            { "value": "2h", "label": "Up to 2 hours" },
+            { "value": "4h", "label": "Up to 4 hours" },
+            { "value": "8h", "label": "Full day (8 hours)" },
+            { "value": "multiDay", "label": "Multiple days" }
+          ]
+        }
+      ],
+      "towTruck": [
+        {
+          "id": "issueType",
+          "type": "single",
+          "text": "What is the vehicle issue?",
+          "required": true,
+          "options": [
+            { "value": "breakdown", "label": "Breakdown" },
+            { "value": "accident", "label": "Accident" },
+            { "value": "flatTire", "label": "Flat tire" },
+            { "value": "battery", "label": "Dead battery" },
+            { "value": "other", "label": "Other" }
+          ],
+          "allowOther": true,
+          "otherLabel": "Other (specify)",
+          "placeholder": "Describe the issue"
+        }
+      ],
+      "fridgeMoving": [
+        {
+          "id": "fridgeType",
+          "type": "select",
+          "text": "What is the refrigerator type?",
+          "required": true,
+          "placeholder": "Select type",
+          "options": [
+            { "value": "singleDoor", "label": "Single-door" },
+            { "value": "doubleDoor", "label": "Double-door" },
+            { "value": "sideBySide", "label": "Side-by-side" }
           ]
         }
       ]
@@ -1994,3 +1817,4 @@
     }
   }
 }
+     
