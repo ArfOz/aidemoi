@@ -17,7 +17,6 @@ type Category = {
   cover?: string;
   specialties?: Record<string, Specialty>;
 };
-
 export default function CategoryPage() {
   const t = useTranslations();
   const locale = useLocale();
