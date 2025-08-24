@@ -9,10 +9,8 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
-  JoinColumns,
 } from 'typeorm';
 import { Category } from './Category';
-import { Subcategory } from './Subcategory';
 
 // Core types supported by frontend
 export type QuestionType =
@@ -90,14 +88,6 @@ export class Question {
   @ManyToOne(() => Category, { onDelete: 'RESTRICT', nullable: true })
   @JoinColumn({ name: 'categoryId', referencedColumnName: 'id' })
   category?: Category | null;
-
-  // Link to Subcategory by composite (categoryId + slug)
-  @ManyToOne(() => Subcategory, { onDelete: 'RESTRICT', nullable: true })
-  @JoinColumns([
-    { name: 'categoryId', referencedColumnName: 'categoryId' },
-    { name: 'subcategoryId', referencedColumnName: 'slug' },
-  ])
-  subcategory?: Subcategory | null;
 }
 
 /**
