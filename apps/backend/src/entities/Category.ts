@@ -23,6 +23,9 @@ export class Category {
   @Column({ type: 'int', default: 0 })
   sortOrder: number;
 
+  @Column({ type: 'varchar', length: 255, unique: true, nullable: true })
+  name: string | null;
+
   @OneToMany(() => CategoryI18n, (i18n) => i18n.category, {
     cascade: ['insert', 'update'],
   })
