@@ -1,5 +1,4 @@
 import { FastifyInstance, FastifyError } from 'fastify';
-import { Type, Static } from '@sinclair/typebox';
 import { AppDataSource } from '../config/database';
 import { Category, CategoryI18n } from '../entities/Category';
 import { Subcategory, SubcategoryI18n } from '../entities/Subcategory';
@@ -145,6 +144,104 @@ export async function categoriesRoutes(fastify: FastifyInstance) {
           process.env.NODE_ENV === 'development' && err instanceof Error
             ? `Failed to upsert category: ${err.message}`
             : 'Failed to upsert category';
+        return reply.status(500).send({
+          success: false,
+          error: { message: devMsg, code: 500 },
+        });
+      }
+    }
+  );
+
+  fastify.get<{
+    Reply:
+      | { success: true; data: { categories: unknown[] } }
+      | ApiErrorResponseType;
+  }>(
+    '/categories',
+    {
+      schema: {
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              success: { type: 'boolean' },
+              data: {
+                type: 'object',
+                properties: {
+                  categories: {
+                    type: 'array',
+                    items: { type: 'object', additionalProperties: true },
+                  },
+                },
+                additionalProperties: true,
+              },
+            },
+            additionalProperties: true,
+          },
+          400: ApiErrorSchema,
+          500: ApiErrorSchema,
+        },
+      },
+    },
+    async (_request, reply) => {
+      try {
+        const categories = await categoryRepo.find();
+
+        const result = [];
+        for (const c of categories) {
+          const i18n = await categoryI18nRepo.find({
+            where: { category: { id: c.id } },
+            relations: { category: true },
+          });
+
+          const subs = await subcategoryRepo.find({
+            where: { categoryId: c.id },
+          });
+
+          const subItems = [];
+          for (const s of subs) {
+            const si18n = await subcategoryI18nRepo.find({
+              where: { subcategory: { id: s.id } },
+              relations: { subcategory: true },
+            });
+
+            subItems.push({
+              id: s.id,
+              categoryId: s.categoryId,
+              slug: s.slug,
+              icon: s.icon ?? null,
+              sortOrder: s.sortOrder,
+              i18n: si18n.map((e: SubcategoryI18n) => ({
+                locale: e.locale,
+                name: e.name,
+                description: e.description ?? null,
+              })),
+            });
+          }
+
+          result.push({
+            id: c.id,
+            name: c.name,
+            icon: c.icon ?? null,
+            sortOrder: c.sortOrder,
+            i18n: i18n.map((e: CategoryI18n) => ({
+              locale: e.locale,
+              name: e.name,
+              description: e.description ?? null,
+            })),
+            subcategories: subItems,
+          });
+        }
+
+        return reply
+          .status(200)
+          .send({ success: true, data: { categories: result } });
+      } catch (err) {
+        fastify.log.error(err);
+        const devMsg =
+          process.env.NODE_ENV === 'development' && err instanceof Error
+            ? `Failed to fetch categories: ${err.message}`
+            : 'Failed to fetch categories';
         return reply.status(500).send({
           success: false,
           error: { message: devMsg, code: 500 },
