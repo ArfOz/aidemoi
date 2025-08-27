@@ -1,7 +1,7 @@
 'use client';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 
 type Stats = {
   professionals?: number;
@@ -11,15 +11,67 @@ type Category = {
   id: string;
   name: string;
   description: string;
-  icon?: string; // emoji/icon string from messages
+  icon?: string; // emoji/icon string
   cover?: string; // optional image url
   stats?: Stats;
 };
 
+type BackendI18n = {
+  locale: string;
+  name: string;
+  description?: string | null;
+};
+type BackendCategory = {
+  id: string;
+  name?: string | null;
+  icon?: string | null;
+  cover?: string | null;
+  i18n?: BackendI18n[];
+};
+
 export default function CategoriesSection() {
-  const t = useTranslations();
   const locale = useLocale();
-  const categories = (t.raw('categories') as Category[]) || [];
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      try {
+        const res = await fetch(
+          'http://localhost:3300/api/v1/categories/categories',
+          {
+            cache: 'no-store',
+          }
+        );
+        if (!res.ok) return;
+        const json = (await res.json()) as {
+          success: boolean;
+          data?: { categories?: BackendCategory[] };
+        };
+        const items = json?.data?.categories ?? [];
+        const mapped: Category[] = items.map((c) => {
+          const match =
+            c.i18n?.find((x) => x.locale === locale) ||
+            c.i18n?.find((x) => x.locale?.startsWith('en')) ||
+            c.i18n?.[0];
+          return {
+            id: c.id,
+            name: match?.name || c.name || c.id,
+            description: match?.description || '',
+            icon: c.icon || '🧩',
+            cover: c.cover || undefined,
+          };
+        });
+        if (mounted) setCategories(mapped);
+      } catch {
+        if (mounted) setCategories([]);
+      }
+    };
+    void load();
+    return () => {
+      mounted = false;
+    };
+  }, [locale]);
 
   const labels = useMemo(
     () =>

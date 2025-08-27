@@ -5,7 +5,7 @@ import { useRouter, usePathname, useParams } from 'next/navigation';
 import { FaLanguage, FaSignInAlt, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { PostalCodes } from './postal-code';
 import { useAuth } from './context/AuthContext';
 
@@ -13,10 +13,42 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams();
+  const locale = (params.locale as string) || currentLang;
   const t = useTranslations();
   const { user, isAuthenticated, logout } = useAuth();
-  // Get the categories array directly
-  const categories = t.raw('categories') as Array<{ id: string; name: string }>;
+  const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([]);
+
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      try {
+        const res = await fetch('http://localhost:3300/api/v1/categories/categories', {
+          cache: 'no-store',
+        });
+        if (!res.ok) return;
+        const json = (await res.json()) as {
+          success: boolean;
+          data?: { categories?: Array<{ id: string; name?: string; i18n?: Array<{ locale: string; name: string }> }> };
+        };
+        const items = json?.data?.categories ?? [];
+        const mapped = items.map((c) => {
+          const match =
+            c.i18n?.find((x) => x.locale === locale) ||
+            c.i18n?.find((x) => x.locale?.startsWith('en')) ||
+            c.i18n?.[0];
+        
+          return { id: c.id, name: match?.name || c.name || c.id };
+        });
+        if (mounted) setCategories(mapped);
+      } catch {
+        if (mounted) setCategories([]);
+      }
+    };
+    void load();
+    return () => {
+      mounted = false;
+    };
+  }, [locale]);
 
   const changeLanguage = (lang: string) => {
     const newPathname = pathname.replace(`/${currentLang}`, `/${lang}`);
@@ -28,7 +60,7 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
     router.push(`/${locale}`);
   };
 
-  const locale = (params.locale as string) || currentLang;
+  
 
   return (
     <nav className="flex items-center justify-between px-8 py-6 bg-gradient-to-r from-purple-800 via-fuchsia-700 to-pink-600 shadow-lg mb-8">

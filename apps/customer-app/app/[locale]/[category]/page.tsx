@@ -1,41 +1,71 @@
-'use client';
-import React from 'react';
 import Link from 'next/link';
-import { useLocale, useTranslations } from 'next-intl';
-import { useParams } from 'next/navigation';
+import { getLocale } from 'next-intl/server';
 
-type Specialty = {
+type BackendI18n = {
+  locale: string;
   name: string;
-  description: string;
-  icon?: string;
+  description?: string | null;
 };
-type Category = {
+type BackendSubcategory = {
+  slug: string;
+  icon?: string | null;
+  i18n?: BackendI18n[];
+};
+type BackendCategory = {
   id: string;
-  name: string;
-  description: string;
-  icon?: string;
-  cover?: string;
-  specialties?: Record<string, Specialty>;
+  name?: string | null;
+  icon?: string | null;
+  i18n?: BackendI18n[];
+  subcategories?: BackendSubcategory[];
 };
-export default function CategoryPage() {
-  const t = useTranslations();
-  const locale = useLocale();
-  const { category } = useParams<{ category: string }>();
 
-  const categories = (t.raw('categories') as Category[]) || [];
-  const active = categories.find((c) => c.id === category);
+export default async function CategoryPage({
+  params,
+}: {
+  params: { locale: string; category: string };
+}) {
+  const locale = await getLocale();
+  const { category } = params;
+
+  let active: BackendCategory | undefined;
+  try {
+    const res = await fetch(
+      'http://localhost:3300/api/v1/categories/categories',
+      {
+        cache: 'no-store',
+      }
+    );
+    if (res.ok) {
+      const json = (await res.json()) as {
+        success: boolean;
+        data?: { categories?: BackendCategory[] };
+      };
+      const items = json?.data?.categories ?? [];
+      active = items.find((c) => c.id === category);
+    }
+  } catch {
+    active = undefined;
+  }
 
   if (!active) {
     return (
       <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
         <h1>Not found</h1>
         <p>Category &quot;{category}&quot; does not exist.</p>
-        <Link href={`/${locale}`}>← Back</Link>
+        <Link href={`/${params.locale}`}>← Back</Link>
       </main>
     );
   }
 
-  const specs = active.specialties || {};
+  const catI18n =
+    active.i18n?.find((x) => x.locale === locale) ||
+    active.i18n?.find((x) => x.locale?.startsWith('en')) ||
+    active.i18n?.[0];
+  const activeName = catI18n?.name || active.name || active.id;
+  const activeDesc = catI18n?.description || '';
+  const activeIcon = active.icon || '📦';
+
+  const subs = active.subcategories ?? [];
 
   return (
     <main
@@ -58,29 +88,19 @@ export default function CategoryPage() {
         <div
           style={{ position: 'relative', height: 180, background: '#f3f4f6' }}
         >
-          {active.cover ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={active.cover}
-              alt={active.name}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              loading="lazy"
-            />
-          ) : (
-            <div
-              style={{
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 56,
-              }}
-            >
-              {active.icon || '📦'}
-            </div>
-          )}
-          {(active.icon || active.name) && (
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 56,
+            }}
+          >
+            {activeIcon}
+          </div>
+          {(activeIcon || activeName) && (
             <div
               style={{
                 position: 'absolute',
@@ -94,13 +114,13 @@ export default function CategoryPage() {
                 gap: 8,
               }}
             >
-              <span style={{ fontSize: 22 }}>{active.icon || '📦'}</span>
-              <strong style={{ fontSize: 18 }}>{active.name}</strong>
+              <span style={{ fontSize: 22 }}>{activeIcon}</span>
+              <strong style={{ fontSize: 18 }}>{activeName}</strong>
             </div>
           )}
         </div>
         <div style={{ padding: '12px 14px', color: '#374151' }}>
-          {active.description}
+          {activeDesc}
         </div>
       </section>
 
@@ -113,36 +133,47 @@ export default function CategoryPage() {
             gap: 16,
           }}
         >
-          {Object.entries(specs).map(([key, s]) => (
-            <Link
-              key={key}
-              href={`/${locale}/${active.id}/${key}`}
-              aria-label={`${s.name} subcategory`}
-              title={s.name}
-              style={{
-                display: 'block',
-                textDecoration: 'none',
-                color: 'inherit',
-                border: '1px solid #e5e7eb',
-                borderRadius: 12,
-                background: 'white',
-                overflow: 'hidden',
-              }}
-            >
-              <div style={{ padding: 14 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ fontSize: 28 }}>{s.icon || '📌'}</div>
-                  <div style={{ fontWeight: 700 }}>{s.name}</div>
+          {subs.map((s) => {
+            const sI18n =
+              s.i18n?.find((x) => x.locale === locale) ||
+              s.i18n?.find((x) => x.locale?.startsWith('en')) ||
+              s.i18n?.[0];
+            const sName = sI18n?.name || s.slug;
+            const sDesc = sI18n?.description || '';
+            const sIcon = s.icon || '📌';
+            return (
+              <Link
+                key={s.slug}
+                href={`/${params.locale}/${active.id}/${s.slug}`}
+                aria-label={`${sName} subcategory`}
+                title={sName}
+                style={{
+                  display: 'block',
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: 12,
+                  background: 'white',
+                  overflow: 'hidden',
+                }}
+              >
+                <div style={{ padding: 14 }}>
+                  <div
+                    style={{ display: 'flex', alignItems: 'center', gap: 10 }}
+                  >
+                    <div style={{ fontSize: 28 }}>{sIcon}</div>
+                    <div style={{ fontWeight: 700 }}>{sName}</div>
+                  </div>
+                  <div style={{ marginTop: 6, color: '#6b7280', fontSize: 13 }}>
+                    {sDesc}
+                  </div>
                 </div>
-                <div style={{ marginTop: 6, color: '#6b7280', fontSize: 13 }}>
-                  {s.description}
-                </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
 
-        {Object.keys(specs).length === 0 && (
+        {subs.length === 0 && (
           <div style={{ color: '#6b7280', marginTop: 12 }}>
             No subcategories found.
           </div>
@@ -150,7 +181,7 @@ export default function CategoryPage() {
       </section>
 
       <div style={{ marginTop: 16 }}>
-        <Link href={`/${locale}`}>← Back to home</Link>
+        <Link href={`/${params.locale}`}>← Back to home</Link>
       </div>
     </main>
   );
