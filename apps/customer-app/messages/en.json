@@ -1,5 +1,10 @@
 {
   "home": {
     "title": "Choose a Service"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout"
   }
 }

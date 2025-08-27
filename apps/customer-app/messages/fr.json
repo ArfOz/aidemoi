@@ -1,5 +1,10 @@
 {
   "home": {
     "title": "Choisissez un service"
+  },
+  "auth": {
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "logout": "Déconnexion"
   }
 }

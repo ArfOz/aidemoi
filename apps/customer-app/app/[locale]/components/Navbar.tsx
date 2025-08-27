@@ -16,19 +16,30 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
   const locale = (params.locale as string) || currentLang;
   const t = useTranslations();
   const { user, isAuthenticated, logout } = useAuth();
-  const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([]);
+  const [categories, setCategories] = useState<
+    Array<{ id: string; name: string }>
+  >([]);
 
   useEffect(() => {
     let mounted = true;
     const load = async () => {
       try {
-        const res = await fetch('http://localhost:3300/api/v1/categories/categories', {
-          cache: 'no-store',
-        });
+        const res = await fetch(
+          'http://localhost:3300/api/v1/categories/categories',
+          {
+            cache: 'no-store',
+          }
+        );
         if (!res.ok) return;
         const json = (await res.json()) as {
           success: boolean;
-          data?: { categories?: Array<{ id: string; name?: string; i18n?: Array<{ locale: string; name: string }> }> };
+          data?: {
+            categories?: Array<{
+              id: string;
+              name?: string;
+              i18n?: Array<{ locale: string; name: string }>;
+            }>;
+          };
         };
         const items = json?.data?.categories ?? [];
         const mapped = items.map((c) => {
@@ -36,7 +47,7 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
             c.i18n?.find((x) => x.locale === locale) ||
             c.i18n?.find((x) => x.locale?.startsWith('en')) ||
             c.i18n?.[0];
-        
+
           return { id: c.id, name: match?.name || c.name || c.id };
         });
         if (mounted) setCategories(mapped);
@@ -59,8 +70,6 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
     logout();
     router.push(`/${locale}`);
   };
-
-  
 
   return (
     <nav className="flex items-center justify-between px-8 py-6 bg-gradient-to-r from-purple-800 via-fuchsia-700 to-pink-600 shadow-lg mb-8">
