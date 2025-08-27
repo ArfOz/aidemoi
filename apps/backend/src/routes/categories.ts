@@ -5,6 +5,8 @@ import { Subcategory, SubcategoryI18n } from '../entities/Subcategory';
 import {
   ApiErrorResponseType,
   ApiErrorSchema,
+  CategoriesListSuccessResponse,
+  CategoriesListSuccessResponseSchema,
   CategoryUpsertRequest,
   CategoryUpsertRequestSchema,
   CategoryUpsertSuccessResponse,
@@ -153,31 +155,13 @@ export async function categoriesRoutes(fastify: FastifyInstance) {
   );
 
   fastify.get<{
-    Reply:
-      | { success: true; data: { categories: unknown[] } }
-      | ApiErrorResponseType;
+    Reply: CategoriesListSuccessResponse | ApiErrorResponseType;
   }>(
     '/categories',
     {
       schema: {
         response: {
-          200: {
-            type: 'object',
-            properties: {
-              success: { type: 'boolean' },
-              data: {
-                type: 'object',
-                properties: {
-                  categories: {
-                    type: 'array',
-                    items: { type: 'object', additionalProperties: true },
-                  },
-                },
-                additionalProperties: true,
-              },
-            },
-            additionalProperties: true,
-          },
+          200: CategoriesListSuccessResponseSchema,
           400: ApiErrorSchema,
           500: ApiErrorSchema,
         },
@@ -233,9 +217,11 @@ export async function categoriesRoutes(fastify: FastifyInstance) {
           });
         }
 
-        return reply
-          .status(200)
-          .send({ success: true, data: { categories: result } });
+        return reply.status(200).send({
+          success: true,
+          message: 'Categories fetched',
+          data: { categories: result },
+        });
       } catch (err) {
         fastify.log.error(err);
         const devMsg =

@@ -1,17 +1,6 @@
 import { getLocale, getTranslations } from 'next-intl/server';
 import { CategoryCard } from './components/category-card';
-
-type BackendCategory = {
-  id: string;
-  name?: string | null;
-  icon?: string | null;
-  sortOrder?: number | null;
-  i18n?: Array<{
-    locale: string;
-    name: string;
-    description?: string | null;
-  }>;
-};
+import { apiAideMoi, CategoriesListSuccessResponse } from '@api';
 
 export default async function HomePage() {
   const t = await getTranslations();
@@ -25,18 +14,13 @@ export default async function HomePage() {
   }> = [];
 
   try {
-    const res = await fetch(
-      'http://localhost:3300/api/v1/categories/categories',
-      { cache: 'no-store' }
+    const res = await apiAideMoi.get<CategoriesListSuccessResponse>(
+      '/categories/categories'
     );
 
-    if (res.ok) {
-      const json = (await res.json()) as {
-        success: boolean;
-        data?: { categories?: BackendCategory[] };
-      };
-
-      const items = json?.data?.categories ?? [];
+    // apiAideMoi.get returns the parsed API response shaped like { success, message, data }
+    if (res?.success) {
+      const items = res.data?.categories ?? [];
       categories = items.map((c) => {
         const match =
           c.i18n?.find((x) => x.locale === locale) ??

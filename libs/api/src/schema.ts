@@ -1,4 +1,4 @@
-import { Static, Type } from '@sinclair/typebox';
+import { Type } from '@sinclair/typebox';
 
 export const ErrorSchema = Type.Object({
   code: Type.Number(),
@@ -171,5 +171,40 @@ export const SubcategoryUpsertSuccessResponseSchema = Type.Object({
       created: Type.Boolean(),
       updatedLocales: Type.Array(Type.String()),
     }),
+  }),
+});
+
+// Categories GET response schemas/types
+export const CategoryI18nOutSchema = CategoryI18nSchema; // same shape as request i18n
+
+export const SubcategoryOutSchema = Type.Object({
+  id: Type.Optional(Type.String()), // internal id may be provided
+  categoryId: Type.Optional(Type.String()),
+  slug: Type.String(),
+  icon: Type.Union([Type.String(), Type.Null()]),
+  sortOrder: Type.Optional(Type.Integer()),
+  i18n: Type.Array(
+    Type.Object({
+      locale: Type.String({ minLength: 2, maxLength: 8 }),
+      name: Type.String({ minLength: 1, maxLength: 255 }),
+      description: Type.Optional(Type.Union([Type.String(), Type.Null()])),
+    })
+  ),
+});
+
+export const CategoryOutSchema = Type.Object({
+  id: Type.String(),
+  name: Type.Optional(Type.String()), // may include default/original name
+  icon: Type.Union([Type.String(), Type.Null()]),
+  sortOrder: Type.Optional(Type.Integer()),
+  i18n: Type.Array(CategoryI18nOutSchema),
+  subcategories: Type.Array(SubcategoryOutSchema),
+});
+
+export const CategoriesListSuccessResponseSchema = Type.Object({
+  success: Type.Literal(true),
+  message: Type.String(),
+  data: Type.Object({
+    categories: Type.Array(CategoryOutSchema),
   }),
 });

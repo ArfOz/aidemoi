@@ -7,7 +7,11 @@
     "emitDeclarationOnly": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
@@ -17,7 +21,10 @@
         "name": "next"
       }
     ],
-    "types": ["jest", "node"],
+    "types": [
+      "jest",
+      "node"
+    ],
     "outDir": "dist",
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
@@ -37,7 +44,8 @@
     "next.config.js",
     "postcss.config.js",
     "tailwind.config.js",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "**/*.json"
   ],
   "exclude": [
     "out-tsc",

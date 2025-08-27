@@ -1,75 +1,35 @@
-'use client';
-
-import { locales } from '../../../i18n/routing';
-import { useRouter, usePathname, useParams } from 'next/navigation';
-import { FaLanguage, FaSignInAlt, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
-import React, { useEffect, useState } from 'react';
+import { getLocale, getTranslations } from 'next-intl/server';
+import { FaLanguage } from 'react-icons/fa';
 import { PostalCodes } from './postal-code';
-import { useAuth } from './context/AuthContext';
+import LanguageButtons from './LanguageButtons';
+import AuthControls from './AuthControls';
+import { apiAideMoi, CategoriesListSuccessResponse } from '@api';
+import { Montserrat } from 'next/font/google';
 
-const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
-  const router = useRouter();
-  const pathname = usePathname();
-  const params = useParams();
-  const locale = (params.locale as string) || currentLang;
-  const t = useTranslations();
-  const { user, isAuthenticated, logout } = useAuth();
-  const [categories, setCategories] = useState<
-    Array<{ id: string; name: string }>
-  >([]);
+const montserrat = Montserrat({ subsets: ['latin'], weight: ['800'] });
 
-  useEffect(() => {
-    let mounted = true;
-    const load = async () => {
-      try {
-        const res = await fetch(
-          'http://localhost:3300/api/v1/categories/categories',
-          {
-            cache: 'no-store',
-          }
-        );
-        if (!res.ok) return;
-        const json = (await res.json()) as {
-          success: boolean;
-          data?: {
-            categories?: Array<{
-              id: string;
-              name?: string;
-              i18n?: Array<{ locale: string; name: string }>;
-            }>;
-          };
-        };
-        const items = json?.data?.categories ?? [];
-        const mapped = items.map((c) => {
-          const match =
-            c.i18n?.find((x) => x.locale === locale) ||
-            c.i18n?.find((x) => x.locale?.startsWith('en')) ||
-            c.i18n?.[0];
+export default async function Navbar({ lang: currentLang }: { lang: string }) {
+  const locale = (await getLocale()) || currentLang;
+  const t = await getTranslations();
 
-          return { id: c.id, name: match?.name || c.name || c.id };
-        });
-        if (mounted) setCategories(mapped);
-      } catch {
-        if (mounted) setCategories([]);
-      }
-    };
-    void load();
-    return () => {
-      mounted = false;
-    };
-  }, [locale]);
+  let categories: Array<{ id: string; name: string }> = [];
+  try {
+    const res = await apiAideMoi.get<CategoriesListSuccessResponse>(
+      '/categories/categories'
+    );
 
-  const changeLanguage = (lang: string) => {
-    const newPathname = pathname.replace(`/${currentLang}`, `/${lang}`);
-    router.push(newPathname);
-  };
-
-  const handleLogout = () => {
-    logout();
-    router.push(`/${locale}`);
-  };
+    const items = res?.data?.categories ?? [];
+    categories = items.map((c) => {
+      const match =
+        c.i18n?.find((x) => x.locale === locale) ||
+        c.i18n?.find((x) => x.locale?.startsWith('en')) ||
+        c.i18n?.[0];
+      return { id: c.id, name: match?.name || c.name || c.id };
+    });
+  } catch {
+    categories = [];
+  }
 
   return (
     <nav className="flex items-center justify-between px-8 py-6 bg-gradient-to-r from-purple-800 via-fuchsia-700 to-pink-600 shadow-lg mb-8">
@@ -79,7 +39,7 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
           <FaLanguage />
         </span>
         <Link href={`/${locale}`} className="flex items-center">
-          <span className="font-logo text-5xl font-extrabold tracking-tight text-white drop-shadow-lg">
+          <span className={`${montserrat.className} text-5xl font-extrabold tracking-tight text-white drop-shadow-lg`}>
             <span className="text-pink-200">Aide</span>
             <span className="text-white">Moi</span>
           </span>
@@ -100,68 +60,18 @@ const Navbar: React.FC<{ lang: string }> = ({ lang: currentLang }) => {
       {/* Right side: Address select, Auth buttons, and Language buttons */}
       <div className="flex gap-4 items-center">
         {/* Address Autocomplete Bar */}
-        <PostalCodes />
+        {/* <PostalCodes /> */}
 
-        {/* Authentication section */}
-        <div className="flex gap-2 items-center">
-          {isAuthenticated && user ? (
-            // Show user info and logout when authenticated
-            <div className="flex items-center gap-2">
-              <Link
-                href={`/${locale}/profile`}
-                className="flex items-center gap-2 px-4 py-2 bg-white text-purple-700 rounded-lg font-semibold hover:bg-purple-100 transition-colors duration-200 shadow-md"
-                title={`Welcome, ${user.username}`}
-              >
-                <FaUser className="text-lg" />
-                <span className="hidden sm:inline">{user.username}</span>
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition-colors duration-200 shadow-md"
-                title={t('auth.logout')}
-              >
-                <FaSignOutAlt className="text-lg" />
-                <span className="hidden sm:inline">{t('auth.logout')}</span>
-              </button>
-            </div>
-          ) : (
-            // Show login button when not authenticated
-            <Link
-              href={`/${locale}/login`}
-              className="flex items-center gap-2 px-4 py-2 bg-white text-purple-700 rounded-lg font-semibold hover:bg-purple-100 transition-colors duration-200 shadow-md"
-              title={t('auth.login')}
-            >
-              <FaSignInAlt className="text-lg" />
-              <span className="hidden sm:inline">{t('auth.login')}</span>
-            </Link>
-          )}
-        </div>
+        {/* Authentication section (client) */}
+        <AuthControls
+          locale={locale}
+          loginLabel={t('auth.login')}
+          logoutLabel={t('auth.logout')}
+        />
 
-        {/* Language buttons */}
-        {locales.map((lang) => (
-          <button
-            key={lang}
-            onClick={() => changeLanguage(lang)}
-            className={`px-6 py-3 text-2xl rounded-xl font-bold transition-colors duration-200 ${
-              currentLang === lang
-                ? 'bg-pink-500 text-white shadow-md'
-                : 'bg-white text-pink-700 hover:bg-pink-600 hover:text-white'
-            }`}
-            aria-current={currentLang === lang ? 'page' : undefined}
-          >
-            {lang.toUpperCase()}
-          </button>
-        ))}
+        {/* Language buttons (client) */}
+        <LanguageButtons currentLang={currentLang} />
       </div>
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap');
-        .font-logo {
-          font-family: 'Montserrat', 'Arial Black', Arial, sans-serif;
-          letter-spacing: 0.05em;
-        }
-      `}</style>
     </nav>
   );
-};
-
-export default Navbar;
+}

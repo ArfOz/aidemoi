@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
+import { apiAideMoi, CategoriesListSuccessResponse } from '@api';
 
 type Stats = {
   professionals?: number;
@@ -16,19 +17,6 @@ type Category = {
   stats?: Stats;
 };
 
-type BackendI18n = {
-  locale: string;
-  name: string;
-  description?: string | null;
-};
-type BackendCategory = {
-  id: string;
-  name?: string | null;
-  icon?: string | null;
-  cover?: string | null;
-  i18n?: BackendI18n[];
-};
-
 export default function CategoriesSection() {
   const locale = useLocale();
   const [categories, setCategories] = useState<Category[]>([]);
@@ -37,18 +25,21 @@ export default function CategoriesSection() {
     let mounted = true;
     const load = async () => {
       try {
-        const res = await fetch(
-          'http://localhost:3300/api/v1/categories/categories',
-          {
-            cache: 'no-store',
-          }
+        const res = await apiAideMoi.get<CategoriesListSuccessResponse>(
+          '/categories/categories'
         );
-        if (!res.ok) return;
-        const json = (await res.json()) as {
-          success: boolean;
-          data?: { categories?: BackendCategory[] };
-        };
-        const items = json?.data?.categories ?? [];
+        // const res = await fetch(
+        //   'http://localhost:3300/api/v1/categories/categories',
+        //   {
+        //     cache: 'no-store',
+        //   }
+        // );
+        // if (!res.ok) return;
+        // const json = (await res.json()) as {
+        //   success: boolean;
+        //   data?: { categories?: BackendCategory[] };
+        // };
+        const items = res.data?.categories ?? [];
         const mapped: Category[] = items.map((c) => {
           const match =
             c.i18n?.find((x) => x.locale === locale) ||
@@ -59,7 +50,6 @@ export default function CategoriesSection() {
             name: match?.name || c.name || c.id,
             description: match?.description || '',
             icon: c.icon || '🧩',
-            cover: c.cover || undefined,
           };
         });
         if (mounted) setCategories(mapped);
