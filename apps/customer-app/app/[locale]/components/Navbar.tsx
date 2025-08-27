@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { FaLanguage } from 'react-icons/fa';
-import { PostalCodes } from './postal-code';
 import LanguageButtons from './LanguageButtons';
 import AuthControls from './AuthControls';
 import { apiAideMoi, CategoriesListSuccessResponse } from '@api';
 import { Montserrat } from 'next/font/google';
+import { PostalCodes } from './postal-code';
 
 const montserrat = Montserrat({ subsets: ['latin'], weight: ['800'] });
 
@@ -39,7 +39,9 @@ export default async function Navbar({ lang: currentLang }: { lang: string }) {
           <FaLanguage />
         </span>
         <Link href={`/${locale}`} className="flex items-center">
-          <span className={`${montserrat.className} text-5xl font-extrabold tracking-tight text-white drop-shadow-lg`}>
+          <span
+            className={`${montserrat.className} text-5xl font-extrabold tracking-tight text-white drop-shadow-lg`}
+          >
             <span className="text-pink-200">Aide</span>
             <span className="text-white">Moi</span>
           </span>
@@ -60,7 +62,7 @@ export default async function Navbar({ lang: currentLang }: { lang: string }) {
       {/* Right side: Address select, Auth buttons, and Language buttons */}
       <div className="flex gap-4 items-center">
         {/* Address Autocomplete Bar */}
-        {/* <PostalCodes /> */}
+        <PostalCodes />
 
         {/* Authentication section (client) */}
         <AuthControls
