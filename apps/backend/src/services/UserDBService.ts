@@ -14,7 +14,7 @@ interface UpdateUserData {
   password?: string;
 }
 
-export class UserService {
+export class UserDBService {
   private userRepository: Repository<User>;
 
   constructor(dataSource: DataSource) {

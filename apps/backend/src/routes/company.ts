@@ -4,7 +4,7 @@ import {
   FastifyRequest,
   FastifyReply,
 } from 'fastify';
-import { CompanyService } from '../services/CompanyService';
+import { CompanyDBService } from '../services/CompanyDBService';
 
 interface CreateCompanyBody {
   name: string;
@@ -29,7 +29,7 @@ async function companyRoutes(
   _options: FastifyPluginOptions
 ) {
   // Initialize CompanyService with database connection
-  const companyService = new CompanyService((fastify as any).db);
+  const companyService = new CompanyDBService((fastify as any).db);
   // Get all companies
   fastify.get(
     '/',

@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
-import { UserService } from '../services/UserService';
+import { UserDBService } from '../services/UserDBService';
 import { JwtService } from '../services/JwtService';
 import { AppDataSource } from '../config/database';
 import { Type } from '@sinclair/typebox';
@@ -27,15 +27,15 @@ import {
   LogoutSuccessResponseType,
   LogoutHeaders,
 } from '@api';
-import { TokenService } from '../services/TokenService';
+import { TokenDBService } from '../services/TokenDBService';
 
 // Add Static for typing
 export async function authRoutes(
   fastify: FastifyInstance,
   _options: FastifyPluginOptions
 ) {
-  const userService = new UserService(AppDataSource);
-  const tokenService = new TokenService(AppDataSource);
+  const userService = new UserDBService(AppDataSource);
+  const tokenService = new TokenDBService(AppDataSource);
 
   fastify.post<{
     Body: LoginRequestType;

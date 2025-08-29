@@ -4,7 +4,7 @@ import {
   FastifyRequest,
   FastifyReply,
 } from 'fastify';
-import { UserService } from '../services/UserService';
+import { UserDBService } from '../services/UserDBService';
 
 interface CreateUserBody {
   username: string;
@@ -26,7 +26,7 @@ async function userRoutes(
   _options: FastifyPluginOptions
 ) {
   // Initialize UserService with database connection
-  const userService = new UserService((fastify as any).db);
+  const userService = new UserDBService((fastify as any).db);
 
   // User schema definitions
   const userSchema = {

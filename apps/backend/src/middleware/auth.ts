@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { JwtService } from '../services/JwtService';
-import { TokenService } from '../services/TokenService';
+import { TokenDBService } from '../services/TokenDBService';
 import { parseBearerToken, TokenPayload } from '@api';
 import { AppDataSource } from '../config/database';
 
@@ -10,7 +10,7 @@ export async function authenticateToken(
   request: FastifyRequest,
   reply: FastifyReply
 ) {
-  const tokenService = new TokenService(AppDataSource);
+  const tokenService = new TokenDBService(AppDataSource);
   try {
     const token = parseBearerToken(request.headers.authorization);
     if (!token) {

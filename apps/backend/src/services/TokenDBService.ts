@@ -1,7 +1,7 @@
 import { DataSource, Repository, LessThan, MoreThan, IsNull } from 'typeorm';
 import { Token } from '../entities/Token';
 
-export class TokenService {
+export class TokenDBService {
   private tokenRepository: Repository<Token>;
 
   constructor(dataSource: DataSource) {

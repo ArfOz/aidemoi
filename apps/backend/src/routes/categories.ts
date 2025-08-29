@@ -1,7 +1,5 @@
 import { FastifyInstance, FastifyError } from 'fastify';
 import { AppDataSource } from '../config/database';
-import { Category, CategoryI18n } from '../entities/Category';
-import { Subcategory, SubcategoryI18n } from '../entities/Subcategory';
 import {
   ApiErrorResponseType,
   ApiErrorSchema,
@@ -16,12 +14,14 @@ import {
   SubcategoryUpsertSuccessResponse,
   SubcategoryUpsertSuccessResponseSchema,
 } from '@api';
+import { CategoriesDBService } from '../services/CategoriesDBService';
+// add back i18n entity types used in mappings
+import type { CategoryI18n } from '../entities/Category';
+import type { SubcategoryI18n } from '../entities/Subcategory';
 
 export async function categoriesRoutes(fastify: FastifyInstance) {
-  const categoryRepo = AppDataSource.getRepository(Category);
-  const categoryI18nRepo = AppDataSource.getRepository(CategoryI18n);
-  const subcategoryRepo = AppDataSource.getRepository(Subcategory);
-  const subcategoryI18nRepo = AppDataSource.getRepository(SubcategoryI18n);
+  // Initialize services
+  const categoriesDBService = new CategoriesDBService(AppDataSource);
 
   // Helper to generate URL-safe slug
   const slugify = (input: string): string =>
@@ -34,14 +34,16 @@ export async function categoriesRoutes(fastify: FastifyInstance) {
       .replace(/^-+|-+$/g, '');
 
   const ensureUniqueCategoryId = async (base: string): Promise<string> => {
-    let candidate = base || 'category';
-    // If available, use as-is
-    // Then append -2, -3 ... until available
+    const effectiveBase = base?.trim() || 'category';
+    let candidate = effectiveBase;
     let suffix = 2;
     while (true) {
-      const exists = await categoryRepo.findOne({ where: { id: candidate } });
+      // REPLACED: categoriesDBService.findOne -> repo.findOne with where
+      const exists = await categoriesDBService.findOne({
+        where: { id: candidate },
+      });
       if (!exists) return candidate;
-      candidate = `${base}-${suffix++}`;
+      candidate = `${effectiveBase}-${suffix++}`;
     }
   };
 
@@ -67,92 +69,129 @@ export async function categoriesRoutes(fastify: FastifyInstance) {
     } satisfies ApiErrorResponseType);
   });
 
-  // Upsert Category
-  fastify.post<{
-    Body: CategoryUpsertRequest;
-    Reply: CategoryUpsertSuccessResponse | ApiErrorResponseType;
-  }>(
-    '/categories',
-    {
-      schema: {
-        body: CategoryUpsertRequestSchema,
-        response: {
-          200: CategoryUpsertSuccessResponseSchema,
-          400: ApiErrorSchema,
-          500: ApiErrorSchema,
-        },
-      },
-    },
-    async (request, reply) => {
-      try {
-        const { icon, sortOrder, i18n } = request.body;
+  // // Upsert Category
+  // fastify.post<{
+  //   Body: CategoryUpsertRequest;
+  //   Reply: CategoryUpsertSuccessResponse | ApiErrorResponseType;
+  // }>(
+  //   '/categories',
+  //   {
+  //     schema: {
+  //       body: CategoryUpsertRequestSchema,
+  //       response: {
+  //         200: CategoryUpsertSuccessResponseSchema,
+  //         400: ApiErrorSchema,
+  //         500: ApiErrorSchema,
+  //       },
+  //     },
+  //   },
+  //   async (request, reply) => {
+  //     try {
+  //       const { icon, sortOrder } = request.body;
+  //       const { i18n } = request.body;
 
-        // Generate ID (slug) from preferred name (en, else first)
-        const preferred =
-          i18n.find((e) => e.locale.toLowerCase() === 'en') ?? i18n[0];
-        const baseSlug = slugify(preferred.name);
-        const id = await ensureUniqueCategoryId(baseSlug);
+  //       // basic validation for i18n
+  //       if (!Array.isArray(i18n) || i18n.length === 0) {
+  //         return reply.status(400).send({
+  //           success: false,
+  //           error: {
+  //             message: 'i18n is required and cannot be empty',
+  //             code: 400,
+  //           },
+  //         });
+  //       }
 
-        let created = false;
-        const updatedLocales: string[] = [];
+  //       // normalize locales and names
+  //       const normalizedI18n = i18n.map((e) => ({
+  //         ...e,
+  //         locale: String(e.locale || '')
+  //           .toLowerCase()
+  //           .trim(),
+  //         name: String(e.name || '').trim(),
+  //         description: e.description ?? null,
+  //       }));
+  //       // ensure all names are present
+  //       if (normalizedI18n.some((e) => !e.name)) {
+  //         return reply.status(400).send({
+  //           success: false,
+  //           error: {
+  //             message: 'All i18n entries must have a non-empty name',
+  //             code: 400,
+  //           },
+  //         });
+  //       }
 
-        let category = await categoryRepo.findOne({ where: { id } });
-        if (!category) {
-          category = categoryRepo.create({
-            id,
-            icon: icon ?? null,
-            sortOrder: sortOrder ?? 0,
-            // keep Category.name aligned on create
-            name: preferred.name,
-          });
-          created = true;
-        } else {
-          category.icon = icon ?? category.icon ?? null;
-          if (typeof sortOrder === 'number') category.sortOrder = sortOrder;
-          // optionally keep name unchanged on updates
-        }
-        await categoryRepo.save(category);
+  //       // Generate ID (slug) from preferred name (en, then en-*, else first)
+  //       const preferred =
+  //         normalizedI18n.find((e) => e.locale === 'en') ??
+  //         normalizedI18n.find((e) => e.locale.startsWith('en')) ??
+  //         normalizedI18n[0];
 
-        for (const entry of i18n) {
-          const existing = await categoryI18nRepo.findOne({
-            where: { category: { id }, locale: entry.locale },
-            relations: { category: true },
-          });
-          if (existing) {
-            existing.name = entry.name;
-            existing.description = entry.description ?? null;
-            await categoryI18nRepo.save(existing);
-          } else {
-            const rec = categoryI18nRepo.create({
-              category,
-              locale: entry.locale,
-              name: entry.name,
-              description: entry.description ?? null,
-            });
-            await categoryI18nRepo.save(rec);
-          }
-          updatedLocales.push(entry.locale);
-        }
+  //       const baseSlugRaw = slugify(preferred.name);
+  //       const baseSlug = baseSlugRaw || 'category';
+  //       const id = await ensureUniqueCategoryId(baseSlug);
 
-        const res: CategoryUpsertSuccessResponse = {
-          success: true,
-          message: created ? 'Category created' : 'Category updated',
-          data: { category: { id, created, updatedLocales } },
-        };
-        return reply.status(200).send(res);
-      } catch (err) {
-        fastify.log.error(err);
-        const devMsg =
-          process.env.NODE_ENV === 'development' && err instanceof Error
-            ? `Failed to upsert category: ${err.message}`
-            : 'Failed to upsert category';
-        return reply.status(500).send({
-          success: false,
-          error: { message: devMsg, code: 500 },
-        });
-      }
-    }
-  );
+  //       let created = false;
+  //       const updatedLocales: string[] = [];
+
+  //       // REPLACED: categoriesDBService.findOne -> repo.findOne with where
+  //       let category = await categoriesDBService.findOne({
+  //         where: { id },
+  //       });
+  //       if (!category) {
+  //         category = categoriesDBService.create({
+  //           id,
+  //           name: preferred.name, // ensure Category.name is set
+  //           icon: icon ?? null,
+  //           sortOrder: sortOrder ?? 0,
+  //         });
+  //         created = true;
+  //       } else {
+  //         category.icon = icon ?? category.icon ?? null;
+  //         if (typeof sortOrder === 'number') category.sortOrder = sortOrder;
+  //       }
+  //       await categoriesDBService.categoryRepo.save(category);
+
+  //       for (const entry of normalizedI18n) {
+  //         const existing = await categoriesDBService.categoryI18nRepo.findOne({
+  //           where: { category: { id }, locale: entry.locale },
+  //           relations: { category: true },
+  //         });
+  //         if (existing) {
+  //           existing.name = entry.name;
+  //           existing.description = entry.description;
+  //           await categoriesDBService.categoryI18nRepo.save(existing);
+  //         } else {
+  //           const rec = categoriesDBService.categoryI18nRepo.create({
+  //             category,
+  //             locale: entry.locale,
+  //             name: entry.name,
+  //             description: entry.description,
+  //           });
+  //           await categoriesDBService.categoryI18nRepo.save(rec);
+  //         }
+  //         updatedLocales.push(entry.locale);
+  //       }
+
+  //       const res: CategoryUpsertSuccessResponse = {
+  //         success: true,
+  //         message: created ? 'Category created' : 'Category updated',
+  //         data: { category: { id, created, updatedLocales } },
+  //       };
+  //       return reply.status(200).send(res);
+  //     } catch (err) {
+  //       fastify.log.error(err);
+  //       const devMsg =
+  //         process.env.NODE_ENV === 'development' && err instanceof Error
+  //           ? `Failed to upsert category: ${err.message}`
+  //           : 'Failed to upsert category';
+  //       return reply.status(500).send({
+  //         success: false,
+  //         error: { message: devMsg, code: 500 },
+  //       });
+  //     }
+  //   }
+  // );
 
   fastify.get<{
     Reply: CategoriesListSuccessResponse | ApiErrorResponseType;
@@ -169,58 +208,15 @@ export async function categoriesRoutes(fastify: FastifyInstance) {
     },
     async (_request, reply) => {
       try {
-        const categories = await categoryRepo.find();
-
-        const result = [];
-        for (const c of categories) {
-          const i18n = await categoryI18nRepo.find({
-            where: { category: { id: c.id } },
-            relations: { category: true },
-          });
-
-          const subs = await subcategoryRepo.find({
-            where: { categoryId: c.id },
-          });
-
-          const subItems = [];
-          for (const s of subs) {
-            const si18n = await subcategoryI18nRepo.find({
-              where: { subcategory: { id: s.id } },
-              relations: { subcategory: true },
-            });
-
-            subItems.push({
-              id: s.id,
-              categoryId: s.categoryId,
-              slug: s.slug,
-              icon: s.icon ?? null,
-              sortOrder: s.sortOrder,
-              i18n: si18n.map((e: SubcategoryI18n) => ({
-                locale: e.locale,
-                name: e.name,
-                description: e.description ?? null,
-              })),
-            });
-          }
-
-          result.push({
-            id: c.id,
-            name: c.name,
-            icon: c.icon ?? null,
-            sortOrder: c.sortOrder,
-            i18n: i18n.map((e: CategoryI18n) => ({
-              locale: e.locale,
-              name: e.name,
-              description: e.description ?? null,
-            })),
-            subcategories: subItems,
-          });
-        }
+        // order for deterministic output
+        const categories = await categoriesDBService.findAll({
+          order: { sortOrder: 'ASC', id: 'ASC' },
+        });
 
         return reply.status(200).send({
           success: true,
           message: 'Categories fetched',
-          data: { categories: result },
+          data: { categories },
         });
       } catch (err) {
         fastify.log.error(err);
@@ -237,93 +233,133 @@ export async function categoriesRoutes(fastify: FastifyInstance) {
   );
 
   // Upsert Subcategory
-  fastify.post<{
-    Body: SubcategoryUpsertRequest;
-    Reply: SubcategoryUpsertSuccessResponse | ApiErrorResponseType;
-  }>(
-    '/subcategories',
-    {
-      schema: {
-        body: SubcategoryUpsertRequestSchema,
-        response: {
-          200: SubcategoryUpsertSuccessResponseSchema,
-          400: ApiErrorSchema,
-          500: ApiErrorSchema,
-        },
-      },
-    },
-    async (request, reply) => {
-      try {
-        const { categoryId, slug, icon, sortOrder, i18n } = request.body;
+  // fastify.post<{
+  //   Body: SubcategoryUpsertRequest;
+  //   Reply: SubcategoryUpsertSuccessResponse | ApiErrorResponseType;
+  // }>(
+  //   '/subcategories',
+  //   {
+  //     schema: {
+  //       body: SubcategoryUpsertRequestSchema,
+  //       response: {
+  //         200: SubcategoryUpsertSuccessResponseSchema,
+  //         400: ApiErrorSchema,
+  //         500: ApiErrorSchema,
+  //       },
+  //     },
+  //   },
+  //   async (request, reply) => {
+  //     try {
+  //       const { categoryId, icon, sortOrder } = request.body;
+  //       let { slug } = request.body;
+  //       const i18n = request.body.i18n;
 
-        // Ensure category exists
-        const cat = await categoryRepo.findOne({ where: { id: categoryId } });
-        if (!cat) {
-          return reply.status(400).send({
-            success: false,
-            error: { message: `Category "${categoryId}" not found`, code: 400 },
-          });
-        }
+  //       // Validate slug and i18n
+  //       slug = slugify(String(slug || '').trim());
+  //       if (!slug) {
+  //         return reply.status(400).send({
+  //           success: false,
+  //           error: { message: 'Valid slug is required', code: 400 },
+  //         });
+  //       }
+  //       if (!Array.isArray(i18n) || i18n.length === 0) {
+  //         return reply.status(400).send({
+  //           success: false,
+  //           error: {
+  //             message: 'i18n is required and cannot be empty',
+  //             code: 400,
+  //           },
+  //         });
+  //       }
+  //       const normalizedI18n = i18n.map((e) => ({
+  //         ...e,
+  //         locale: String(e.locale || '')
+  //           .toLowerCase()
+  //           .trim(),
+  //         name: String(e.name || '').trim(),
+  //         description: e.description ?? null,
+  //       }));
+  //       if (normalizedI18n.some((e) => !e.name)) {
+  //         return reply.status(400).send({
+  //           success: false,
+  //           error: {
+  //             message: 'All i18n entries must have a non-empty name',
+  //             code: 400,
+  //           },
+  //         });
+  //       }
 
-        let created = false;
-        const updatedLocales: string[] = [];
+  //       // Ensure category exists
+  //       const cat = await categoriesDBService.findOne({
+  //         where: { id: categoryId },
+  //       });
+  //       if (!cat) {
+  //         return reply.status(400).send({
+  //           success: false,
+  //           error: { message: `Category "${categoryId}" not found`, code: 400 },
+  //         });
+  //       }
 
-        let sub = await subcategoryRepo.findOne({
-          where: { categoryId, slug },
-        });
-        if (!sub) {
-          sub = subcategoryRepo.create({
-            categoryId,
-            slug,
-            icon: icon ?? null,
-            sortOrder: sortOrder ?? 0,
-            category: cat,
-          });
-          created = true;
-        } else {
-          sub.icon = icon ?? sub.icon ?? null;
-          if (typeof sortOrder === 'number') sub.sortOrder = sortOrder;
-        }
-        await subcategoryRepo.save(sub);
+  //       let created = false;
+  //       const updatedLocales: string[] = [];
 
-        for (const entry of i18n) {
-          const existing = await subcategoryI18nRepo.findOne({
-            where: { subcategory: { id: sub.id }, locale: entry.locale },
-            relations: { subcategory: true },
-          });
-          if (existing) {
-            existing.name = entry.name;
-            existing.description = entry.description ?? null;
-            await subcategoryI18nRepo.save(existing);
-          } else {
-            const rec = subcategoryI18nRepo.create({
-              subcategory: sub,
-              locale: entry.locale,
-              name: entry.name,
-              description: entry.description ?? null,
-            });
-            await subcategoryI18nRepo.save(rec);
-          }
-          updatedLocales.push(entry.locale);
-        }
+  //       let sub = await categoriesDBService.findOne({
+  //         where: { categoryId, slug },
+  //       });
+  //       if (!sub) {
+  //         sub = categoriesDBService.subcategoryRepo.create({
+  //           categoryId,
+  //           slug,
+  //           icon: icon ?? null,
+  //           sortOrder: sortOrder ?? 0,
+  //           category: cat,
+  //         });
+  //         created = true;
+  //       } else {
+  //         sub.icon = icon ?? sub.icon ?? null;
+  //         if (typeof sortOrder === 'number') sub.sortOrder = sortOrder;
+  //       }
+  //       await categoriesDBService.subcategoryRepo.save(sub);
 
-        const res: SubcategoryUpsertSuccessResponse = {
-          success: true,
-          message: created ? 'Subcategory created' : 'Subcategory updated',
-          data: { subcategory: { categoryId, slug, created, updatedLocales } },
-        };
-        return reply.status(200).send(res);
-      } catch (err) {
-        fastify.log.error(err);
-        const devMsg =
-          process.env.NODE_ENV === 'development' && err instanceof Error
-            ? `Failed to upsert subcategory: ${err.message}`
-            : 'Failed to upsert subcategory';
-        return reply.status(500).send({
-          success: false,
-          error: { message: devMsg, code: 500 },
-        });
-      }
-    }
-  );
+  //       for (const entry of normalizedI18n) {
+  //         const existing =
+  //           await categoriesDBService.subcategoryI18nRepo.findOne({
+  //             where: { subcategory: { id: sub.id }, locale: entry.locale },
+  //             relations: { subcategory: true },
+  //           });
+  //         if (existing) {
+  //           existing.name = entry.name;
+  //           existing.description = entry.description;
+  //           await categoriesDBService.subcategoryI18nRepo.save(existing);
+  //         } else {
+  //           const rec = categoriesDBService.subcategoryI18nRepo.create({
+  //             subcategory: sub,
+  //             locale: entry.locale,
+  //             name: entry.name,
+  //             description: entry.description,
+  //           });
+  //           await categoriesDBService.subcategoryI18nRepo.save(rec);
+  //         }
+  //         updatedLocales.push(entry.locale);
+  //       }
+
+  //       const res: SubcategoryUpsertSuccessResponse = {
+  //         success: true,
+  //         message: created ? 'Subcategory created' : 'Subcategory updated',
+  //         data: { subcategory: { categoryId, slug, created, updatedLocales } },
+  //       };
+  //       return reply.status(200).send(res);
+  //     } catch (err) {
+  //       fastify.log.error(err);
+  //       const devMsg =
+  //         process.env.NODE_ENV === 'development' && err instanceof Error
+  //           ? `Failed to upsert subcategory: ${err.message}`
+  //           : 'Failed to upsert subcategory';
+  //       return reply.status(500).send({
+  //         success: false,
+  //         error: { message: devMsg, code: 500 },
+  //       });
+  //     }
+  //   }
+  // );
 }
