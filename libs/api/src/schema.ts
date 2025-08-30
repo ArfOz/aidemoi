@@ -198,7 +198,7 @@ export const CategoryOutSchema = Type.Object({
   icon: Type.Union([Type.String(), Type.Null()]),
   sortOrder: Type.Optional(Type.Integer()),
   i18n: Type.Array(CategoryI18nOutSchema),
-  subcategories: Type.Array(SubcategoryOutSchema),
+  subcategories: Type.Optional(Type.Array(SubcategoryOutSchema)),
 });
 
 export const CategoriesListSuccessResponseSchema = Type.Object({
@@ -207,4 +207,11 @@ export const CategoriesListSuccessResponseSchema = Type.Object({
   data: Type.Object({
     categories: Type.Array(CategoryOutSchema),
   }),
+});
+
+export const CategoryGetRequestSchema = Type.Object({
+  includeSubcategories: Type.Optional(Type.Boolean({ default: false })),
+  languages: Type.Optional(
+    Type.Array(Type.String({ minLength: 2, maxLength: 8 }))
+  ),
 });

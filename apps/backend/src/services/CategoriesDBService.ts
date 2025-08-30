@@ -85,67 +85,92 @@ export class CategoriesDBService {
     order?: FindOptionsOrder<Category>;
     select?: FindOptionsSelect<Category>;
   } = {}): Promise<CategoryDto[]> {
-    const findOptions: any = {
+    // Get categories with their i18n data in a single query
+    const categories = await this.categoryRepo.find({
       where,
       order,
-    };
+      select,
+      relations: {
+        i18n: true,
+      },
+    });
 
-    if (select) {
-      findOptions.select = select;
-    }
-
-    const categories = await this.categoryRepo.find(findOptions);
-
-    const result: CategoryDto[] = [];
-    for (const c of categories) {
-      const i18n = await this.categoryI18nRepo.find({
-        where: { category: { id: c.id } },
-        relations: { category: true },
-        order: { locale: 'ASC' },
-      });
-      result.push({
-        id: c.id,
-        name: c.name,
-        icon: c.icon ?? null,
-        sortOrder: c.sortOrder,
-        createdAt: c.createdAt,
-        updatedAt: c.updatedAt,
-        i18n: i18n.map((e) => ({
-          locale: e.locale,
-          name: e.name,
-          description: e.description ?? null,
-        })),
-      });
-    }
-    return result;
+    // Convert to DTOs
+    return categories.map((category) => ({
+      id: category.id,
+      name: category.name,
+      icon: category.icon ?? null,
+      sortOrder: category.sortOrder,
+      createdAt: category.createdAt,
+      updatedAt: category.updatedAt,
+      i18n: category.i18n
+        ? category.i18n
+            .map((i18nItem) => ({
+              locale: i18nItem.locale,
+              name: i18nItem.name,
+              description: i18nItem.description ?? null,
+            }))
+            .sort((a, b) => a.locale.localeCompare(b.locale))
+        : [],
+    }));
   }
 
   async findOne(params: FindOneOptions<Category>): Promise<CategoryDto | null> {
-    const c = await this.categoryRepo.findOne(params);
+    // Ensure we have i18n relations
+    const options = { ...params };
+    if (!options.relations) {
+      options.relations = { i18n: true };
+    } else if (
+      typeof options.relations === 'object' &&
+      !Array.isArray(options.relations)
+    ) {
+      options.relations = { ...options.relations, i18n: true };
+    }
 
-    if (!c) return null;
-    return c;
+    const category = await this.categoryRepo.findOne(options);
+    if (!category) return null;
+
+    return {
+      id: category.id,
+      name: category.name,
+      icon: category.icon ?? null,
+      sortOrder: category.sortOrder,
+      createdAt: category.createdAt,
+      updatedAt: category.updatedAt,
+      i18n: category.i18n
+        ? category.i18n.map((i18nItem) => ({
+            locale: i18nItem.locale,
+            name: i18nItem.name,
+            description: i18nItem.description ?? null,
+          }))
+        : [],
+    };
   }
 
   async findById(id: CategoryId): Promise<CategoryDto | null> {
-    const c = await this.categoryRepo.findOne({ where: { id } });
-    if (!c) return null;
-    const i18n = await this.categoryI18nRepo.find({
-      where: { category: { id } },
-      relations: { category: true },
+    const category = await this.categoryRepo.findOne({
+      where: { id },
+      relations: {
+        i18n: true,
+      },
     });
+
+    if (!category) return null;
+
     return {
-      id: c.id,
-      name: c.name,
-      icon: c.icon ?? null,
-      sortOrder: c.sortOrder,
-      createdAt: c.createdAt,
-      updatedAt: c.updatedAt,
-      i18n: i18n.map((e) => ({
-        locale: e.locale,
-        name: e.name,
-        description: e.description ?? null,
-      })),
+      id: category.id,
+      name: category.name,
+      icon: category.icon ?? null,
+      sortOrder: category.sortOrder,
+      createdAt: category.createdAt,
+      updatedAt: category.updatedAt,
+      i18n: category.i18n
+        ? category.i18n.map((i18nItem) => ({
+            locale: i18nItem.locale,
+            name: i18nItem.name,
+            description: i18nItem.description ?? null,
+          }))
+        : [],
     };
   }
 

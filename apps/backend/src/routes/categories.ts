@@ -5,6 +5,8 @@ import {
   ApiErrorSchema,
   CategoriesListSuccessResponse,
   CategoriesListSuccessResponseSchema,
+  CategoryGetRequest,
+  CategoryGetRequestSchema,
   CategoryUpsertRequest,
   CategoryUpsertRequestSchema,
   CategoryUpsertSuccessResponse,
@@ -18,6 +20,7 @@ import { CategoriesDBService } from '../services/CategoriesDBService';
 // add back i18n entity types used in mappings
 import type { CategoryI18n } from '../entities/Category';
 import type { SubcategoryI18n } from '../entities/Subcategory';
+import { In } from 'typeorm';
 
 export async function categoriesRoutes(fastify: FastifyInstance) {
   // Initialize services
@@ -38,7 +41,7 @@ export async function categoriesRoutes(fastify: FastifyInstance) {
     let candidate = effectiveBase;
     let suffix = 2;
     while (true) {
-      // REPLACED: categoriesDBService.findOne -> repo.findOne with where
+      // REPLACED: categoriesDBService.findOne -> rerpo.findOne with where
       const exists = await categoriesDBService.findOne({
         where: { id: candidate },
       });
@@ -194,11 +197,13 @@ export async function categoriesRoutes(fastify: FastifyInstance) {
   // );
 
   fastify.get<{
+    Querystring: CategoryGetRequest;
     Reply: CategoriesListSuccessResponse | ApiErrorResponseType;
   }>(
     '/categories',
     {
       schema: {
+        querystring: CategoryGetRequestSchema,
         response: {
           200: CategoriesListSuccessResponseSchema,
           400: ApiErrorSchema,
@@ -206,11 +211,18 @@ export async function categoriesRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    async (_request, reply) => {
+    async (request, reply) => {
       try {
-        // order for deterministic output
+        // Get languages from query parameters instead of body
+        const { languages: lang } = request.query;
+
+        console.log('Query parameters:', request.query);
+
         const categories = await categoriesDBService.findAll({
           order: { sortOrder: 'ASC', id: 'ASC' },
+          where: lang
+            ? { i18n: { locale: Array.isArray(lang) ? In(lang) : lang } }
+            : undefined,
         });
 
         return reply.status(200).send({
@@ -363,3 +375,7 @@ export async function categoriesRoutes(fastify: FastifyInstance) {
   //   }
   // );
 }
+//       });
+//     }
+//   }
+// );

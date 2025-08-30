@@ -16,6 +16,7 @@ import {
   SubcategoryUpsertRequestSchema,
   SubcategoryUpsertSuccessResponseSchema,
   CategoriesListSuccessResponseSchema,
+  CategoryGetRequestSchema,
 } from './schema';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -73,3 +74,5 @@ export type SubcategoryUpsertSuccessResponse = Static<
 export type CategoriesListSuccessResponse = Static<
   typeof CategoriesListSuccessResponseSchema
 >;
+
+export type CategoryGetRequest = Static<typeof CategoryGetRequestSchema>;
