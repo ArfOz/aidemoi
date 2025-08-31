@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
-import { UserDBService } from '../services/UserDBService';
+import { UserDBService } from '../services/DatabaseService/UserDBService';
 import { JwtService } from '../services/JwtService';
 import { AppDataSource } from '../config/database';
 import { Type } from '@sinclair/typebox';
@@ -27,7 +27,7 @@ import {
   LogoutSuccessResponseType,
   LogoutHeaders,
 } from '@api';
-import { TokenDBService } from '../services/TokenDBService';
+import { TokenDBService } from '../services/DatabaseService/TokenDBService';
 
 // Add Static for typing
 export async function authRoutes(

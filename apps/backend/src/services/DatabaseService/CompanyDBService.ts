@@ -1,5 +1,5 @@
 import { Repository, DataSource } from 'typeorm';
-import { Company } from '../entities/Company';
+import { Company } from '../../entities/Company';
 
 export class CompanyDBService {
   private companyRepository: Repository<Company>;

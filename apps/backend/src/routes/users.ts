@@ -4,7 +4,7 @@ import {
   FastifyRequest,
   FastifyReply,
 } from 'fastify';
-import { UserDBService } from '../services/UserDBService';
+import { UserDBService } from '../services/DatabaseService/UserDBService';
 
 interface CreateUserBody {
   username: string;

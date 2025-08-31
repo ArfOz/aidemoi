@@ -129,7 +129,6 @@ export const CategoryI18nSchema = Type.Object({
   description: Type.Optional(Type.String()),
 });
 export const CategoryUpsertRequestSchema = Type.Object({
-  // id removed; it is generated on the server
   icon: Type.Optional(Type.String({ maxLength: 16 })),
   sortOrder: Type.Optional(Type.Integer()),
   i18n: Type.Array(CategoryI18nSchema, { minItems: 1 }),

@@ -4,7 +4,7 @@ import {
   FastifyRequest,
   FastifyReply,
 } from 'fastify';
-import { CompanyDBService } from '../services/CompanyDBService';
+import { CompanyDBService } from '../services/DatabaseService/CompanyDBService';
 
 interface CreateCompanyBody {
   name: string;

@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { JwtService } from '../services/JwtService';
-import { TokenDBService } from '../services/TokenDBService';
+import { TokenDBService } from '../services/DatabaseService/TokenDBService';
 import { parseBearerToken, TokenPayload } from '@api';
 import { AppDataSource } from '../config/database';
 

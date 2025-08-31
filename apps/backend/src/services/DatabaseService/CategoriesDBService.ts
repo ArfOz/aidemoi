@@ -7,8 +7,8 @@ import {
   FindOptionsSelect,
   FindOneOptions,
 } from 'typeorm';
-import { Category, CategoryI18n } from '../entities/Category';
-import { Subcategory, SubcategoryI18n } from '../entities/Subcategory';
+import { Category, CategoryI18n } from '../../entities/Category';
+import { Subcategory, SubcategoryI18n } from '../../entities/Subcategory';
 
 export type CategoryId = string; // slug primary key (e.g., "moving")
 
@@ -19,6 +19,7 @@ export interface CategoryI18nInput {
 }
 
 export interface CreateCategoryInput {
+  id: CategoryId;
   icon?: string | null;
   sortOrder?: number;
   i18n: CategoryI18nInput[]; // at least one locale

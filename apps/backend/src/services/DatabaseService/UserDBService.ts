@@ -1,6 +1,6 @@
 import { DataSource, Repository } from 'typeorm';
-import { User } from '../entities/User';
-import { PasswordService } from './PasswordService';
+import { User } from '../../entities/User';
+import { PasswordService } from '../PasswordService';
 
 interface CreateUserData {
   username: string;
