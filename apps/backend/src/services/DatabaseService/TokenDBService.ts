@@ -1,17 +1,7 @@
-import { DataSource, Repository, LessThan, MoreThan, IsNull } from 'typeorm';
-import { Token } from '../../entities/Token';
+import { PrismaClient } from '@prisma/client';
 
 export class TokenDBService {
-  private tokenRepository: Repository<Token>;
-
-  constructor(dataSource: DataSource) {
-    if (!dataSource.isInitialized) {
-      throw new Error(
-        'DataSource must be initialized before using TokenService'
-      );
-    }
-    this.tokenRepository = dataSource.getRepository(Token);
-  }
+  constructor(private prisma: PrismaClient) {} // Will be injected by Fastify plugin
 
   // Upsert by userId (one row per user)
   async createToken(data: {
@@ -20,69 +10,86 @@ export class TokenDBService {
     refreshToken: string;
     expiresAtToken: Date | null;
     expiresAtRefresh: Date | null;
-  }): Promise<Token> {
-    await this.tokenRepository.upsert(
-      {
-        userId: data.userId,
-        token: data.token,
-        refreshToken: data.refreshToken,
-        expiresAtToken: data.expiresAtToken,
-        expiresAtRefresh: data.expiresAtRefresh,
-      },
-      ['userId']
-    );
-    const token = await this.tokenRepository.findOne({
+  }) {
+    // First try to find existing token for this user
+    const existingToken = await this.prisma.token.findFirst({
       where: { userId: data.userId },
     });
-    if (!token) {
-      throw new Error('Token not found after upsert');
+
+    if (existingToken) {
+      // Update existing token
+      return this.prisma.token.update({
+        where: { id: existingToken.id },
+        data: {
+          accessToken: data.token,
+          refreshToken: data.refreshToken,
+          expiresAtAccessToken: data.expiresAtToken || undefined,
+          expiresAtRefreshToken: data.expiresAtRefresh || undefined,
+        },
+      });
+    } else {
+      // Create new token
+      return this.prisma.token.create({
+        data: {
+          userId: data.userId,
+          accessToken: data.token,
+          refreshToken: data.refreshToken,
+          expiresAtAccessToken: data.expiresAtToken || new Date(),
+          expiresAtRefreshToken: data.expiresAtRefresh || new Date(),
+        },
+      });
     }
-    return token;
   }
 
   // Search by either access or refresh token
-  async getTokenByValue(value: string): Promise<Token | null> {
-    return await this.tokenRepository.findOne({
-      where: [{ token: value }, { refreshToken: value }],
+  async getTokenByValue(value: string) {
+    return this.prisma.token.findFirst({
+      where: {
+        OR: [{ accessToken: value }, { refreshToken: value }],
+      },
     });
   }
 
   // Validate only the refresh token against its expiry
-  async getValidTokenByValue(
-    value: string,
-    now: Date = new Date()
-  ): Promise<Token | null> {
-    return await this.tokenRepository.findOne({
-      where: [
-        { refreshToken: value, expiresAtRefresh: IsNull() },
-        { refreshToken: value, expiresAtRefresh: MoreThan(now) },
-      ],
+  async getValidTokenByValue(value: string, now: Date = new Date()) {
+    return this.prisma.token.findFirst({
+      where: {
+        refreshToken: value,
+        expiresAtRefreshToken: { gt: now },
+      },
     });
   }
 
-  async deleteToken(value: string): Promise<Token | null> {
+  async deleteToken(value: string) {
     const token = await this.getTokenByValue(value);
     if (!token) return null;
-    await this.tokenRepository.remove(token);
+
+    await this.prisma.token.delete({
+      where: { id: token.id },
+    });
     return token;
   }
 
   async deleteTokensByUser(userId: number): Promise<number> {
-    const result = await this.tokenRepository.delete({ userId });
-    return result.affected ?? 0;
+    const result = await this.prisma.token.deleteMany({
+      where: { userId },
+    });
+    return result.count;
   }
 
   async deleteExpiredTokens(now: Date = new Date()): Promise<number> {
-    const result = await this.tokenRepository.delete({
-      expiresAtToken: LessThan(now),
+    const result = await this.prisma.token.deleteMany({
+      where: {
+        expiresAtAccessToken: { lt: now },
+      },
     });
-    return result.affected ?? 0;
+    return result.count;
   }
 
-  async getTokensByUser(userId: number): Promise<Token[]> {
-    return await this.tokenRepository.find({
+  async getTokensByUser(userId: number) {
+    return this.prisma.token.findMany({
       where: { userId },
-      order: { createdAt: 'DESC' },
+      orderBy: { createdAt: 'desc' },
     });
   }
 }

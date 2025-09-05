@@ -1,7 +1,6 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import { UserDBService } from '../services/DatabaseService/UserDBService';
 import { JwtService } from '../services/JwtService';
-import { AppDataSource } from '../config/database';
 import { Type } from '@sinclair/typebox';
 import { authenticateToken } from '../middleware/auth';
 
@@ -34,8 +33,8 @@ export async function authRoutes(
   fastify: FastifyInstance,
   _options: FastifyPluginOptions
 ) {
-  const userService = new UserDBService(AppDataSource);
-  const tokenService = new TokenDBService(AppDataSource);
+  const userService = new UserDBService(fastify.prisma);
+  const tokenService = new TokenDBService(fastify.prisma);
 
   fastify.post<{
     Body: LoginRequestType;
@@ -67,7 +66,7 @@ export async function authRoutes(
         const tokenPayload = {
           userId: user.id,
           email: user.email,
-          username: user.username,
+          username: user.username || '',
         };
 
         const { accessToken, refreshToken } =
@@ -108,7 +107,7 @@ export async function authRoutes(
             },
             user: {
               id: user.id.toString(),
-              username: user.username,
+              username: user.username || '',
               email: user.email,
               // roles: ['user'],
             },
@@ -171,7 +170,7 @@ export async function authRoutes(
           data: {
             user: {
               id: newUser.id.toString(),
-              username: newUser.username,
+              username: newUser.username || '',
               email: newUser.email,
               roles: ['user'],
             },

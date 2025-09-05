@@ -1,11 +1,12 @@
 import fastify, { FastifyInstance, FastifyServerOptions } from 'fastify';
-import databasePlugin from './plugins/database';
+import prismaPlugin from './plugins/prisma';
 import corsPlugin from './plugins/cors';
 import helmetPlugin from './plugins/helmet';
 import rateLimitPlugin from './plugins/rateLimit';
 import swaggerPlugin from './plugins/swagger';
 import healthRoutes from './routes/health';
 import apiRoutes from './routes/api';
+import { authRoutes } from './routes/auth';
 
 /**
  * Create and configure Fastify instance
@@ -29,7 +30,7 @@ function build(opts: FastifyServerOptions = {}): FastifyInstance {
   });
 
   // Register plugins
-  app.register(databasePlugin);
+  app.register(prismaPlugin);
   app.register(corsPlugin);
   app.register(helmetPlugin);
   app.register(rateLimitPlugin);
@@ -38,7 +39,7 @@ function build(opts: FastifyServerOptions = {}): FastifyInstance {
   // Register routes
   app.register(healthRoutes, { prefix: '/health' });
   app.register(apiRoutes, { prefix: '/api/v1' });
-  // app.register(authRoutes, { prefix: '/api/auth' });
+  app.register(authRoutes, { prefix: '/api/auth' });
   // app.register(userRoutes, { prefix: '/api/user' });
   // app.register(companyRoutes, { prefix: '/api/company' });
 

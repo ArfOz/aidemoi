@@ -1,5 +1,4 @@
-import { DataSource, Repository } from 'typeorm';
-import { User } from '../../entities/User';
+import { PrismaClient } from '@prisma/client';
 import { PasswordService } from '../PasswordService';
 
 interface CreateUserData {
@@ -15,41 +14,65 @@ interface UpdateUserData {
 }
 
 export class UserDBService {
-  private userRepository: Repository<User>;
+  constructor(private prisma: PrismaClient) {} // Will be injected by Fastify plugin
 
-  constructor(dataSource: DataSource) {
-    this.userRepository = dataSource.getRepository(User);
-  }
-
-  async findAll(): Promise<User[]> {
-    return await this.userRepository.find({
-      select: ['id', 'username', 'email', 'createdAt', 'updatedAt'], // Exclude password
-      order: { id: 'ASC' },
+  async findAll() {
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+        // Exclude password
+      },
+      orderBy: { id: 'asc' },
     });
   }
 
-  async findById(id: number): Promise<User | null> {
-    return await this.userRepository.findOne({
+  async findById(id: number) {
+    return this.prisma.user.findUnique({
       where: { id },
-      select: ['id', 'username', 'email', 'createdAt', 'updatedAt'], // Exclude password
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+        // Exclude password
+      },
     });
   }
 
-  async findByEmail(email: string): Promise<User | null> {
-    return await this.userRepository.findOne({
+  async findByEmail(email: string) {
+    return this.prisma.user.findUnique({
       where: { email },
-      select: ['id', 'username', 'email', 'createdAt', 'updatedAt'], // Exclude password
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+        // Exclude password
+      },
     });
   }
 
-  async findByEmailWithPassword(email: string): Promise<User | null> {
-    return await this.userRepository.findOne({
+  async findByEmailWithPassword(email: string) {
+    return this.prisma.user.findUnique({
       where: { email },
-      select: ['id', 'username', 'email', 'password', 'createdAt', 'updatedAt'], // Include password for auth
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        password: true, // Include password for auth
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   }
 
-  async create(userData: CreateUserData): Promise<User> {
+  async create(userData: CreateUserData) {
     // Validate password strength
     const passwordValidation = PasswordService.validatePasswordStrength(
       userData.password
@@ -63,18 +86,19 @@ export class UserDBService {
       userData.password
     );
 
-    const user = this.userRepository.create({
-      ...userData,
-      password: hashedPassword,
+    // Create user with hashed password
+    const savedUser = await this.prisma.user.create({
+      data: {
+        ...userData,
+        password: hashedPassword,
+      },
     });
 
-    const savedUser = await this.userRepository.save(user);
-
     // Return user without password
-    return (await this.findById(savedUser.id)) as User;
+    return savedUser;
   }
 
-  async update(id: number, userData: UpdateUserData): Promise<User | null> {
+  async update(id: number, userData: UpdateUserData) {
     const updateData: any = { ...userData };
 
     // If password is being updated, hash it
@@ -90,23 +114,30 @@ export class UserDBService {
       );
     }
 
-    await this.userRepository.update(id, updateData);
-    return await this.findById(id);
+    await this.prisma.user.update({
+      where: { id },
+      data: updateData,
+    });
+
+    return this.findById(id);
   }
 
   async delete(id: number): Promise<boolean> {
-    const result = await this.userRepository.delete(id);
-    return (result.affected ?? 0) > 0;
+    try {
+      await this.prisma.user.delete({
+        where: { id },
+      });
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   async count(): Promise<number> {
-    return await this.userRepository.count();
+    return this.prisma.user.count();
   }
 
-  async authenticateUser(
-    email: string,
-    password: string
-  ): Promise<User | null> {
+  async authenticateUser(email: string, password: string) {
     // Find user with password included
     const user = await this.findByEmailWithPassword(email);
     if (!user || !user.password) {
@@ -123,6 +154,6 @@ export class UserDBService {
     }
 
     // Return user without password
-    return await this.findById(user.id);
+    return this.findById(user.id);
   }
 }
