@@ -146,7 +146,9 @@ export async function authRoutes(
 
       try {
         // Check if user already exists
-        const existingUser = await userService.findByEmail(email);
+        const existingUser = await userService.findAll({
+          where: { email },
+        });
         if (existingUser) {
           return reply.status(409).send({
             success: false,
@@ -155,6 +157,20 @@ export async function authRoutes(
               code: 409,
             },
             message: 'User with this email already exists',
+          });
+        }
+
+        const existingUsername = await userService.findAll({
+          where: { username },
+        });
+        if (existingUsername) {
+          return reply.status(409).send({
+            success: false,
+            error: {
+              message: 'Username is already taken',
+              code: 409,
+            },
+            message: 'Username is already taken',
           });
         }
 

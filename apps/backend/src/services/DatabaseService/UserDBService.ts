@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { PasswordService } from '../PasswordService';
 
 interface CreateUserData {
@@ -16,8 +16,19 @@ interface UpdateUserData {
 export class UserDBService {
   constructor(private prisma: PrismaClient) {} // Will be injected by Fastify plugin
 
-  async findAll() {
+  async findAll({
+    where,
+    take,
+    skip,
+    orderBy,
+  }: {
+    where?: Prisma.UserWhereInput;
+    take?: number;
+    skip?: number;
+    orderBy?: any;
+  }) {
     return this.prisma.user.findMany({
+      where,
       select: {
         id: true,
         username: true,
@@ -33,20 +44,6 @@ export class UserDBService {
   async findById(id: number) {
     return this.prisma.user.findUnique({
       where: { id },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        createdAt: true,
-        updatedAt: true,
-        // Exclude password
-      },
-    });
-  }
-
-  async findByEmail(email: string) {
-    return this.prisma.user.findUnique({
-      where: { email },
       select: {
         id: true,
         username: true,
