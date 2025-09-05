@@ -132,6 +132,7 @@ export const CategoryUpsertRequestSchema = Type.Object({
   icon: Type.Optional(Type.String({ maxLength: 16 })),
   sortOrder: Type.Optional(Type.Integer()),
   i18n: Type.Array(CategoryI18nSchema, { minItems: 1 }),
+  id: Type.Optional(Type.String()), // for updates
 });
 
 export const CategoryUpsertSuccessResponseSchema = Type.Object({

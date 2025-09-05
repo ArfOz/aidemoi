@@ -7,7 +7,13 @@ export type CategoryWithI18n = Prisma.CategoryGetPayload<{
 export class CategoriesDBService {
   constructor(private prisma: PrismaClient) {}
 
-  async findAll(): Promise<CategoryWithI18n[]> {
+  async findAll({
+    where,
+    order,
+  }: {
+    where?: Prisma.CategoryWhereInput;
+    order?: Prisma.CategoryOrderByWithRelationInput[];
+  } = {}): Promise<CategoryWithI18n[]> {
     return this.prisma.category.findMany({
       include: { i18n: true, subcategories: true },
       orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
