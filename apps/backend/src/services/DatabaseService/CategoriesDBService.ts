@@ -27,16 +27,24 @@ export class CategoriesDBService {
     });
   }
 
-  async create(
-    input: Prisma.CategoryCreateInput
-  ): Promise<{ id: string; created: true }> {
-    const created = await this.prisma.category.create({ data: input });
-    return { id: created.id, created: true };
+  async create(input: Prisma.CategoryCreateInput): Promise<CategoryWithI18n> {
+    const created = await this.prisma.category.create({
+      data: input,
+      include: { i18n: true, subcategories: true },
+    });
+    return created;
   }
 
-  async update(id: string, input: Prisma.CategoryUpdateInput) {
-    await this.prisma.category.update({ where: { id }, data: input });
-    return { id, updated: true };
+  async update(
+    id: string,
+    input: Prisma.CategoryUpdateInput
+  ): Promise<CategoryWithI18n> {
+    const updated = await this.prisma.category.update({
+      where: { id },
+      data: input,
+      include: { i18n: true, subcategories: true },
+    });
+    return updated;
   }
 
   async delete(id: string): Promise<boolean> {

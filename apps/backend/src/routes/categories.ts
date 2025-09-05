@@ -62,7 +62,7 @@ export async function categoriesRoutes(fastify: FastifyInstance) {
     },
     async (request, reply) => {
       try {
-        const { id: providedId, icon, sortOrder, i18n } = request.body;
+        const { id, icon, sortOrder, i18n } = request.body;
 
         // basic validation for i18n
         if (!Array.isArray(i18n) || i18n.length === 0) {
@@ -96,8 +96,9 @@ export async function categoriesRoutes(fastify: FastifyInstance) {
           });
         }
 
-        let id = providedId;
         let created = false;
+
+        let newId;
 
         if (id) {
           // Update existing category
@@ -111,7 +112,7 @@ export async function categoriesRoutes(fastify: FastifyInstance) {
               },
             });
           }
-        } else {
+        } else if (!id) {
           // Create new category: Generate ID (slug) from preferred name
           const preferred =
             normalizedI18n.find((e) => e.locale === 'en') ??
@@ -119,7 +120,7 @@ export async function categoriesRoutes(fastify: FastifyInstance) {
             normalizedI18n[0];
 
           const baseSlug = slugify(preferred.name) || 'category';
-          id = await ensureUniqueCategoryId(baseSlug);
+          newId = await ensureUniqueCategoryId(baseSlug);
           created = true;
         }
 
@@ -131,15 +132,15 @@ export async function categoriesRoutes(fastify: FastifyInstance) {
         };
 
         const result = created
-          ? await categoriesDBService.create({ id, ...upsertData } as any)
-          : await categoriesDBService.update(id, upsertData as any);
+          ? await categoriesDBService.create({ newId, ...upsertData } as any)
+          : await categoriesDBService.update(id!, upsertData as any);
 
         const res: CategoryUpsertSuccessResponse = {
           success: true,
           message: created ? 'Category created' : 'Category updated',
           data: {
             category: {
-              id,
+              id: result.id,
               created,
               updatedLocales: created
                 ? normalizedI18n.map((item) => item.locale)
