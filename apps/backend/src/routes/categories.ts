@@ -62,7 +62,9 @@ export async function categoriesRoutes(fastify: FastifyInstance) {
     },
     async (request, reply) => {
       try {
-        const { id, icon, sortOrder, i18n } = request.body;
+        // allow server to generate id when creating new category
+        let id = request.body.id as string | undefined;
+        const { icon, sortOrder, i18n } = request.body;
 
         // basic validation for i18n
         if (!Array.isArray(i18n) || i18n.length === 0) {
@@ -112,7 +114,7 @@ export async function categoriesRoutes(fastify: FastifyInstance) {
               },
             });
           }
-        } else if (!id) {
+        } else {
           // Create new category: Generate ID (slug) from preferred name
           const preferred =
             normalizedI18n.find((e) => e.locale === 'en') ??
@@ -121,6 +123,8 @@ export async function categoriesRoutes(fastify: FastifyInstance) {
 
           const baseSlug = slugify(preferred.name) || 'category';
           newId = await ensureUniqueCategoryId(baseSlug);
+          // assign generated id into `id` so Prisma create receives the required `id`
+          id = newId;
           created = true;
         }
 
@@ -132,7 +136,7 @@ export async function categoriesRoutes(fastify: FastifyInstance) {
         };
 
         const result = created
-          ? await categoriesDBService.create({ newId, ...upsertData } as any)
+          ? await categoriesDBService.create({ id, ...upsertData } as any)
           : await categoriesDBService.update(id!, upsertData as any);
 
         const res: CategoryUpsertSuccessResponse = {
