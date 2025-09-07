@@ -4,6 +4,7 @@ import {
   ApiErrorSchema,
   CategoriesListSuccessResponse,
   CategoriesListSuccessResponseSchema,
+  CategoryDetailSuccessResponseSchema,
   CategoryGetRequest,
   CategoryGetRequestSchema,
   CategoryUpsertRequest,
@@ -229,6 +230,53 @@ export async function categoriesRoutes(fastify: FastifyInstance) {
           process.env.NODE_ENV === 'development' && err instanceof Error
             ? `Failed to fetch categories: ${err.message}`
             : 'Failed to fetch categories';
+        return reply.status(500).send({
+          success: false,
+          error: { message: devMsg, code: 500 },
+        });
+      }
+    }
+  );
+
+  fastify.get<{
+    Querystring: CategoryGetRequest;
+    Params: { id: string };
+  }>(
+    '/categories/:id',
+    {
+      schema: {
+        params: CategoryGetRequestSchema,
+        response: {
+          200: CategoryDetailSuccessResponseSchema,
+          404: ApiErrorSchema,
+          500: ApiErrorSchema,
+        },
+      },
+    },
+    async (request, reply) => {
+      try {
+        const { id } = request.params;
+
+        // Fetch category by ID (service includes i18n)
+        const category = await categoriesDBService.findById(id);
+        if (!category) {
+          return reply.status(404).send({
+            success: false,
+            error: { message: `Category "${id}" not found`, code: 404 },
+          });
+        }
+
+        return reply.status(200).send({
+          success: true,
+          message: 'Category fetched',
+          data: { category },
+        });
+      } catch (err) {
+        fastify.log.error(err);
+        const devMsg =
+          process.env.NODE_ENV === 'development' && err instanceof Error
+            ? `Failed to fetch category: ${err.message}`
+            : 'Failed to fetch category';
         return reply.status(500).send({
           success: false,
           error: { message: devMsg, code: 500 },

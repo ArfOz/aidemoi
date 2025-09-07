@@ -215,3 +215,12 @@ export const CategoryGetRequestSchema = Type.Object({
     Type.Array(Type.String({ minLength: 2, maxLength: 8 }))
   ),
 });
+
+export const CategoryDetailSuccessResponseSchema = Type.Object({
+  success: Type.Literal(true),
+  message: Type.String(),
+  data: Type.Object({
+    category: CategoryOutSchema,
+    subcategories: Type.Optional(Type.Array(SubcategoryOutSchema)),
+  }),
+});
