@@ -18,6 +18,7 @@ import {
   CategoriesListSuccessResponseSchema,
   CategoryGetRequestSchema,
   CategoryDetailSuccessResponseSchema,
+  CategoriesListRequestSchema,
 } from './schema';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -59,6 +60,8 @@ export type TokenType = Static<typeof TokenSchema>;
 
 // export type LogoutRequest = Static<typeof LogoutRequestSchema>;
 export type CategoryUpsertRequest = Static<typeof CategoryUpsertRequestSchema>;
+
+export type CategoriesListRequest = Static<typeof CategoriesListRequestSchema>;
 
 export type CategoryUpsertSuccessResponse = Static<
   typeof CategoryUpsertSuccessResponseSchema

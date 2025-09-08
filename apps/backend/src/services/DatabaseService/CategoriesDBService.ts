@@ -9,21 +9,29 @@ export class CategoriesDBService {
 
   async findAll({
     where,
-    order,
+    orderBy,
+    include,
   }: {
     where?: Prisma.CategoryWhereInput;
-    order?: Prisma.CategoryOrderByWithRelationInput[];
+    orderBy?: Prisma.CategoryOrderByWithRelationInput[];
+    include?: Prisma.CategoryInclude;
   } = {}): Promise<CategoryWithI18n[]> {
     return this.prisma.category.findMany({
       include: { i18n: true, subcategories: true },
-      orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
+      orderBy: orderBy,
     });
   }
 
-  async findById(id: string): Promise<CategoryWithI18n | null> {
+  async findById({
+    where,
+    include,
+  }: {
+    where: Prisma.CategoryWhereUniqueInput;
+    include?: Prisma.CategoryInclude;
+  }): Promise<CategoryWithI18n | null> {
     return this.prisma.category.findUnique({
-      where: { id },
-      include: { i18n: true, subcategories: true },
+      where,
+      include: include ?? { i18n: true, subcategories: true },
     });
   }
 

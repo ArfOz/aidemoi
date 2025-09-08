@@ -63,7 +63,7 @@ export const LoginSuccessResponseSchema = Type.Intersect([
 
 // export type ApiResponseType = Static<typeof ApiResponseSchema>;
 export const ApiErrorSchema = Type.Object({
-  success: Type.Boolean(),
+  success: Type.Literal(false),
   data: Type.Optional(Type.Any()),
   error: Type.Optional(ErrorSchema),
   message: Type.Optional(Type.String()),
@@ -127,6 +127,7 @@ export const CategoryI18nSchema = Type.Object({
   locale: Type.String({ minLength: 2, maxLength: 8 }),
   name: Type.String({ minLength: 1, maxLength: 255 }),
   description: Type.Optional(Type.String()),
+  id: Type.Optional(Type.String()),
 });
 export const CategoryUpsertRequestSchema = Type.Object({
   icon: Type.Optional(Type.String({ maxLength: 16 })),
@@ -145,6 +146,13 @@ export const CategoryUpsertSuccessResponseSchema = Type.Object({
       updatedLocales: Type.Array(Type.String()),
     }),
   }),
+});
+
+export const CategoriesListRequestSchema = Type.Object({
+  includeSubcategories: Type.Optional(Type.Boolean({ default: false })),
+  languages: Type.Optional(
+    Type.Array(Type.String({ minLength: 2, maxLength: 8 }))
+  ),
 });
 
 // Subcategory upsert schemas/types
@@ -199,6 +207,8 @@ export const CategoryOutSchema = Type.Object({
   sortOrder: Type.Optional(Type.Integer()),
   i18n: Type.Array(CategoryI18nOutSchema),
   subcategories: Type.Optional(Type.Array(SubcategoryOutSchema)),
+  createdAt: Type.String({ format: 'date-time' }),
+  updatedAt: Type.String({ format: 'date-time' }),
 });
 
 export const CategoriesListSuccessResponseSchema = Type.Object({

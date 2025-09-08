@@ -255,7 +255,7 @@ export async function authRoutes(
           data: {
             user: {
               id: user.id.toString(),
-              username: user.username,
+              username: user.username || '',
               email: user.email,
               roles: ['user'],
             },
