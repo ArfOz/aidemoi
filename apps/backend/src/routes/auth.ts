@@ -1,7 +1,6 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
-import { UserService } from '../services/UserService';
+import { UserDBService } from '../services/DatabaseService/UserDBService';
 import { JwtService } from '../services/JwtService';
-import { AppDataSource } from '../config/database';
 import { Type } from '@sinclair/typebox';
 import { authenticateToken } from '../middleware/auth';
 
@@ -27,15 +26,15 @@ import {
   LogoutSuccessResponseType,
   LogoutHeaders,
 } from '@api';
-import { TokenService } from '../services/TokenService';
+import { TokenDBService } from '../services/DatabaseService/TokenDBService';
 
 // Add Static for typing
 export async function authRoutes(
   fastify: FastifyInstance,
   _options: FastifyPluginOptions
 ) {
-  const userService = new UserService(AppDataSource);
-  const tokenService = new TokenService(AppDataSource);
+  const userService = new UserDBService(fastify.prisma);
+  const tokenService = new TokenDBService(fastify.prisma);
 
   fastify.post<{
     Body: LoginRequestType;
@@ -67,7 +66,7 @@ export async function authRoutes(
         const tokenPayload = {
           userId: user.id,
           email: user.email,
-          username: user.username,
+          username: user.username || '',
         };
 
         const { accessToken, refreshToken } =
@@ -108,7 +107,7 @@ export async function authRoutes(
             },
             user: {
               id: user.id.toString(),
-              username: user.username,
+              username: user.username || '',
               email: user.email,
               // roles: ['user'],
             },
@@ -147,7 +146,9 @@ export async function authRoutes(
 
       try {
         // Check if user already exists
-        const existingUser = await userService.findByEmail(email);
+        const existingUser = await userService.findAll({
+          where: { email },
+        });
         if (existingUser) {
           return reply.status(409).send({
             success: false,
@@ -156,6 +157,20 @@ export async function authRoutes(
               code: 409,
             },
             message: 'User with this email already exists',
+          });
+        }
+
+        const existingUsername = await userService.findAll({
+          where: { username },
+        });
+        if (existingUsername) {
+          return reply.status(409).send({
+            success: false,
+            error: {
+              message: 'Username is already taken',
+              code: 409,
+            },
+            message: 'Username is already taken',
           });
         }
 
@@ -171,7 +186,7 @@ export async function authRoutes(
           data: {
             user: {
               id: newUser.id.toString(),
-              username: newUser.username,
+              username: newUser.username || '',
               email: newUser.email,
               roles: ['user'],
             },
@@ -240,7 +255,7 @@ export async function authRoutes(
           data: {
             user: {
               id: user.id.toString(),
-              username: user.username,
+              username: user.username || '',
               email: user.email,
               roles: ['user'],
             },

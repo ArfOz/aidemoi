@@ -11,6 +11,14 @@ import {
   RefreshTokenRequestSchema,
   LogoutSuccessResponseSchema,
   TokenSchema,
+  CategoryUpsertRequestSchema,
+  CategoryUpsertSuccessResponseSchema,
+  SubcategoryUpsertRequestSchema,
+  SubcategoryUpsertSuccessResponseSchema,
+  CategoriesListSuccessResponseSchema,
+  CategoryGetRequestSchema,
+  CategoryDetailSuccessResponseSchema,
+  CategoriesListRequestSchema,
 } from './schema';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -51,3 +59,28 @@ export interface LogoutHeaders {
 export type TokenType = Static<typeof TokenSchema>;
 
 // export type LogoutRequest = Static<typeof LogoutRequestSchema>;
+export type CategoryUpsertRequest = Static<typeof CategoryUpsertRequestSchema>;
+
+export type CategoriesListRequest = Static<typeof CategoriesListRequestSchema>;
+
+export type CategoryUpsertSuccessResponse = Static<
+  typeof CategoryUpsertSuccessResponseSchema
+>;
+
+export type SubcategoryUpsertRequest = Static<
+  typeof SubcategoryUpsertRequestSchema
+>;
+
+export type SubcategoryUpsertSuccessResponse = Static<
+  typeof SubcategoryUpsertSuccessResponseSchema
+>;
+
+export type CategoriesListSuccessResponse = Static<
+  typeof CategoriesListSuccessResponseSchema
+>;
+
+export type CategoryGetRequest = Static<typeof CategoryGetRequestSchema>;
+
+export type CategoryDetailSuccessResponse = Static<
+  typeof CategoryDetailSuccessResponseSchema
+>;

@@ -1,8 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { JwtService } from '../services/JwtService';
-import { TokenService } from '../services/TokenService';
+import { TokenDBService } from '../services/DatabaseService/TokenDBService';
 import { parseBearerToken, TokenPayload } from '@api';
-import { AppDataSource } from '../config/database';
 
 export type AuthenticatedRequest = FastifyRequest & { user: TokenPayload };
 
@@ -10,7 +9,7 @@ export async function authenticateToken(
   request: FastifyRequest,
   reply: FastifyReply
 ) {
-  const tokenService = new TokenService(AppDataSource);
+  const tokenService = new TokenDBService(request.server.prisma);
   try {
     const token = parseBearerToken(request.headers.authorization);
     if (!token) {

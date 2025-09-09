@@ -1,0 +1,96 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql" // postgresql | sqlite | mysql
+    url      = "postgresql://neondb_owner:npg_yUhiR5YxcQD9@ep-wild-bonus-a9w5sjg0-pooler.gwc.azure.neon.tech:5432/neondb"
+}
+
+model Category {
+    id            String         @id
+    icon          String?        @map("icon")
+    sortOrder     Int            @default(0) @map("sortOrder")
+    name          String         @map("name")
+    createdAt     DateTime       @default(now()) @map("createdAt")
+    updatedAt     DateTime       @updatedAt @map("updatedAt")
+    i18n          CategoryI18n[]
+    subcategories Subcategory[]
+}
+
+model CategoryI18n {
+    id          Int      @id @default(autoincrement())
+    categoryId  String
+    locale      String   @db.VarChar(8)
+    name        String   @db.VarChar(255)
+    description String?  @db.Text
+    category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+    @@unique([categoryId, locale], name: "uq_category_i18n")
+}
+
+model Subcategory {
+    id         Int               @id @default(autoincrement())
+    categoryId String
+    slug       String            @db.VarChar(128)
+    icon       String?           @db.VarChar(16)
+    sortOrder  Int               @default(0)
+    name       String?
+    createdAt  DateTime          @default(now())
+    updatedAt  DateTime          @updatedAt
+    category   Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+    i18n       SubcategoryI18n[]
+
+    @@unique([categoryId, slug], name: "uq_subcategory_cat_slug")
+}
+
+model SubcategoryI18n {
+    id            Int     @id @default(autoincrement())
+    subcategoryId Int
+    locale        String  @db.VarChar(8)
+    name          String  @db.VarChar(255)
+    description   String? @db.Text
+
+    subcategory Subcategory @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
+
+    @@unique([subcategoryId, locale], name: "uq_subcategory_i18n")
+}
+
+model User {
+    id        Int      @id @default(autoincrement())
+    email     String   @unique
+    password  String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    tokens    Token[]
+    username  String?  @unique
+}
+
+model Token {
+    id                    Int      @id @default(autoincrement())
+    userId                Int
+    user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    createdAt             DateTime @default(now())
+    refreshedAt           DateTime @updatedAt
+    accessToken           String   @unique
+    refreshToken          String   @unique
+    expiresAtAccessToken  DateTime
+    expiresAtRefreshToken DateTime
+}
+
+model Company {
+    id            Int      @id @default(autoincrement())
+    name          String
+    email         String   @unique
+    description   String?
+    website       String?
+    phone         String?
+    address       String?
+    city          String?
+    country       String?
+    postalCode    String?
+    employeeCount Int?     @default(0)
+    status        String   @default("active")
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+}

@@ -1,10 +1,10 @@
+import { CompanyDBService } from './../services/DatabaseService/CompanyDBService';
 import {
   FastifyInstance,
   FastifyPluginOptions,
   FastifyRequest,
   FastifyReply,
 } from 'fastify';
-import { CompanyService } from '../services/CompanyService';
 
 interface CreateCompanyBody {
   name: string;
@@ -29,7 +29,7 @@ async function companyRoutes(
   _options: FastifyPluginOptions
 ) {
   // Initialize CompanyService with database connection
-  const companyService = new CompanyService((fastify as any).db);
+  const companyService = new CompanyDBService(fastify.prisma);
   // Get all companies
   fastify.get(
     '/',
@@ -299,7 +299,7 @@ async function companyRoutes(
         });
       }
 
-      const deleted = await companyService.delete(companyId);
+      const deleted = await companyService.deleteById(companyId);
 
       if (!deleted) {
         return reply.status(404).send({

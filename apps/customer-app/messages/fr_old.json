@@ -1,0 +1,1903 @@
+{
+  "home": {
+    "title": "Choisissez un service"
+  },
+
+  "categories": [
+    {
+      "id": "moving",
+      "name": "Déménagement",
+      "description": "Services de déménagement de maisons et de bureaux",
+      "icon": "🚚",
+      "cover": "https://images.unsplash.com/photo-1600585154084-4e5fe7c39198?w=1600&q=80&auto=format&fit=crop",
+      "stats": {
+        "professionals": 5200,
+        "rating": { "value": 4.8, "reviews": 35699 }
+      },
+      "specialties": {
+        "local": {
+          "name": "Déménagement local",
+          "description": "Déménagements de courte distance dans la même ville ou région",
+          "icon": "🏠",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "longDistance": {
+          "name": "Longue distance",
+          "description": "Déménagements inter-états ou inter-pays",
+          "icon": "🛣️",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "packing": {
+          "name": "Services d'emballage",
+          "description": "Emballage professionnel des meubles, objets fragiles et cartons",
+          "icon": "📦",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "unpacking": {
+          "name": "Déballage & Installation",
+          "description": "Déballage, organisation et installation des meubles à destination",
+          "icon": "📬",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "furnitureAssembly": {
+          "name": "Montage de meubles",
+          "description": "Démontage et remontage de meubles",
+          "icon": "🪑",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "storage": {
+          "name": "Stockage temporaire",
+          "description": "Solutions de stockage sécurisé entre deux déménagements",
+          "icon": "📦🔒",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cleaning",
+      "name": "Nettoyage",
+      "description": "Nettoyage résidentiel et commercial",
+      "icon": "🧼",
+      "cover": "https://images.unsplash.com/photo-1581579188871-45ea61f2a0c8?w=1600&q=80&auto=format&fit=crop",
+      "stats": {
+        "professionals": 6031,
+        "rating": { "value": 4.7, "reviews": 20540 }
+      },
+      "specialties": {
+        "residential": {
+          "name": "Nettoyage résidentiel",
+          "description": "Nettoyage des maisons, appartements et condos",
+          "icon": "🏠",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "commercial": {
+          "name": "Nettoyage commercial",
+          "description": "Nettoyage des bureaux, commerces et espaces industriels",
+          "icon": "🏢",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "deepCleaning": {
+          "name": "Nettoyage en profondeur",
+          "description": "Nettoyage minutieux des zones à fort passage et difficiles d'accès",
+          "icon": "🧽",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "moveInOut": {
+          "name": "Nettoyage d'emménagement/déménagement",
+          "description": "Nettoyage avant emménagement ou après déménagement",
+          "icon": "📦",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "windowCleaning": {
+          "name": "Nettoyage des vitres",
+          "description": "Lavage intérieur et extérieur des fenêtres",
+          "icon": "🪟",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "plumbing",
+      "name": "Plomberie",
+      "description": "Réparations, installations et entretien des systèmes de plomberie",
+      "icon": "🚰",
+      "cover": "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?w=1600&q=80&auto=format&fit=crop",
+      "stats": {
+        "professionals": 3320,
+        "rating": { "value": 4.6, "reviews": 11728 }
+      },
+      "specialties": {
+        "leakRepair": {
+          "name": "Réparation de fuites",
+          "description": "Réparation des fuites de tuyaux et robinets",
+          "icon": "💧",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "fixtureInstall": {
+          "name": "Installation d'appareils",
+          "description": "Éviers, toilettes, douches et lave-vaisselle",
+          "icon": "🚿",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "pipeReplacement": {
+          "name": "Remplacement de tuyaux",
+          "description": "Remplacement de tuyauterie et services d'égouts",
+          "icon": "🔩",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "electrical",
+      "name": "Électricité",
+      "description": "Câblage électrique, éclairage et inspections de sécurité",
+      "icon": "💡",
+      "cover": "https://images.unsplash.com/photo-1581093588401-16e0e5b2c1d3?w=1600&q=80&auto=format&fit=crop",
+      "stats": {
+        "professionals": 2890,
+        "rating": { "value": 4.7, "reviews": 985 }
+      },
+      "specialties": {
+        "rewiring": {
+          "name": "Re-câblage",
+          "description": "Services de re-câblage résidentiel et commercial",
+          "icon": "⚡",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "lighting": {
+          "name": "Installation d'éclairage",
+          "description": "Installations d'éclairage intérieur et extérieur",
+          "icon": "💡",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "safetyInspections": {
+          "name": "Inspections de sécurité",
+          "description": "Vérification de conformité et contrôles de sécurité",
+          "icon": "🔍",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "painting",
+      "name": "Peinture",
+      "description": "Peinture intérieure et extérieure pour maisons et bureaux",
+      "icon": "🎨",
+      "cover": "https://images.unsplash.com/photo-1507668077129-56e32842fceb?w=1600&q=80&auto=format&fit=crop",
+      "stats": {
+        "professionals": 9698,
+        "rating": { "value": 4.9, "reviews": 104226 }
+      },
+      "specialties": {
+        "interior": {
+          "name": "Peinture intérieure",
+          "description": "Murs, plafonds, moulures et armoires",
+          "icon": "🖌️",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "exterior": {
+          "name": "Peinture extérieure",
+          "description": "Bardages, clôtures, terrasses et moulures extérieures",
+          "icon": "🌳",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "colorConsult": {
+          "name": "Conseil en couleurs",
+          "description": "Conseils professionnels sur les couleurs et finitions",
+          "icon": "🖍️",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "handyman",
+      "name": "Bricoleur",
+      "description": "Petits travaux et installations",
+      "icon": "🔧",
+      "cover": "https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=1600&q=80&auto=format&fit=crop",
+      "stats": {
+        "professionals": 4645,
+        "rating": { "value": 4.6, "reviews": 14925 }
+      },
+      "specialties": {
+        "furnitureAssembly": {
+          "name": "Montage de meubles",
+          "description": "Montage et assemblage de meubles",
+          "icon": "🪑",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "installation": {
+          "name": "Petites installations",
+          "description": "Installation d'étagères, stores et luminaires",
+          "icon": "🔩",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "paintingTouchUps": {
+          "name": "Retouches de peinture",
+          "description": "Petits travaux de peinture et retouches",
+          "icon": "🎨",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "oddJobs": {
+          "name": "Petits travaux divers",
+          "description": "Diverses réparations et petits travaux à domicile",
+          "icon": "🔨",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "doorInstallation": {
+          "name": "Installation de portes et fenêtres",
+          "description": "Pose de portes et montage de fenêtres",
+          "icon": "🚪",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "repair",
+      "name": "Réparation",
+      "description": "Réparations d'appareils et de la maison",
+      "icon": "🛠️",
+      "cover": "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=1600&q=80&auto=format&fit=crop",
+      "stats": {
+        "professionals": 4353,
+        "rating": { "value": 4.6, "reviews": 5319 }
+      },
+      "specialties": {
+        "applianceRepair": {
+          "name": "Réparation d'appareils",
+          "description": "Réparation de réfrigérateurs, fours, lave-linge et sèche-linge",
+          "icon": "🍽️",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "electricalRepair": {
+          "name": "Réparations électriques",
+          "description": "Dépannage et réparation de problèmes électriques",
+          "icon": "💡",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "plumbingRepair": {
+          "name": "Réparations de plomberie",
+          "description": "Réparation de tuyaux, robinets et fuites",
+          "icon": "🚰",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "carpentryRepair": {
+          "name": "Réparations de menuiserie",
+          "description": "Réparation d'armoires, portes et éléments en bois",
+          "icon": "🪚",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "drywallRepair": {
+          "name": "Réparation de cloisons sèches",
+          "description": "Rebouchage de trous et réparation de murs",
+          "icon": "🧱",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "gardening",
+      "name": "Jardinage",
+      "description": "Entretien de pelouse, plantation et aménagement paysager",
+      "icon": "🌿",
+      "cover": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1600&q=80&auto=format&fit=crop",
+      "stats": {
+        "professionals": 5426,
+        "rating": { "value": 4.7, "reviews": 14925 }
+      },
+      "specialties": {
+        "lawnMowing": {
+          "name": "Tonte de pelouse",
+          "description": "Tonte régulière et bordures",
+          "icon": "🚜",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "planting": {
+          "name": "Plantation & Désherbage",
+          "description": "Massifs de fleurs, arbustes et potagers",
+          "icon": "🌷",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        },
+        "landscapeDesign": {
+          "name": "Conception paysagère",
+          "description": "Aménagement extérieur et planification de jardin",
+          "icon": "🏡",
+          "questions": [
+            {
+              "id": "jobSize",
+              "type": "select",
+              "text": "Quelle est la taille du travail ?",
+              "required": true,
+              "placeholder": "Choisir la taille du travail",
+              "options": [
+                { "value": "small", "label": "Petite" },
+                { "value": "medium", "label": "Moyenne" },
+                { "value": "large", "label": "Grande" }
+              ]
+            },
+            {
+              "id": "jobDate",
+              "type": "date",
+              "text": "Quand avez-vous besoin du service ?",
+              "required": true
+            },
+            {
+              "id": "jobTime",
+              "type": "time",
+              "text": "Heure préférée",
+              "required": false
+            },
+            {
+              "id": "address",
+              "type": "text",
+              "text": "Où le service aura-t-il lieu ?",
+              "placeholder": "Quartier, arrondissement ou adresse complète",
+              "required": true
+            },
+            {
+              "id": "budget",
+              "type": "number",
+              "text": "Quel est votre budget estimé ? (facultatif)",
+              "required": false,
+              "min": 0,
+              "unit": "€"
+            },
+            {
+              "id": "details",
+              "type": "text",
+              "text": "Détails supplémentaires",
+              "placeholder": "Décrivez les détails importants",
+              "required": false
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "auth": {
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "logout": "Déconnexion"
+  },
+  "questions": {
+    "cleaning": {
+      "houseCleaning": [
+        {
+          "id": "areaM2",
+          "type": "number",
+          "text": "Quelle est la superficie en mètres carrés ?",
+          "placeholder": "Saisir la surface en m²",
+          "required": true,
+          "min": 1,
+          "unit": "m²"
+        }
+      ],
+      "officeCleaning": [
+        {
+          "id": "areaM2",
+          "type": "number",
+          "text": "Quelle est la superficie du bureau (m²) ?",
+          "placeholder": "Saisir la surface en m²",
+          "required": true,
+          "min": 1,
+          "unit": "m²"
+        }
+      ],
+      "deepCleaning": [
+        {
+          "id": "areaM2",
+          "type": "number",
+          "text": "Quelle est la superficie en mètres carrés ?",
+          "placeholder": "Saisir la surface en m²",
+          "required": true,
+          "min": 1,
+          "unit": "m²"
+        }
+      ]
+    }
+  }
+}
