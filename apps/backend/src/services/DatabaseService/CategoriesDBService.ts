@@ -1,7 +1,7 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 
 export type CategoryWithI18n = Prisma.CategoryGetPayload<{
-  include: { i18n: true; subcategories: true };
+  include: { i18n: true; subcategories: { include: { i18n: true } } };
 }>;
 
 export class CategoriesDBService {
@@ -10,35 +10,53 @@ export class CategoriesDBService {
   async findAll({
     where,
     orderBy,
-    include,
   }: {
     where?: Prisma.CategoryWhereInput;
     orderBy?: Prisma.CategoryOrderByWithRelationInput[];
-    include?: Prisma.CategoryInclude;
   } = {}): Promise<CategoryWithI18n[]> {
-    return this.prisma.category.findMany({
-      include: { i18n: true, subcategories: true },
-      orderBy: orderBy,
+    return await this.prisma.category.findMany({
+      where,
+      include: {
+        i18n: true,
+        subcategories: {
+          include: {
+            i18n: true,
+          },
+        },
+      },
+      orderBy,
     });
   }
 
   async findById({
     where,
-    include,
   }: {
     where: Prisma.CategoryWhereUniqueInput;
-    include?: Prisma.CategoryInclude;
   }): Promise<CategoryWithI18n | null> {
-    return this.prisma.category.findUnique({
+    return await this.prisma.category.findUnique({
       where,
-      include: include ?? { i18n: true, subcategories: true },
+      include: {
+        i18n: true,
+        subcategories: {
+          include: {
+            i18n: true,
+          },
+        },
+      },
     });
   }
 
   async create(input: Prisma.CategoryCreateInput): Promise<CategoryWithI18n> {
     const created = await this.prisma.category.create({
       data: input,
-      include: { i18n: true, subcategories: true },
+      include: {
+        i18n: true,
+        subcategories: {
+          include: {
+            i18n: true,
+          },
+        },
+      },
     });
     return created;
   }
@@ -50,7 +68,14 @@ export class CategoriesDBService {
     const updated = await this.prisma.category.update({
       where: { id },
       data: input,
-      include: { i18n: true, subcategories: true },
+      include: {
+        i18n: true,
+        subcategories: {
+          include: {
+            i18n: true,
+          },
+        },
+      },
     });
     return updated;
   }

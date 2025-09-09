@@ -20,13 +20,27 @@ function build(opts: FastifyServerOptions = {}): FastifyInstance {
       ...(process.env.NODE_ENV === 'development' && {
         transport: {
           target: 'pino-pretty',
-          options: {
-            colorize: true,
-          },
+          options: { colorize: true },
         },
       }),
     },
     ...opts,
+  });
+
+  /**
+   * Global hook: response payload’ındaki tüm Date objelerini
+   * ISO string formatına çevirir. Böylece Fastify + TypeBox JSON Schema
+   * ile tam uyumlu olur.
+   */
+  app.addHook('onSend', async (request, reply, payload) => {
+    if (payload && typeof payload === 'object') {
+      return JSON.parse(
+        JSON.stringify(payload, (key, value) =>
+          value instanceof Date ? value.toISOString() : value
+        )
+      );
+    }
+    return payload;
   });
 
   // Register plugins
@@ -40,8 +54,6 @@ function build(opts: FastifyServerOptions = {}): FastifyInstance {
   app.register(healthRoutes, { prefix: '/health' });
   app.register(apiRoutes, { prefix: '/api/v1' });
   app.register(authRoutes, { prefix: '/api/auth' });
-  // app.register(userRoutes, { prefix: '/api/user' });
-  // app.register(companyRoutes, { prefix: '/api/company' });
 
   // Global error handler
   app.setErrorHandler(async (error, request, reply) => {

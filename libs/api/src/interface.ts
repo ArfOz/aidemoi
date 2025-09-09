@@ -81,6 +81,6 @@ export type CategoriesListSuccessResponse = Static<
 
 export type CategoryGetRequest = Static<typeof CategoryGetRequestSchema>;
 
-export type CategoryGetDetailSuccessResponse = Static<
+export type CategoryDetailSuccessResponse = Static<
   typeof CategoryDetailSuccessResponseSchema
 >;

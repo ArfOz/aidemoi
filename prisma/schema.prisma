@@ -11,7 +11,7 @@ model Category {
     id            String         @id
     icon          String?        @map("icon")
     sortOrder     Int            @default(0) @map("sortOrder")
-    name          String?        @map("name")
+    name          String         @map("name")
     createdAt     DateTime       @default(now()) @map("createdAt")
     updatedAt     DateTime       @updatedAt @map("updatedAt")
     i18n          CategoryI18n[]
@@ -19,13 +19,12 @@ model Category {
 }
 
 model CategoryI18n {
-    id          Int     @id @default(autoincrement())
+    id          Int      @id @default(autoincrement())
     categoryId  String
-    locale      String  @db.VarChar(8)
-    name        String  @db.VarChar(255)
-    description String? @db.Text
-
-    category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+    locale      String   @db.VarChar(8)
+    name        String   @db.VarChar(255)
+    description String?  @db.Text
+    category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
     @@unique([categoryId, locale], name: "uq_category_i18n")
 }
@@ -64,21 +63,20 @@ model User {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     tokens    Token[]
-    username String?  @unique
+    username  String?  @unique
 }
 
 model Token {
-    id        Int      @id @default(autoincrement())
-    userId    Int
-    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    createdAt DateTime @default(now())
-    refreshedAt DateTime @updatedAt
-    accessToken     String   @unique
-    refreshToken String   @unique
-    expiresAtAccessToken DateTime
+    id                    Int      @id @default(autoincrement())
+    userId                Int
+    user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    createdAt             DateTime @default(now())
+    refreshedAt           DateTime @updatedAt
+    accessToken           String   @unique
+    refreshToken          String   @unique
+    expiresAtAccessToken  DateTime
     expiresAtRefreshToken DateTime
 }
-
 
 model Company {
     id            Int      @id @default(autoincrement())

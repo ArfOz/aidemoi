@@ -124,10 +124,10 @@ export const RegisterSuccessResponseSchema = Type.Intersect([
 
 // Category upsert schemas/types
 export const CategoryI18nSchema = Type.Object({
+  id: Type.Optional(Type.Integer()),
   locale: Type.String({ minLength: 2, maxLength: 8 }),
   name: Type.String({ minLength: 1, maxLength: 255 }),
-  description: Type.Optional(Type.String()),
-  id: Type.Optional(Type.String()),
+  description: Type.Union([Type.String(), Type.Null()]),
 });
 export const CategoryUpsertRequestSchema = Type.Object({
   icon: Type.Optional(Type.String({ maxLength: 16 })),
@@ -182,15 +182,15 @@ export const SubcategoryUpsertSuccessResponseSchema = Type.Object({
   }),
 });
 
-// Categories GET response schemas/types
-export const CategoryI18nOutSchema = CategoryI18nSchema; // same shape as request i18n
-
 export const SubcategoryOutSchema = Type.Object({
-  id: Type.Optional(Type.String()), // internal id may be provided
-  categoryId: Type.Optional(Type.String()),
-  slug: Type.String(),
-  icon: Type.Union([Type.String(), Type.Null()]),
-  sortOrder: Type.Optional(Type.Integer()),
+  id: Type.Integer(),
+  categoryId: Type.String(),
+  slug: Type.String({ maxLength: 128 }),
+  icon: Type.Union([Type.String({ maxLength: 16 }), Type.Null()]),
+  sortOrder: Type.Integer({ default: 0 }),
+  name: Type.Union([Type.String(), Type.Null()]),
+  createdAt: Type.String({ format: 'date-time' }), // ✅ Fastify uyumlu
+  updatedAt: Type.String({ format: 'date-time' }), // ✅ Fastify uyumlu
   i18n: Type.Array(
     Type.Object({
       locale: Type.String({ minLength: 2, maxLength: 8 }),
@@ -200,22 +200,22 @@ export const SubcategoryOutSchema = Type.Object({
   ),
 });
 
-export const CategoryOutSchema = Type.Object({
+export const CategoryDetailSchema = Type.Object({
   id: Type.String(),
-  name: Type.Optional(Type.String()), // may include default/original name
+  name: Type.String(),
   icon: Type.Union([Type.String(), Type.Null()]),
-  sortOrder: Type.Optional(Type.Integer()),
-  i18n: Type.Array(CategoryI18nOutSchema),
-  subcategories: Type.Optional(Type.Array(SubcategoryOutSchema)),
-  createdAt: Type.String({ format: 'date-time' }),
-  updatedAt: Type.String({ format: 'date-time' }),
+  sortOrder: Type.Integer({ default: 0 }), // Prisma default(0)
+  i18n: Type.Array(CategoryI18nSchema),
+  subcategories: Type.Array(SubcategoryOutSchema), // Prisma’da hep mevcut
+  createdAt: Type.String({ format: 'date-time' }), // ✅ Fastify uyumlu
+  updatedAt: Type.String({ format: 'date-time' }), // ✅ Fastify uyumlu
 });
 
 export const CategoriesListSuccessResponseSchema = Type.Object({
   success: Type.Literal(true),
   message: Type.String(),
   data: Type.Object({
-    categories: Type.Array(CategoryOutSchema),
+    categories: Type.Array(CategoryDetailSchema),
   }),
 });
 
@@ -230,7 +230,6 @@ export const CategoryDetailSuccessResponseSchema = Type.Object({
   success: Type.Literal(true),
   message: Type.String(),
   data: Type.Object({
-    category: CategoryOutSchema,
-    subcategories: Type.Optional(Type.Array(SubcategoryOutSchema)),
+    category: CategoryDetailSchema,
   }),
 });

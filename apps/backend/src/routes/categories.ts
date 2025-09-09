@@ -2,20 +2,20 @@ import { FastifyInstance } from 'fastify';
 import {
   ApiErrorResponseType,
   ApiErrorSchema,
-  CategoriesListRequest,
-  CategoriesListSuccessResponse,
-  CategoriesListSuccessResponseSchema,
   CategoryDetailSuccessResponseSchema,
-  CategoryGetDetailSuccessResponse,
+  CategoryDetailSuccessResponse,
   CategoryGetRequest,
   CategoryGetRequestSchema,
   CategoryUpsertRequest,
-  CategoryUpsertRequestSchema,
   CategoryUpsertSuccessResponse,
+  CategoryUpsertRequestSchema,
   CategoryUpsertSuccessResponseSchema,
+  CategoriesListRequest,
+  CategoriesListSuccessResponse,
+  CategoriesListSuccessResponseSchema,
+  SubcategoryUpsertSuccessResponse,
   SubcategoryUpsertRequest,
   SubcategoryUpsertRequestSchema,
-  SubcategoryUpsertSuccessResponse,
   SubcategoryUpsertSuccessResponseSchema,
 } from '@api';
 import { CategoriesDBService } from '../services/DatabaseService/CategoriesDBService';
@@ -144,12 +144,20 @@ export async function categoriesRoutes(
           icon: icon ?? null,
           sortOrder: sortOrder,
           // When creating, pass nested create shape Prisma expects
-          i18n: created ? { create: normalizedI18n } : normalizedI18n,
+          i18n: created
+            ? { create: normalizedI18n }
+            : { deleteMany: {}, create: normalizedI18n },
         };
 
         const result = created
-          ? await categoriesDBService.create({ id, ...upsertData } as any)
-          : await categoriesDBService.update(id!, upsertData as any);
+          ? await categoriesDBService.create({
+              id,
+              name:
+                normalizedI18n.find((e) => e.locale === 'en')?.name ??
+                normalizedI18n[0].name,
+              ...upsertData,
+            })
+          : await categoriesDBService.update(id!, upsertData);
 
         const res: CategoryUpsertSuccessResponse = {
           success: true,
@@ -180,59 +188,62 @@ export async function categoriesRoutes(
     }
   );
 
-  // fastify.get<{
-  //   Querystring: CategoriesListRequest;
-  //   Reply: CategoriesListSuccessResponse | ApiErrorResponseType;
-  // }>(
-  //   '/categories',
-  //   {
-  //     schema: {
-  //       querystring: CategoryGetRequestSchema,
-  //       response: {
-  //         200: CategoriesListSuccessResponseSchema,
-  //         400: ApiErrorSchema,
-  //         500: ApiErrorSchema,
-  //       },
-  //     },
-  //   },
-  //   async (request, reply) => {
-  //     try {
-  //       // Get languages from query parameters
-  //       const { languages: lang } = request.query;
+  fastify.get<{
+    Querystring: CategoriesListRequest;
+    Reply: CategoriesListSuccessResponse | ApiErrorResponseType;
+  }>(
+    '/categories',
+    {
+      schema: {
+        querystring: CategoryGetRequestSchema,
+        response: {
+          200: CategoriesListSuccessResponseSchema,
+          400: ApiErrorSchema,
+          500: ApiErrorSchema,
+        },
+      },
+    },
+    async (request, reply) => {
+      try {
+        // Get languages from query parameters
+        const { languages: lang } = request.query;
 
-  //       // Fetch all categories (service includes i18n)
-  //       const categories = await categoriesDBService.findAll({
-  //         where: lang
-  //           ? {
-  //               i18n: { some: { locale: { in: lang } } },
-  //             }
-  //           : undefined,
-  //       });
+        // Fetch all categories (service includes i18n)
+        const categories = await categoriesDBService.findAll({
+          where: lang
+            ? {
+                i18n: { some: { locale: { in: lang } } },
+              }
+            : undefined,
+        });
 
-  //       return reply.status(200).send({
-  //         success: true,
-  //         message: 'Categories fetched',
-  //         data: categories,
-  //       });
-  //     } catch (err) {
-  //       fastify.log.error(err);
-  //       const devMsg =
-  //         process.env.NODE_ENV === 'development' && err instanceof Error
-  //           ? `Failed to fetch categories: ${err.message}`
-  //           : 'Failed to fetch categories';
-  //       return reply.status(500).send({
-  //         success: false,
-  //         message: 'Request failed',
-  //         error: { message: devMsg, code: 500 },
-  //       });
-  //     }
-  //   }
-  // );
+        return reply.status(200).send({
+          success: true,
+          message: 'Categories fetched',
+          data: {
+            categories:
+              categories as unknown as CategoriesListSuccessResponse['data']['categories'],
+          },
+        });
+      } catch (err) {
+        fastify.log.error(err);
+        const devMsg =
+          process.env.NODE_ENV === 'development' && err instanceof Error
+            ? `Failed to fetch categories: ${err.message}`
+            : 'Failed to fetch categories';
+        return reply.status(500).send({
+          success: false,
+          message: 'Request failed',
+          error: { message: devMsg, code: 500 },
+        });
+      }
+    }
+  );
 
   fastify.get<{
     Params: { id: string };
     Querystring: CategoryGetRequest;
-    Reply: CategoryGetDetailSuccessResponse | ApiErrorResponseType;
+    Reply: CategoryDetailSuccessResponse | ApiErrorResponseType;
   }>(
     '/category/:id',
     {
@@ -260,7 +271,6 @@ export async function categoriesRoutes(
         // Fetch category by ID (service includes i18n)
         const category = await categoriesDBService.findById({
           where: { id },
-          include: { subcategories: true, i18n: true },
         });
         if (!category) {
           return reply.status(404).send({
@@ -273,36 +283,13 @@ export async function categoriesRoutes(
           });
         }
 
-        console.log('Fetched category:', category);
-
-        // Transform the category to match the expected schema
-        const transformedCategory = {
-          ...category,
-          name: category.name ?? undefined,
-          sortOrder: category.sortOrder ?? undefined,
-          subcategories:
-            category.subcategories?.map((sub) => ({
-              id: sub.id.toString(),
-              slug: sub.slug,
-              categoryId: sub.categoryId,
-              sortOrder: sub.sortOrder ?? undefined,
-              icon: sub.icon,
-              i18n: [], // Add i18n data if available in subcategory
-            })) ?? undefined,
-          i18n: category.i18n.map((item) => ({
-            id: item.id.toString(),
-            name: item.name,
-            locale: item.locale,
-            description: item.description ?? undefined,
-          })),
-          createdAt: category.createdAt.toISOString(),
-          updatedAt: category.updatedAt.toISOString(),
-        };
-
         return reply.status(200).send({
           success: true,
           message: 'Category fetched',
-          data: { category: transformedCategory },
+          data: {
+            category:
+              category as unknown as CategoryDetailSuccessResponse['data']['category'],
+          },
         });
       } catch (err) {
         fastify.log.error(err);
@@ -418,7 +405,7 @@ export async function categoriesRoutes(
           try {
             const result = await subCategoriesDBService.create({
               categoryId,
-              slug: slug as any, // service accepts optional slug
+              slug: slug as string, // service accepts optional slug
               icon: icon ?? null,
               sortOrder: sortOrder ?? 0,
               i18n: normalizedI18n,
@@ -427,7 +414,7 @@ export async function categoriesRoutes(
             updatedLocales = normalizedI18n.map((item) => item.locale);
             // capture generated slug if service returned one
             slug = result.slug;
-          } catch (err) {
+          } catch {
             // Fallback if createSubcategory doesn't exist
             return reply.status(500).send({
               success: false,
@@ -443,7 +430,7 @@ export async function categoriesRoutes(
           try {
             const updateResult = await subCategoriesDBService.update(
               categoryId,
-              slug as any,
+              slug as string,
               {
                 icon: icon ?? null,
                 sortOrder: sortOrder,
@@ -451,7 +438,7 @@ export async function categoriesRoutes(
               }
             );
             updatedLocales = updateResult?.updatedLocales ?? [];
-          } catch (err) {
+          } catch {
             // Fallback if updateSubcategory doesn't exist
             return reply.status(500).send({
               success: false,
