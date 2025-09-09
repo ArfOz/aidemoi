@@ -1,6 +1,10 @@
 import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
-import { apiAideMoi, CategoriesListSuccessResponse } from '@api';
+import {
+  apiAideMoi,
+  CategoriesListSuccessResponse,
+  CategoryDetailSuccessResponse,
+} from '@api';
 
 type BackendI18n = {
   locale: string;
@@ -30,11 +34,10 @@ export default async function CategoryPage({
 
   let active: BackendCategory | undefined;
   try {
-    const json = await apiAideMoi.get<CategoriesListSuccessResponse>(
-      '/categories/categories'
+    const json = await apiAideMoi.get<CategoryDetailSuccessResponse>(
+      `/categories/category/${category}?languages=${locale}`
     );
-    const items = json?.data?.categories ?? [];
-    active = items.find((c) => c.id === category);
+    active = json?.data?.category;
   } catch {
     active = undefined;
   }

@@ -157,7 +157,7 @@ export async function categoriesRoutes(
                 normalizedI18n[0].name,
               ...upsertData,
             })
-          : await categoriesDBService.update(id!, upsertData);
+          : await categoriesDBService.update(id, upsertData);
 
         const res: CategoryUpsertSuccessResponse = {
           success: true,
