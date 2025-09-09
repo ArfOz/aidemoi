@@ -30,16 +30,32 @@ export class CategoriesDBService {
 
   async findById({
     where,
+    languages,
   }: {
     where: Prisma.CategoryWhereUniqueInput;
+    languages?: string[];
   }): Promise<CategoryWithI18n | null> {
     return await this.prisma.category.findUnique({
       where,
       include: {
-        i18n: true,
+        i18n:
+          languages && languages.length > 0
+            ? {
+                where: {
+                  locale: { in: languages },
+                },
+              }
+            : true,
         subcategories: {
           include: {
-            i18n: true,
+            i18n:
+              languages && languages.length > 0
+                ? {
+                    where: {
+                      locale: { in: languages },
+                    },
+                  }
+                : true,
           },
         },
       },

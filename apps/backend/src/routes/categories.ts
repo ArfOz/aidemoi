@@ -263,15 +263,17 @@ export async function categoriesRoutes(
     },
     async (request, reply) => {
       try {
-        // Get id from URL params
+        // Get id from URL params and languages from query
         const { id } = request.params;
+        const { languages: lang } = request.query;
 
-        // console.log('Fetching category with id:', id);
-
-        // Fetch category by ID (service includes i18n)
+        console.log('Fetching category', id, 'with languages', lang);
+        // Fetch category by ID with language filtering at database level
         const category = await categoriesDBService.findById({
           where: { id },
+          languages: lang && lang.length > 0 ? lang : undefined,
         });
+
         if (!category) {
           return reply.status(404).send({
             success: false,
