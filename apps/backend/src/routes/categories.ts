@@ -208,13 +208,15 @@ export async function categoriesRoutes(
         // Get languages from query parameters
         const { languages: lang } = request.query;
 
-        // Fetch all categories (service includes i18n)
+        // Fetch all categories with language filtering at database level
         const categories = await categoriesDBService.findAll({
-          where: lang
-            ? {
-                i18n: { some: { locale: { in: lang } } },
-              }
-            : undefined,
+          where:
+            lang && lang.length > 0
+              ? {
+                  i18n: { some: { locale: { in: lang } } },
+                }
+              : undefined,
+          languages: lang && lang.length > 0 ? lang : undefined,
         });
 
         return reply.status(200).send({
@@ -267,7 +269,6 @@ export async function categoriesRoutes(
         const { id } = request.params;
         const { languages: lang } = request.query;
 
-        console.log('Fetching category', id, 'with languages', lang);
         // Fetch category by ID with language filtering at database level
         const category = await categoriesDBService.findById({
           where: { id },

@@ -1,7 +1,7 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 
 export type CategoryWithI18n = Prisma.CategoryGetPayload<{
-  include: { i18n: true; subcategories: { include: { i18n: true } } };
+  include: { i18n: true };
 }>;
 
 export class CategoriesDBService {
@@ -10,19 +10,23 @@ export class CategoriesDBService {
   async findAll({
     where,
     orderBy,
+    languages,
   }: {
     where?: Prisma.CategoryWhereInput;
     orderBy?: Prisma.CategoryOrderByWithRelationInput[];
+    languages?: string[];
   } = {}): Promise<CategoryWithI18n[]> {
     return await this.prisma.category.findMany({
       where,
       include: {
-        i18n: true,
-        subcategories: {
-          include: {
-            i18n: true,
-          },
-        },
+        i18n:
+          languages && languages.length > 0
+            ? {
+                where: {
+                  locale: { in: languages },
+                },
+              }
+            : true,
       },
       orderBy,
     });

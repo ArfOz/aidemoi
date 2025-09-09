@@ -211,11 +211,21 @@ export const CategoryDetailSchema = Type.Object({
   updatedAt: Type.String({ format: 'date-time' }), // ✅ Fastify uyumlu
 });
 
+export const CategoryListSchema = Type.Object({
+  id: Type.String(),
+  name: Type.String(),
+  icon: Type.Union([Type.String(), Type.Null()]),
+  sortOrder: Type.Integer({ default: 0 }), // Prisma default(0)
+  i18n: Type.Array(CategoryI18nSchema),
+  createdAt: Type.String({ format: 'date-time' }), // ✅ Fastify uyumlu
+  updatedAt: Type.String({ format: 'date-time' }), // ✅ Fastify uyumlu
+});
+
 export const CategoriesListSuccessResponseSchema = Type.Object({
   success: Type.Literal(true),
   message: Type.String(),
   data: Type.Object({
-    categories: Type.Array(CategoryDetailSchema),
+    categories: Type.Array(CategoryListSchema),
   }),
 });
 
