@@ -243,3 +243,33 @@ export const CategoryDetailSuccessResponseSchema = Type.Object({
     category: CategoryDetailSchema,
   }),
 });
+
+export const QuestionAddSuccessResponseSchema = Type.Object({
+  success: Type.Literal(true),
+  message: Type.String(),
+  data: Type.Object({
+    questionId: Type.Integer(),
+    submittedAt: Type.String({ format: 'date-time' }),
+  }),
+});
+
+// add Question i18n schema
+export const QuestionI18nSchema = Type.Object({
+  id: Type.Optional(Type.Integer()),
+  locale: Type.String({ minLength: 2, maxLength: 8 }),
+  label: Type.String({ minLength: 1, maxLength: 255 }),
+  description: Type.Optional(Type.Union([Type.String(), Type.Null()])),
+});
+
+// replace/define Question upsert request schema
+export const QuestionUpsertRequestSchema = Type.Object({
+  id: Type.Optional(Type.Integer()), // for updates
+  subcategoryId: Type.Integer(),
+  type: Type.String({ maxLength: 50 }), // text, textarea, select, multiselect, radio, checkbox, number, email, phone, date, file
+  required: Type.Optional(Type.Boolean()),
+  sortOrder: Type.Optional(Type.Integer()),
+  options: Type.Optional(Type.Any()), // JSON-compatible: array of option objects
+  validation: Type.Optional(Type.Any()), // JSON-compatible validation rules
+  isActive: Type.Optional(Type.Boolean({ default: true })),
+  i18n: Type.Array(QuestionI18nSchema, { minItems: 1 }),
+});

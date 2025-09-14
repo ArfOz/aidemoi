@@ -188,6 +188,7 @@ export async function categoriesRoutes(
     }
   );
 
+  // List Categories
   fastify.get<{
     Querystring: CategoriesListRequest;
     Reply: CategoriesListSuccessResponse | ApiErrorResponseType;
@@ -242,6 +243,7 @@ export async function categoriesRoutes(
     }
   );
 
+  // Get Category by ID
   fastify.get<{
     Params: { id: string };
     Querystring: CategoryGetRequest;
