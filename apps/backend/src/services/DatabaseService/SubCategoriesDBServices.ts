@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient, Subcategory } from '@prisma/client';
 
 export type SubcategoryWithI18n = Prisma.SubcategoryGetPayload<{
   include: { i18n: true };
@@ -35,10 +35,21 @@ export class SubCategoriesDBServices {
       order?: Prisma.SubcategoryOrderByWithRelationInput;
     } = {}
   ): Promise<SubcategoryWithI18n[]> {
-    return this.prisma.subcategory.findMany({
+    return await this.prisma.subcategory.findMany({
       where: opts.where,
       include: { i18n: true },
       orderBy: opts.order ?? [{ sortOrder: 'asc' }, { slug: 'asc' }],
+    });
+  }
+
+  async findUnique({
+    where,
+  }: {
+    where: Prisma.SubcategoryWhereUniqueInput;
+  }): Promise<Subcategory | null> {
+    return await this.prisma.subcategory.findUnique({
+      where,
+      include: { i18n: true },
     });
   }
 
@@ -46,7 +57,7 @@ export class SubCategoriesDBServices {
     categoryId: string,
     slug: SubcategoryId
   ): Promise<SubcategoryWithI18n | null> {
-    return this.prisma.subcategory.findFirst({
+    return await this.prisma.subcategory.findFirst({
       where: { categoryId, slug },
       include: { i18n: true },
     });
@@ -174,13 +185,6 @@ export class SubCategoriesDBServices {
   async count(categoryId?: string): Promise<number> {
     return this.prisma.subcategory.count({
       where: categoryId ? { categoryId } : {},
-    });
-  }
-
-  async findByCategoryId(categoryId: string): Promise<SubcategoryWithI18n[]> {
-    return this.findAll({
-      where: { categoryId },
-      order: { sortOrder: 'asc', slug: 'asc' },
     });
   }
 }

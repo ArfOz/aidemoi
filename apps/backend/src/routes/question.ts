@@ -9,9 +9,32 @@ import {
   QuestionUpsertRequest,
   QuestionUpsertRequestSchema,
 } from '@api';
+import { SubCategoriesDBServices } from '../services/DatabaseService/SubCategoriesDBServices';
 
 async function questionRoutes(fastify: FastifyInstance): Promise<void> {
   const questionsDBService = new QuestionsDBService(fastify.prisma);
+  const subCategoriesDBService = new SubCategoriesDBServices(fastify.prisma);
+
+  // Ensure all thrown errors are serialized into the project's ApiErrorSchema shape
+  fastify.setErrorHandler(async (error, request, reply) => {
+    fastify.log.error(error);
+
+    const statusCode = (error && (error as any).statusCode) || 500;
+    const message =
+      process.env.NODE_ENV === 'development' && error instanceof Error
+        ? error.message
+        : statusCode >= 500
+        ? 'Internal Server Error'
+        : String((error as any).message || 'Error');
+
+    // Always include the required "success" field and format "error" per ApiErrorSchema
+    return reply.status(statusCode).send({
+      success: false,
+      error: { message, code: statusCode },
+      message,
+    });
+  });
+
   // GET /questions?categoryId=moving
   fastify.get('/questions', async (request, reply) => {
     try {
@@ -48,21 +71,43 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
     },
     async (request, reply) => {
       try {
-        const payload = request.body as QuestionUpsertRequest;
+        const payload = request.body;
 
-        // minimal runtime sanity checks (schema already enforces required fields)
-        if (!payload || !payload.i18n || payload.i18n.length === 0) {
+        const hasSubcategoryId = await subCategoriesDBService.findUnique({
+          where: { id: payload.subcategoryId },
+        });
+
+        console.log(
+          'hasSubcategorasdddddddddddddddddddddddyId',
+          hasSubcategoryId
+        );
+        if (!hasSubcategoryId) {
           return reply.status(400).send({
             success: false,
             error: {
-              message: 'i18n is required and must be a non-empty array',
+              message: 'Invalid subcategoryId: not found',
               code: 400,
             },
           });
         }
 
-        // create via service (cast to any to accommodate Prisma input types)
-        const created = await questionsDBService.create(payload as any);
+        // create via service - transform payload to include subcategory relation
+        const { subcategoryId, i18n, ...rest } = payload;
+        const createInput = {
+          ...rest,
+          subcategory: {
+            connect: { id: subcategoryId },
+          },
+          i18n: {
+            create: i18n.map((item) => ({
+              locale: item.locale,
+              title: item.label, // Map label to title as required by Prisma schema
+              description: item.description,
+              placeholder: undefined, // Add placeholder field if needed
+            })),
+          },
+        };
+        const created = await questionsDBService.create(createInput);
 
         return reply.status(200).send({
           success: true,
