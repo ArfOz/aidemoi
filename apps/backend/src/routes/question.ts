@@ -1,11 +1,16 @@
+import { Question } from '@prisma/client';
 import { FastifyInstance } from 'fastify';
 // import { CategoriesDBService } from '../services/DatabaseService';
 import { QuestionsDBService } from '../services/DatabaseService/QuestionsDBService';
 import {
   ApiErrorResponseType,
   ApiErrorSchema,
+  CategoryGetRequestSchema,
   QuestionAddSuccessResponse,
   QuestionAddSuccessResponseSchema,
+  QuestionGetRequestSchema,
+  QuestionGetSuccessResponse,
+  QuestionGetSuccessResponseSchema,
   QuestionUpsertRequest,
   QuestionUpsertRequestSchema,
 } from '@api';
@@ -35,22 +40,71 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
     });
   });
 
-  // GET /questions?categoryId=moving
-  fastify.get('/questions', async (request, reply) => {
-    try {
-      return reply.status(200).send({
-        success: true,
-        message: 'Questions fetched',
-        //   data: { questions },
-      });
-    } catch (err) {
-      fastify.log.error(err);
-      return reply.status(500).send({
-        success: false,
-        error: { message: 'Failed to fetch questions', code: 500 },
-      });
+  // GET /question?categoryId=moving
+  fastify.get<{
+    Params: { id: string };
+    Querystring: { lang: string };
+    Reply: ApiErrorResponseType | QuestionGetSuccessResponse;
+  }>(
+    '/question/:id/',
+    {
+      schema: {
+        params: {
+          type: 'object',
+          properties: { id: { type: 'string' } },
+          required: ['id'],
+        },
+        // require "lang" query param
+        querystring: {
+          type: 'object',
+          properties: {
+            lang: { type: 'string' },
+          },
+          required: ['lang'],
+          additionalProperties: false,
+        },
+        response: {
+          200: QuestionGetSuccessResponseSchema,
+          404: ApiErrorSchema,
+          500: ApiErrorSchema,
+        },
+      },
+    },
+
+    async (request, reply) => {
+      try {
+        const question: Question | null = await questionsDBService.findById({
+          where: { id: parseInt(request.params.id, 10) },
+          language: request.query.lang, // required string
+        });
+
+        if (!question) {
+          return reply.status(404).send({
+            success: false,
+            error: { message: 'Question not found', code: 404 },
+          });
+        }
+
+        return reply.status(200).send({
+          success: true,
+          message: 'Question fetched',
+          data: {
+            question: {
+              ...question,
+              createdAt: question.createdAt.toISOString(),
+              updatedAt: question.updatedAt.toISOString(),
+            },
+          },
+        });
+      } catch (err) {
+        fastify.log.error(err);
+        return reply.status(500).send({
+          success: false,
+          error: { message: 'Failed to fetch questions', code: 500 },
+        });
+      }
     }
-  });
+  );
 
   // POST /question -> create a new question
   fastify.post<{
@@ -58,17 +112,17 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
     Reply: QuestionAddSuccessResponse | ApiErrorResponseType;
   }>(
     '/question',
-    {
-      schema: {
-        // validate incoming JSON body against the upsert schema
-        body: QuestionUpsertRequestSchema,
-        response: {
-          200: QuestionAddSuccessResponseSchema,
-          400: ApiErrorSchema,
-          500: ApiErrorSchema,
-        },
-      },
-    },
+    // {
+    //   schema: {
+    //     // validate incoming JSON body against the upsert schema
+    //     body: QuestionUpsertRequestSchema,
+    //     response: {
+    //       200: QuestionAddSuccessResponseSchema,
+    //       400: ApiErrorSchema,
+    //       500: ApiErrorSchema,
+    //     },
+    //   },
+    // },
     async (request, reply) => {
       try {
         const payload = request.body;
@@ -77,10 +131,6 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
           where: { id: payload.subcategoryId },
         });
 
-        console.log(
-          'hasSubcategorasdddddddddddddddddddddddyId',
-          hasSubcategoryId
-        );
         if (!hasSubcategoryId) {
           return reply.status(400).send({
             success: false,

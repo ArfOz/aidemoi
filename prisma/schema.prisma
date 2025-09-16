@@ -3,17 +3,17 @@ generator client {
 }
 
 datasource db {
-    provider = "postgresql" // postgresql | sqlite | mysql
-    url      = "postgresql://neondb_owner:npg_yUhiR5YxcQD9@ep-wild-bonus-a9w5sjg0-pooler.gwc.azure.neon.tech:5432/neondb"
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 model Category {
     id            String         @id
-    icon          String?        @map("icon")
-    sortOrder     Int            @default(0) @map("sortOrder")
-    name          String         @map("name")
-    createdAt     DateTime       @default(now()) @map("createdAt")
-    updatedAt     DateTime       @updatedAt @map("updatedAt")
+    icon          String?
+    sortOrder     Int            @default(0)
+    name          String
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @updatedAt
     i18n          CategoryI18n[]
     subcategories Subcategory[]
 }
@@ -58,14 +58,13 @@ model SubcategoryI18n {
 }
 
 model User {
-    id        Int            @id @default(autoincrement())
-    email     String         @unique
+    id        Int      @id @default(autoincrement())
+    email     String   @unique
     password  String
-    createdAt DateTime       @default(now())
-    updatedAt DateTime       @updatedAt
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
     tokens    Token[]
-    username  String?        @unique
-    responses UserResponse[]
+    username  String?  @unique
 }
 
 model Token {
@@ -98,50 +97,47 @@ model Company {
 }
 
 model Question {
-    id            Int            @id @default(autoincrement())
+    id            Int     @id @default(autoincrement())
     subcategoryId Int
-    type          String         @db.VarChar(50) // text, textarea, select, multiselect, radio, checkbox, number, email, phone, date, file
-    required      Boolean        @default(false)
-    sortOrder     Int            @default(0)
-    options       Json? // For select, multiselect, radio, checkbox - stores array of options
-    validation    Json? // For validation rules (min, max, regex, etc.)
-    isActive      Boolean        @default(true)
-    createdAt     DateTime       @default(now())
-    updatedAt     DateTime       @updatedAt
-    subcategory   Subcategory    @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
-    i18n          QuestionI18n[]
-    responses     UserResponse[]
+    type          String
+    required      Boolean
+    sortOrder     Int
+    validation    String?
+    isActive      Boolean @default(true)
 
-    @@index([subcategoryId, sortOrder])
+    subcategory  Subcategory           @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
+    options      Option[]
+    translations QuestionTranslation[]
 }
 
-model QuestionI18n {
-    id          Int      @id @default(autoincrement())
+model QuestionTranslation {
+    id          Int     @id @default(autoincrement())
     questionId  Int
-    locale      String   @db.VarChar(8)
-    title       String   @db.VarChar(500)
-    description String?  @db.Text
-    placeholder String?  @db.VarChar(255)
-    question    Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+    locale      String  @db.VarChar(8) // "en" veya "fr"
+    label       String
+    description String?
 
-    @@unique([questionId, locale], name: "uq_question_i18n")
+    question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+    @@unique([questionId, locale])
 }
 
-model UserResponse {
+model Option {
     id         Int      @id @default(autoincrement())
-    userId     Int? // Optional - for anonymous responses
+    value      String
     questionId Int
-    sessionId  String?  @db.VarChar(255) // For tracking anonymous user sessions
-    answer     Json // Stores the user's answer (can be string, number, array, etc.)
-    ipAddress  String?  @db.VarChar(45)
-    userAgent  String?  @db.Text
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
-    user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
     question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
-    @@index([userId])
-    @@index([questionId])
-    @@index([sessionId])
-    @@index([createdAt])
+    translations OptionTranslation[]
+}
+
+model OptionTranslation {
+    id       Int    @id @default(autoincrement())
+    optionId Int
+    locale   String @db.VarChar(8) // "en" veya "fr"
+    label    String
+
+    option Option @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+    @@unique([optionId, locale])
 }

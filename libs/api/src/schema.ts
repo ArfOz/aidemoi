@@ -273,3 +273,17 @@ export const QuestionUpsertRequestSchema = Type.Object({
   isActive: Type.Optional(Type.Boolean({ default: true })),
   i18n: Type.Array(QuestionI18nSchema, { minItems: 1 }),
 });
+
+export const QuestionGetRequestSchema = Type.Object({
+  includeInactive: Type.Optional(Type.Boolean({ default: false })),
+  languages: Type.Optional(Type.String({ minLength: 1, maxLength: 8 })),
+});
+
+export const QuestionGetSuccessResponseSchema = Type.Object({
+  success: Type.Literal(true),
+  message: Type.String(),
+  data: Type.Object({
+    // allow any shape for question to avoid serializer schema mismatch
+    question: Type.Any(),
+  }),
+});

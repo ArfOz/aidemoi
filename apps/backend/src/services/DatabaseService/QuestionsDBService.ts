@@ -1,5 +1,9 @@
 import { Prisma, PrismaClient, Question } from '@prisma/client';
 
+export type QuestionWithI18n = Prisma.QuestionGetPayload<{
+  include: { i18n: true };
+}>;
+
 export class QuestionsDBService {
   constructor(private prisma: PrismaClient) {}
 
@@ -43,42 +47,22 @@ export class QuestionsDBService {
 
   async findById({
     where,
-    id,
-    languages,
+    language,
   }: {
-    where?: Prisma.QuestionWhereUniqueInput;
-    id?: number;
-    languages?: string[];
-  }): Promise<Question | null> {
-    const uniqueWhere = where ?? (typeof id === 'number' ? { id } : undefined);
-    if (!uniqueWhere) {
-      throw new Error('findById requires either `where` or `id`');
-    }
+    where: Prisma.QuestionWhereUniqueInput;
 
+    language: string;
+  }): Promise<QuestionWithI18n | null> {
     return await this.prisma.question.findUnique({
-      where: uniqueWhere,
+      where,
       include: {
-        i18n:
-          languages && languages.length > 0
-            ? {
-                where: {
-                  locale: { in: languages },
-                },
-              }
-            : true,
-        subcategory: {
-          include: {
-            category: true,
-            i18n:
-              languages && languages.length > 0
-                ? {
-                    where: {
-                      locale: { in: languages },
-                    },
-                  }
-                : true,
-          },
-        },
+        i18n: language
+          ? {
+              where: {
+                locale: { in: [language] },
+              },
+            }
+          : true,
       },
     });
   }

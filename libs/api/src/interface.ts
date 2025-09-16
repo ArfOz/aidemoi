@@ -21,6 +21,7 @@ import {
   CategoriesListRequestSchema,
   QuestionAddSuccessResponseSchema,
   QuestionUpsertRequestSchema,
+  QuestionGetSuccessResponseSchema,
 } from './schema';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -92,3 +93,7 @@ export type QuestionAddSuccessResponse = Static<
 >;
 
 export type QuestionUpsertRequest = Static<typeof QuestionUpsertRequestSchema>;
+
+export type QuestionGetSuccessResponse = Static<
+  typeof QuestionGetSuccessResponseSchema
+>;
