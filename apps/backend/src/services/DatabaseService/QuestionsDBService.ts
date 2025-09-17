@@ -1,9 +1,5 @@
 import { Prisma, PrismaClient, Question } from '@prisma/client';
 
-export type QuestionWithI18n = Prisma.QuestionGetPayload<{
-  include: { i18n: true };
-}>;
-
 export class QuestionsDBService {
   constructor(private prisma: PrismaClient) {}
 
@@ -11,37 +7,15 @@ export class QuestionsDBService {
     where,
     orderBy,
     languages,
+    select,
   }: {
     where?: Prisma.QuestionWhereInput;
     orderBy?: Prisma.QuestionOrderByWithRelationInput[];
     languages?: string[];
+    select?: Prisma.QuestionSelect;
   } = {}): Promise<Question[]> {
     return await this.prisma.question.findMany({
       where,
-      include: {
-        i18n:
-          languages && languages.length > 0
-            ? {
-                where: {
-                  locale: { in: languages },
-                },
-              }
-            : true,
-        subcategory: {
-          include: {
-            category: true,
-            i18n:
-              languages && languages.length > 0
-                ? {
-                    where: {
-                      locale: { in: languages },
-                    },
-                  }
-                : true,
-          },
-        },
-      },
-      orderBy: orderBy || [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
     });
   }
 
@@ -50,19 +24,18 @@ export class QuestionsDBService {
     language,
   }: {
     where: Prisma.QuestionWhereUniqueInput;
-
-    language: string;
-  }): Promise<QuestionWithI18n | null> {
+    language?: string;
+  }): Promise<Question | null> {
     return await this.prisma.question.findUnique({
       where,
-      include: {
-        i18n: language
-          ? {
-              where: {
-                locale: { in: [language] },
-              },
-            }
-          : true,
+      select: {
+        id: true,
+        subcategoryId: true,
+        isActive: true,
+        sortOrder: true,
+        type: true,
+        required: true,
+        validation: true,
       },
     });
   }
@@ -117,7 +90,6 @@ export class QuestionsDBService {
       where: { id },
       data: { isActive: false },
       include: {
-        i18n: true,
         subcategory: {
           include: {
             category: true,
@@ -133,7 +105,6 @@ export class QuestionsDBService {
       where: { id },
       data: { isActive: true },
       include: {
-        i18n: true,
         subcategory: {
           include: {
             category: true,

@@ -142,20 +142,58 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
         }
 
         // create via service - transform payload to include subcategory relation
-        const { subcategoryId, i18n, ...rest } = payload;
+        const { subcategoryId, i18n, options, text, placeholder, ...rest } =
+          payload;
+
+        // Build i18n create payload: use provided i18n or fall back to English from `text`
+        const i18nCreate =
+          i18n && Array.isArray(i18n) && i18n.length > 0
+            ? i18n.map((item) => ({
+                locale: item.locale,
+                label: item.label,
+                description: item.description ?? null,
+                placeholder: item.placeholder ?? null,
+              }))
+            : [
+                {
+                  locale: 'en',
+                  label: (text as string) || (rest as any).label || 'Untitled',
+                  description: null,
+                  placeholder: placeholder ?? null,
+                },
+              ];
+
+        // Build options create payload if options provided
+        const optionsCreate = Array.isArray(options)
+          ? options.map((opt: any) => ({
+              value: opt.value,
+              key: opt.key ?? undefined,
+              sortOrder: opt.sortOrder ?? 0,
+              meta: opt.meta ?? undefined,
+              // create a default i18n translation for option label (fallback to en)
+              i18n: {
+                create: [
+                  {
+                    locale: 'en',
+                    label: opt.label ?? String(opt.value),
+                  },
+                ],
+              },
+            }))
+          : undefined;
+
         const createInput = {
           ...rest,
+          // ensure text/label fields aren't lost for Question model if needed
+          text,
+          placeholder,
           subcategory: {
             connect: { id: subcategoryId },
           },
           i18n: {
-            create: i18n.map((item) => ({
-              locale: item.locale,
-              title: item.label, // Map label to title as required by Prisma schema
-              description: item.description,
-              placeholder: undefined, // Add placeholder field if needed
-            })),
+            create: i18nCreate,
           },
+          ...(optionsCreate ? { options: { create: optionsCreate } } : {}),
         };
         const created = await questionsDBService.create(createInput);
 
@@ -164,7 +202,6 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
           message: 'Question created',
           data: {
             questionId: created.id,
-            submittedAt: created.createdAt.toISOString(),
           },
         });
       } catch (err: any) {
