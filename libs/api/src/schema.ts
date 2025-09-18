@@ -244,6 +244,21 @@ export const CategoryDetailSuccessResponseSchema = Type.Object({
   }),
 });
 
+export const SubcategoryDetailRequestSchema = Type.Object({
+  includeSubcategories: Type.Optional(Type.Boolean({ default: false })),
+  languages: Type.Optional(
+    Type.Array(Type.String({ minLength: 2, maxLength: 8 }))
+  ),
+});
+
+export const SubcategoryDetailSuccessResponseSchema = Type.Object({
+  success: Type.Literal(true),
+  message: Type.String(),
+  data: Type.Object({
+    subcategory: SubcategoryOutSchema,
+  }),
+});
+
 export const QuestionAddSuccessResponseSchema = Type.Object({
   success: Type.Literal(true),
   message: Type.String(),
@@ -261,17 +276,31 @@ export const QuestionI18nSchema = Type.Object({
   description: Type.Optional(Type.Union([Type.String(), Type.Null()])),
 });
 
-// replace/define Question upsert request schema
+// Option Translation Schema
+export const OptionTranslationSchema = Type.Object({
+  locale: Type.String({ minLength: 2, maxLength: 8 }),
+  label: Type.String({ minLength: 1, maxLength: 255 }),
+});
+
+// Option Schema
+export const OptionSchema = Type.Object({
+  value: Type.String(),
+  key: Type.Optional(Type.String()),
+  sortOrder: Type.Optional(Type.Integer({ default: 0 })),
+  meta: Type.Optional(Type.String()),
+  translations: Type.Array(OptionTranslationSchema, { minItems: 1 }),
+});
+
+// Main Question Upsert Schema
 export const QuestionUpsertRequestSchema = Type.Object({
-  id: Type.Optional(Type.Integer()), // for updates
   subcategoryId: Type.Integer(),
-  type: Type.String({ maxLength: 50 }), // text, textarea, select, multiselect, radio, checkbox, number, email, phone, date, file
-  required: Type.Optional(Type.Boolean()),
-  sortOrder: Type.Optional(Type.Integer()),
-  options: Type.Optional(Type.Any()), // JSON-compatible: array of option objects
-  validation: Type.Optional(Type.Any()), // JSON-compatible validation rules
+  type: Type.String({ minLength: 1, maxLength: 50 }),
+  required: Type.Optional(Type.Boolean({ default: false })),
+  sortOrder: Type.Optional(Type.Integer({ default: 0 })),
   isActive: Type.Optional(Type.Boolean({ default: true })),
-  i18n: Type.Array(QuestionI18nSchema, { minItems: 1 }),
+  i18n: Type.Optional(Type.Array(QuestionI18nSchema, { minItems: 1 })),
+  translations: Type.Array(QuestionI18nSchema, { minItems: 1 }),
+  options: Type.Optional(Type.Array(OptionSchema)),
 });
 
 export const QuestionGetRequestSchema = Type.Object({

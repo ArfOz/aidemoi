@@ -15,6 +15,7 @@ import {
   QuestionUpsertRequestSchema,
 } from '@api';
 import { SubCategoriesDBServices } from '../services/DatabaseService/SubCategoriesDBServices';
+import { Prisma } from '@prisma/client';
 
 async function questionRoutes(fastify: FastifyInstance): Promise<void> {
   const questionsDBService = new QuestionsDBService(fastify.prisma);
@@ -40,76 +41,76 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
     });
   });
 
-  // GET /question?categoryId=moving
-  fastify.get<{
-    Params: { id: string };
-    Querystring: { lang: string };
-    Reply: ApiErrorResponseType | QuestionGetSuccessResponse;
-  }>(
-    '/question/:id/',
-    {
-      schema: {
-        params: {
-          type: 'object',
-          properties: { id: { type: 'string' } },
-          required: ['id'],
-        },
-        // require "lang" query param
-        querystring: {
-          type: 'object',
-          properties: {
-            lang: { type: 'string' },
-          },
-          required: ['lang'],
-          additionalProperties: false,
-        },
-        response: {
-          200: QuestionGetSuccessResponseSchema,
-          404: ApiErrorSchema,
-          500: ApiErrorSchema,
-        },
-      },
-    },
+  // // GET /question?categoryId=moving
+  // fastify.get<{
+  //   Params: { id: string };
+  //   Querystring: { lang: string };
+  //   Reply: ApiErrorResponseType | QuestionGetSuccessResponse;
+  // }>(
+  //   '/question/:id/',
+  //   {
+  //     schema: {
+  //       params: {
+  //         type: 'object',
+  //         properties: { id: { type: 'string' } },
+  //         required: ['id'],
+  //       },
+  //       // require "lang" query param
+  //       querystring: {
+  //         type: 'object',
+  //         properties: {
+  //           lang: { type: 'string' },
+  //         },
+  //         required: ['lang'],
+  //         additionalProperties: false,
+  //       },
+  //       response: {
+  //         200: QuestionGetSuccessResponseSchema,
+  //         404: ApiErrorSchema,
+  //         500: ApiErrorSchema,
+  //       },
+  //     },
+  //   },
 
-    async (request, reply) => {
-      try {
-        const question: Question | null = await questionsDBService.findById({
-          where: { id: parseInt(request.params.id, 10) },
-          language: request.query.lang, // required string
-        });
+  //   async (request, reply) => {
+  //     try {
+  //       const question: Question | null = await questionsDBService.findById({
+  //         where: { id: parseInt(request.params.id, 10) },
+  //         language: request.query.lang, // required string
+  //       });
 
-        if (!question) {
-          return reply.status(404).send({
-            success: false,
-            error: { message: 'Question not found', code: 404 },
-          });
-        }
+  //       if (!question) {
+  //         return reply.status(404).send({
+  //           success: false,
+  //           error: { message: 'Question not found', code: 404 },
+  //         });
+  //       }
 
-        return reply.status(200).send({
-          success: true,
-          message: 'Question fetched',
-          data: {
-            question: {
-              ...question,
-              createdAt: question.createdAt.toISOString(),
-              updatedAt: question.updatedAt.toISOString(),
-            },
-          },
-        });
-      } catch (err) {
-        fastify.log.error(err);
-        return reply.status(500).send({
-          success: false,
-          error: { message: 'Failed to fetch questions', code: 500 },
-        });
-      }
-    }
-  );
+  //       return reply.status(200).send({
+  //         success: true,
+  //         message: 'Question fetched',
+  //         data: {
+  //           question: {
+  //             ...question,
+  //             createdAt: question.createdAt.toISOString(),
+  //             updatedAt: question.updatedAt.toISOString(),
+  //           },
+  //         },
+  //       });
+  //     } catch (err) {
+  //       fastify.log.error(err);
+  //       return reply.status(500).send({
+  //         success: false,
+  //         error: { message: 'Failed to fetch questions', code: 500 },
+  //       });
+  //     }
+  //   }
+  // );
 
   // POST /question -> create a new question
   fastify.post<{
     Body: QuestionUpsertRequest;
-    Reply: QuestionAddSuccessResponse | ApiErrorResponseType;
+    Reply: QuestionAddSuccessResponse | ApiErrorResponseType | any;
   }>(
     '/question',
     // {
@@ -141,60 +142,45 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
           });
         }
 
+        const data = payload;
+
         // create via service - transform payload to include subcategory relation
-        const { subcategoryId, i18n, options, text, placeholder, ...rest } =
-          payload;
+        // Removed unsupported `sortOrder` fields to match Prisma schema
+        const createInput: Prisma.QuestionCreateInput = {
+          type: data.type,
+          required: data.required ?? false,
+          isActive: data.isActive ?? true,
+          sortOrder: data.sortOrder ?? 0,
 
-        // Build i18n create payload: use provided i18n or fall back to English from `text`
-        const i18nCreate =
-          i18n && Array.isArray(i18n) && i18n.length > 0
-            ? i18n.map((item) => ({
-                locale: item.locale,
-                label: item.label,
-                description: item.description ?? null,
-                placeholder: item.placeholder ?? null,
-              }))
-            : [
-                {
-                  locale: 'en',
-                  label: (text as string) || (rest as any).label || 'Untitled',
-                  description: null,
-                  placeholder: placeholder ?? null,
-                },
-              ];
-
-        // Build options create payload if options provided
-        const optionsCreate = Array.isArray(options)
-          ? options.map((opt: any) => ({
-              value: opt.value,
-              key: opt.key ?? undefined,
-              sortOrder: opt.sortOrder ?? 0,
-              meta: opt.meta ?? undefined,
-              // create a default i18n translation for option label (fallback to en)
-              i18n: {
-                create: [
-                  {
-                    locale: 'en',
-                    label: opt.label ?? String(opt.value),
-                  },
-                ],
-              },
-            }))
-          : undefined;
-
-        const createInput = {
-          ...rest,
-          // ensure text/label fields aren't lost for Question model if needed
-          text,
-          placeholder,
           subcategory: {
-            connect: { id: subcategoryId },
+            connect: { id: data.subcategoryId },
           },
-          i18n: {
-            create: i18nCreate,
+
+          // Question translations
+          translations: {
+            create: data.translations.map((t: any) => ({
+              locale: t.locale,
+              label: t.label,
+              description: t.description ?? null,
+            })),
           },
-          ...(optionsCreate ? { options: { create: optionsCreate } } : {}),
+
+          // Options + their translations (omit sortOrder if not supported by schema)
+          options: data.options
+            ? {
+                create: data.options.map((o: any) => ({
+                  value: o.value,
+                  translations: {
+                    create: o.translations.map((ot: any) => ({
+                      locale: ot.locale,
+                      label: ot.label,
+                    })),
+                  },
+                })),
+              }
+            : undefined,
         };
+
         const created = await questionsDBService.create(createInput);
 
         return reply.status(200).send({
@@ -218,6 +204,52 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
       }
     }
   );
+
+  // // GET /question/categories
+  // fastify.get<{
+  //   Querystring: { lang: string };
+  //   Reply: ApiErrorResponseType | CategoryGetSuccessResponse;
+  // }>(
+  //   '/question/categories',
+  //   {
+  //     schema: {
+  //       // require "lang" query param
+  //       querystring: {
+  //         type: 'object',
+  //         properties: {
+  //           lang: { type: 'string' },
+  //         },
+  //         required: ['lang'],
+  //         additionalProperties: false,
+  //       },
+  //       response: {
+  //         200: CategoryGetSuccessResponseSchema,
+  //         500: ApiErrorSchema,
+  //       },
+  //     },
+  //   },
+
+  //   async (request, reply) => {
+  //     try {
+  //       // const categories = await categoriesDBService.findAll();
+  //       const categories = []; // TODO: fetch from DB
+
+  //       return reply.status(200).send({
+  //         success: true,
+  //         message: 'Categories fetched',
+  //         data: {
+  //           categories,
+  //         },
+  //       });
+  //     } catch (err) {
+  //       fastify.log.error(err);
+  //       return reply.status(500).send({
+  //         success: false,
+  //         error: { message: 'Failed to fetch categories', code: 500 },
+  //       });
+  //     }
+  //   }
+  // );
 }
 
 export default questionRoutes;

@@ -22,6 +22,8 @@ import {
   QuestionAddSuccessResponseSchema,
   QuestionUpsertRequestSchema,
   QuestionGetSuccessResponseSchema,
+  SubcategoryDetailRequestSchema,
+  SubcategoryDetailSuccessResponseSchema,
 } from './schema';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -88,6 +90,10 @@ export type CategoryDetailSuccessResponse = Static<
   typeof CategoryDetailSuccessResponseSchema
 >;
 
+export type SubcategoryDetailSuccessResponse = Static<
+  typeof SubcategoryDetailSuccessResponseSchema
+>;
+
 export type QuestionAddSuccessResponse = Static<
   typeof QuestionAddSuccessResponseSchema
 >;
@@ -96,4 +102,8 @@ export type QuestionUpsertRequest = Static<typeof QuestionUpsertRequestSchema>;
 
 export type QuestionGetSuccessResponse = Static<
   typeof QuestionGetSuccessResponseSchema
+>;
+
+export type SubcategoryGetRequest = Static<
+  typeof SubcategoryDetailRequestSchema
 >;

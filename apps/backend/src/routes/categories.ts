@@ -17,6 +17,8 @@ import {
   SubcategoryUpsertRequest,
   SubcategoryUpsertRequestSchema,
   SubcategoryUpsertSuccessResponseSchema,
+  SubcategoryGetRequest,
+  SubcategoryDetailSuccessResponse,
 } from '@api';
 import { CategoriesDBService } from '../services/DatabaseService/CategoriesDBService';
 import { SubCategoriesDBServices } from '../services/DatabaseService/SubCategoriesDBServices';
@@ -310,6 +312,63 @@ export async function categoriesRoutes(
       }
     }
   );
+
+  // List/Get Subcategories
+  fastify.get<{
+    Params: { id: string };
+    Body: SubcategoryGetRequest;
+    Reply: SubcategoryDetailSuccessResponse | ApiErrorResponseType;
+  }>('/subcategory/:id', async (request, reply) => {
+    try {
+      // allow optional query params: categoryId and languages (array)
+      const q: any = request.query || {};
+      const categoryId: string | undefined = q.categoryId;
+      const languages: string[] | undefined = q.languages;
+
+      const where: any = {};
+      if (categoryId) where.categoryId = categoryId;
+      if (languages && Array.isArray(languages) && languages.length > 0) {
+        where.i18n = { some: { locale: { in: languages } } };
+      }
+
+      const subcategory = await subCategoriesDBService.findUnique({
+        where: {
+          id: Number(request.params.id),
+        },
+      });
+
+      if (!subcategory) {
+        return reply.status(404).send({
+          success: false,
+          message: 'Subcategory not found',
+          error: {
+            message: `Subcategory with id "${request.params.id}" not found`,
+            code: 404,
+          },
+        });
+      }
+
+      return reply.status(200).send({
+        success: true,
+        message: 'Subcategory fetched',
+        data: {
+          subcategory:
+            subcategory as unknown as SubcategoryDetailSuccessResponse['data']['subcategory'],
+        },
+      });
+    } catch (err) {
+      fastify.log.error(err);
+      const devMsg =
+        process.env.NODE_ENV === 'development' && err instanceof Error
+          ? `Failed to fetch subcategories: ${err.message}`
+          : 'Failed to fetch subcategories';
+      return reply.status(500).send({
+        success: false,
+        message: 'Request failed',
+        error: { message: devMsg, code: 500 },
+      });
+    }
+  });
 
   // Upsert SubCategory
   fastify.post<{
