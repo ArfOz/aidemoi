@@ -36,6 +36,20 @@ export class QuestionsDBService {
         type: true,
         required: true,
         validation: true,
+        translations: {
+          where: {
+            locale: language || 'en',
+          },
+        },
+        options: {
+          include: {
+            translations: {
+              where: {
+                locale: language || 'en',
+              },
+            },
+          },
+        },
       },
     });
   }

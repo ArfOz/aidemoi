@@ -41,7 +41,6 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
     });
   });
 
-  // // GET /question?categoryId=moving
   // fastify.get<{
   //   Params: { id: string };
   //   Querystring: { lang: string };
@@ -144,8 +143,6 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
 
         const data = payload;
 
-        // create via service - transform payload to include subcategory relation
-        // Removed unsupported `sortOrder` fields to match Prisma schema
         const createInput: Prisma.QuestionCreateInput = {
           type: data.type,
           required: data.required ?? false,
@@ -205,51 +202,55 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
     }
   );
 
-  // // GET /question/categories
-  // fastify.get<{
-  //   Querystring: { lang: string };
-  //   Reply: ApiErrorResponseType | CategoryGetSuccessResponse;
-  // }>(
-  //   '/question/categories',
-  //   {
-  //     schema: {
-  //       // require "lang" query param
-  //       querystring: {
-  //         type: 'object',
-  //         properties: {
-  //           lang: { type: 'string' },
-  //         },
-  //         required: ['lang'],
-  //         additionalProperties: false,
-  //       },
-  //       response: {
-  //         200: CategoryGetSuccessResponseSchema,
-  //         500: ApiErrorSchema,
-  //       },
-  //     },
-  //   },
+  // GET /question/categories
+  fastify.get<{
+    Params: { id: string };
+    // Querystring: CategoryGetRequest;
+    // Reply: CategoryDetailSuccessResponse | ApiErrorResponseType;
+  }>(
+    '/question/:id',
+    {
+      schema: {
+        // require "lang" query param
+        params: {
+          type: 'object',
+          properties: { id: { type: 'string' } },
+          required: ['id'],
+        },
+        querystring: CategoryGetRequestSchema,
+        // response: {
+        //   200: CategoryGetSuccessResponseSchema,
+        //   500: ApiErrorSchema,
+        // },
+      },
+    },
 
-  //   async (request, reply) => {
-  //     try {
-  //       // const categories = await categoriesDBService.findAll();
-  //       const categories = []; // TODO: fetch from DB
+    async (request, reply) => {
+      try {
+        const { id } = request.params;
+        const questions = await questionsDBService.findById({
+          where: { id: parseInt(id, 10) },
+          language: request.query.lang,
+        });
 
-  //       return reply.status(200).send({
-  //         success: true,
-  //         message: 'Categories fetched',
-  //         data: {
-  //           categories,
-  //         },
-  //       });
-  //     } catch (err) {
-  //       fastify.log.error(err);
-  //       return reply.status(500).send({
-  //         success: false,
-  //         error: { message: 'Failed to fetch categories', code: 500 },
-  //       });
-  //     }
-  //   }
-  // );
+        console.log(questions);
+
+        return reply.status(200).send({
+          success: true,
+          message: 'Questions fetched',
+          data: {
+            questions,
+          },
+        });
+      } catch (err) {
+        fastify.log.error(err);
+        return reply.status(500).send({
+          success: false,
+          error: { message: 'Failed to fetch categories', code: 500 },
+        });
+      }
+    }
+  );
 }
 
 export default questionRoutes;
