@@ -1,19 +1,20 @@
-import { Question } from '@prisma/client';
+// removed unused import
 import { FastifyInstance } from 'fastify';
 // import { CategoriesDBService } from '../services/DatabaseService';
 import { QuestionsDBService } from '../services/DatabaseService/QuestionsDBService';
 import {
   ApiErrorResponseType,
   ApiErrorSchema,
-  CategoryGetRequestSchema,
   QuestionAddSuccessResponse,
-  QuestionAddSuccessResponseSchema,
   QuestionGetRequest,
   QuestionGetRequestSchema,
   QuestionGetSuccessResponse,
   QuestionGetSuccessResponseSchema,
   QuestionUpsertRequest,
+  QuestionUpdateRequestSchema,
+  QuestionUpdateSuccessResponseSchema,
   QuestionUpsertRequestSchema,
+  QuestionAddSuccessResponseSchema,
 } from '@api';
 import { SubCategoriesDBServices } from '../services/DatabaseService/SubCategoriesDBServices';
 import { Prisma } from '@prisma/client';
@@ -26,13 +27,17 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.setErrorHandler(async (error, request, reply) => {
     fastify.log.error(error);
 
-    const statusCode = (error && (error as any).statusCode) || 500;
+    const statusCode =
+      (error && (error as unknown as { statusCode?: number }).statusCode) ||
+      500;
     const message =
       process.env.NODE_ENV === 'development' && error instanceof Error
         ? error.message
         : statusCode >= 500
         ? 'Internal Server Error'
-        : String((error as any).message || 'Error');
+        : String(
+            (error as unknown as { message?: unknown }).message || 'Error'
+          );
 
     // Always include the required "success" field and format "error" per ApiErrorSchema
     return reply.status(statusCode).send({
@@ -110,20 +115,20 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
   // POST /question -> create a new question
   fastify.post<{
     Body: QuestionUpsertRequest;
-    Reply: QuestionAddSuccessResponse | ApiErrorResponseType | any;
+    Reply: QuestionAddSuccessResponse | ApiErrorResponseType;
   }>(
     '/question',
-    // {
-    //   schema: {
-    //     // validate incoming JSON body against the upsert schema
-    //     body: QuestionUpsertRequestSchema,
-    //     response: {
-    //       200: QuestionAddSuccessResponseSchema,
-    //       400: ApiErrorSchema,
-    //       500: ApiErrorSchema,
-    //     },
-    //   },
-    // },
+    {
+      schema: {
+        // validate incoming JSON body against the upsert schema
+        body: QuestionUpsertRequestSchema,
+        response: {
+          200: QuestionAddSuccessResponseSchema,
+          400: ApiErrorSchema,
+          500: ApiErrorSchema,
+        },
+      },
+    },
     async (request, reply) => {
       try {
         const payload = request.body;
@@ -156,25 +161,36 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
 
           // Question translations
           translations: {
-            create: data.translations.map((t: any) => ({
-              locale: t.locale,
-              label: t.label,
-              description: t.description ?? null,
-            })),
+            create: data.translations.map(
+              (t: {
+                locale: string;
+                label: string;
+                description?: string | null;
+              }) => ({
+                locale: t.locale,
+                label: t.label,
+                description: t.description ?? null,
+              })
+            ),
           },
 
           // Options + their translations (omit sortOrder if not supported by schema)
           options: data.options
             ? {
-                create: data.options.map((o: any) => ({
-                  value: o.value,
-                  translations: {
-                    create: o.translations.map((ot: any) => ({
-                      locale: ot.locale,
-                      label: ot.label,
-                    })),
-                  },
-                })),
+                create: data.options.map(
+                  (o: {
+                    value: string;
+                    translations?: Array<{ locale: string; label: string }>;
+                  }) => ({
+                    value: o.value,
+                    translations: {
+                      create: (o.translations || []).map((ot) => ({
+                        locale: ot.locale,
+                        label: ot.label,
+                      })),
+                    },
+                  })
+                ),
               }
             : undefined,
         };
@@ -186,9 +202,10 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
           message: 'Question created',
           data: {
             questionId: created.id,
+            submittedAt: new Date().toISOString(),
           },
         });
-      } catch (err: any) {
+      } catch (err) {
         fastify.log.error(err);
         // map known Prisma errors if desired (e.g., P2002) or return generic error
         const devMsg =
@@ -207,22 +224,21 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get<{
     Params: { id: string };
     Querystring: QuestionGetRequest;
-    // Reply: CategoryDetailSuccessResponse | ApiErrorResponseType;
+    Reply: QuestionGetSuccessResponse | ApiErrorResponseType;
   }>(
     '/question/:id',
     {
       schema: {
-        // require "lang" query param
         params: {
           type: 'object',
           properties: { id: { type: 'string' } },
           required: ['id'],
         },
-        querystring: CategoryGetRequestSchema,
-        // response: {
-        //   200: CategoryGetSuccessResponseSchema,
-        //   500: ApiErrorSchema,
-        // },
+        querystring: QuestionGetRequestSchema,
+        response: {
+          200: QuestionGetSuccessResponseSchema,
+          500: ApiErrorSchema,
+        },
       },
     },
 
@@ -250,6 +266,166 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
         return reply.status(500).send({
           success: false,
           error: { message: 'Failed to fetch categories', code: 500 },
+        });
+      }
+    }
+  );
+
+  // PATCH /question/:id -> update existing question (including translations and options)
+  fastify.patch<{
+    Params: { id: string };
+    Body: Partial<QuestionUpsertRequest> & {
+      translations?: Array<{
+        locale: string;
+        label: string;
+        description?: string | null;
+      }>;
+      options?: Array<{
+        value: string;
+        translations?: Array<{ locale: string; label: string }>;
+      }>;
+    };
+  }>(
+    '/question/:id',
+    {
+      schema: {
+        params: {
+          type: 'object',
+          properties: { id: { type: 'string' } },
+          required: ['id'],
+        },
+        body: QuestionUpdateRequestSchema,
+        response: {
+          200: QuestionUpdateSuccessResponseSchema,
+          400: ApiErrorSchema,
+          404: ApiErrorSchema,
+          500: ApiErrorSchema,
+        },
+      },
+    },
+    async (request, reply) => {
+      try {
+        const id = parseInt(request.params.id, 10);
+        const payload = request.body as Partial<QuestionUpsertRequest> & {
+          translations?: Array<{
+            locale: string;
+            label: string;
+            description?: string | null;
+          }>;
+          options?: Array<{
+            value: string;
+            translations?: Array<{ locale: string; label: string }>;
+          }>;
+        };
+
+        // ensure question exists
+        const existing = await fastify.prisma.question.findUnique({
+          where: { id },
+        });
+        if (!existing) {
+          return reply.status(404).send({
+            success: false,
+            message: 'Question not found',
+            error: { message: 'Question not found', code: 404 },
+          });
+        }
+
+        // validate subcategory if provided
+        if (payload.subcategoryId) {
+          const sub = await subCategoriesDBService.findUnique({
+            where: { id: payload.subcategoryId },
+          });
+          if (!sub) {
+            return reply.status(400).send({
+              success: false,
+              message: 'Invalid subcategoryId',
+              error: { message: 'Subcategory not found', code: 400 },
+            });
+          }
+        }
+
+        // Build update payload for question base fields
+        const updateData: Prisma.QuestionUpdateInput = {
+          type: payload.type ?? undefined,
+          required:
+            typeof payload.required === 'boolean'
+              ? payload.required
+              : undefined,
+          isActive:
+            typeof payload.isActive === 'boolean'
+              ? payload.isActive
+              : undefined,
+          sortOrder:
+            typeof payload.sortOrder === 'number'
+              ? payload.sortOrder
+              : undefined,
+          subcategory: payload.subcategoryId
+            ? { connect: { id: payload.subcategoryId } }
+            : undefined,
+        };
+
+        // If translations provided, remove existing translations and create new ones
+        if (Array.isArray(payload.translations)) {
+          // delete existing translations
+          await fastify.prisma.questionTranslation.deleteMany({
+            where: { questionId: id },
+          });
+          // create new translations
+          updateData.translations = {
+            create: payload.translations.map((t) => ({
+              locale: t.locale,
+              label: t.label,
+              description: t.description ?? null,
+            })),
+          } as Prisma.QuestionUpdateInput['translations'];
+        }
+
+        // If options provided, replace existing options and their translations
+        if (Array.isArray(payload.options)) {
+          // delete existing option translations and options
+          const existingOptions = await fastify.prisma.option.findMany({
+            where: { questionId: id },
+          });
+          const optionIds = existingOptions.map((o) => o.id);
+          if (optionIds.length > 0) {
+            await fastify.prisma.optionTranslation.deleteMany({
+              where: { optionId: { in: optionIds } },
+            });
+            await fastify.prisma.option.deleteMany({
+              where: { id: { in: optionIds } },
+            });
+          }
+
+          updateData.options = {
+            create: payload.options.map((o) => ({
+              value: o.value,
+              translations: {
+                create: (o.translations || []).map((ot) => ({
+                  locale: ot.locale,
+                  label: ot.label,
+                })),
+              },
+            })),
+          } as Prisma.QuestionUpdateInput['options'];
+        }
+
+        const updated = await questionsDBService.update({ id }, updateData);
+
+        return reply.status(200).send({
+          success: true,
+          message: 'Question updated',
+          data: { questionId: updated.id, updatedAt: new Date().toISOString() },
+        });
+      } catch (err) {
+        fastify.log.error(err);
+        const devMsg =
+          process.env.NODE_ENV === 'development' && err instanceof Error
+            ? err.message
+            : 'Failed to update question';
+        return reply.status(500).send({
+          success: false,
+          message: 'Request failed',
+          error: { message: devMsg, code: 500 },
         });
       }
     }

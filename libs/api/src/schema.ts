@@ -313,6 +313,53 @@ export const QuestionGetSuccessResponseSchema = Type.Object({
   message: Type.String(),
   data: Type.Object({
     // allow any shape for question to avoid serializer schema mismatch
-    question: Type.Any(),
+    questions: Type.Any(),
+  }),
+});
+
+// Questions helper removed — not used
+
+// Question Update Request Schema (partial upsert)
+export const QuestionUpdateRequestSchema = Type.Object({
+  subcategoryId: Type.Optional(Type.Integer()),
+  type: Type.Optional(Type.String({ minLength: 1, maxLength: 50 })),
+  required: Type.Optional(Type.Boolean()),
+  sortOrder: Type.Optional(Type.Integer()),
+  isActive: Type.Optional(Type.Boolean()),
+  translations: Type.Optional(
+    Type.Array(
+      Type.Object({
+        locale: Type.String({ minLength: 2, maxLength: 8 }),
+        label: Type.String({ minLength: 1, maxLength: 255 }),
+        description: Type.Optional(Type.Union([Type.String(), Type.Null()])),
+      }),
+      { minItems: 1 }
+    )
+  ),
+  options: Type.Optional(
+    Type.Array(
+      Type.Object({
+        value: Type.String(),
+        translations: Type.Optional(
+          Type.Array(
+            Type.Object({
+              locale: Type.String({ minLength: 2, maxLength: 8 }),
+              label: Type.String({ minLength: 1, maxLength: 255 }),
+            }),
+            { minItems: 1 }
+          )
+        ),
+      }),
+      { minItems: 1 }
+    )
+  ),
+});
+
+export const QuestionUpdateSuccessResponseSchema = Type.Object({
+  success: Type.Literal(true),
+  message: Type.String(),
+  data: Type.Object({
+    questionId: Type.Integer(),
+    updatedAt: Type.String({ format: 'date-time' }),
   }),
 });
