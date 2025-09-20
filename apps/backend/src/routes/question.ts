@@ -8,6 +8,7 @@ import {
   CategoryGetRequestSchema,
   QuestionAddSuccessResponse,
   QuestionAddSuccessResponseSchema,
+  QuestionGetRequest,
   QuestionGetRequestSchema,
   QuestionGetSuccessResponse,
   QuestionGetSuccessResponseSchema,
@@ -205,7 +206,7 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
   // GET /question/categories
   fastify.get<{
     Params: { id: string };
-    // Querystring: CategoryGetRequest;
+    Querystring: QuestionGetRequest;
     // Reply: CategoryDetailSuccessResponse | ApiErrorResponseType;
   }>(
     '/question/:id',
@@ -228,9 +229,11 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
     async (request, reply) => {
       try {
         const { id } = request.params;
+        const { lang } = request.query;
+        console.log('lang', lang);
         const questions = await questionsDBService.findById({
           where: { id: parseInt(id, 10) },
-          language: request.query.lang,
+          language: lang,
         });
 
         console.log(questions);

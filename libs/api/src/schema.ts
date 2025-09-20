@@ -305,7 +305,7 @@ export const QuestionUpsertRequestSchema = Type.Object({
 
 export const QuestionGetRequestSchema = Type.Object({
   includeInactive: Type.Optional(Type.Boolean({ default: false })),
-  languages: Type.Optional(Type.String({ minLength: 1, maxLength: 8 })),
+  lang: Type.String({ minLength: 1, maxLength: 8 }),
 });
 
 export const QuestionGetSuccessResponseSchema = Type.Object({
