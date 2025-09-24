@@ -6,16 +6,29 @@ export class QuestionsDBService {
   async findAll({
     where,
     orderBy,
-    languages,
+    language,
     select,
   }: {
     where?: Prisma.QuestionWhereInput;
     orderBy?: Prisma.QuestionOrderByWithRelationInput[];
-    languages?: string[];
+    language?: string;
     select?: Prisma.QuestionSelect;
   } = {}): Promise<Question[]> {
+    if (language) {
+      // Ensure translations and options translations are filtered by language
+      where = {
+        ...where,
+        translations: { some: { locale: language } },
+        options: {
+          some: { translations: { some: { locale: language } } },
+        },
+      };
+    }
+
     return await this.prisma.question.findMany({
       where,
+      orderBy: orderBy || [{ sortOrder: 'asc' }, { id: 'asc' }],
+      select: select || undefined,
     });
   }
 
@@ -56,11 +69,11 @@ export class QuestionsDBService {
 
   async findBySubcategory({
     subcategoryId,
-    languages,
+    language,
     activeOnly = true,
   }: {
     subcategoryId: number;
-    languages?: string[];
+    language?: string;
     activeOnly?: boolean;
   }): Promise<Question[]> {
     return await this.findAll({
@@ -68,7 +81,7 @@ export class QuestionsDBService {
         subcategoryId,
         ...(activeOnly && { isActive: true }),
       },
-      languages,
+      language: language && language.length > 0 ? language[0] : undefined,
     });
   }
 

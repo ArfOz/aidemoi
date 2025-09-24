@@ -430,6 +430,62 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
       }
     }
   );
+
+  //Get aLL qUESTIONS Subcategory
+  fastify.get<{
+    Params: { subcategoryId: string };
+    Querystring: { lang: string };
+    Reply: ApiErrorResponseType | QuestionGetSuccessResponse;
+  }>(
+    '/subcategory/:subcategoryId',
+    {
+      schema: {
+        params: {
+          type: 'object',
+          properties: { subcategoryId: { type: 'string' } },
+          required: ['subcategoryId'],
+        },
+        querystring: {
+          type: 'object',
+          properties: { lang: { type: 'string' } },
+          required: ['lang'],
+          additionalProperties: false,
+        },
+        response: {
+          200: QuestionGetSuccessResponseSchema,
+          500: ApiErrorSchema,
+        },
+      },
+    },
+    async (request, reply) => {
+      try {
+        const { subcategoryId } = request.params;
+        const { lang } = request.query;
+
+        const questions = await questionsDBService.findAll({
+          where: { subcategoryId: parseInt(subcategoryId, 10) },
+          language: lang,
+        });
+
+        return reply.status(200).send({
+          success: true,
+          message: 'Questions fetched',
+          data: { questions },
+        });
+      } catch (err) {
+        fastify.log.error(err);
+        const devMsg =
+          process.env.NODE_ENV === 'development' && err instanceof Error
+            ? err.message
+            : 'Failed to fetch questions';
+        return reply.status(500).send({
+          success: false,
+          message: 'Request failed',
+          error: { message: devMsg, code: 500 },
+        });
+      }
+    }
+  );
 }
 
 export default questionRoutes;
