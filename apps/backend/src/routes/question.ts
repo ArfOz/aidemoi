@@ -465,6 +465,24 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
         const questions = await questionsDBService.findAll({
           where: { subcategoryId: parseInt(subcategoryId, 10) },
           language: lang,
+          select: {
+            id: true,
+            subcategoryId: true,
+            isActive: true,
+            sortOrder: true,
+            type: true,
+            required: true,
+            validation: true,
+            translations: {
+              where: { locale: lang || 'en' },
+            },
+            options: {
+              include: {
+                translations: { where: { locale: lang || 'en' } },
+              },
+              orderBy: { id: 'asc' },
+            },
+          },
         });
 
         return reply.status(200).send({
