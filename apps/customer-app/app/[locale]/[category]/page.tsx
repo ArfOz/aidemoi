@@ -4,25 +4,8 @@ import {
   apiAideMoi,
   CategoriesListSuccessResponse,
   CategoryDetailSuccessResponse,
+  SubcategoryDetailSuccessResponse,
 } from '@api';
-
-type BackendI18n = {
-  locale: string;
-  name: string;
-  description?: string | null;
-};
-type BackendSubcategory = {
-  slug: string;
-  icon?: string | null;
-  i18n?: BackendI18n[];
-};
-type BackendCategory = {
-  id: string;
-  name?: string | null;
-  icon?: string | null;
-  i18n?: BackendI18n[];
-  subcategories?: BackendSubcategory[];
-};
 
 export default async function CategoryPage({
   params,
@@ -31,13 +14,13 @@ export default async function CategoryPage({
 }) {
   const locale = await getLocale();
   const { category } = params;
-
-  let active: BackendCategory | undefined;
+  let active: CategoryDetailSuccessResponse['data']['category'] | undefined;
   try {
     const json = await apiAideMoi.get<CategoryDetailSuccessResponse>(
       `/categories/category/${category}?languages=${locale}`
     );
     active = json?.data?.category;
+    const id = active.subcategories?.[0]?.id;
   } catch {
     active = undefined;
   }
@@ -139,7 +122,9 @@ export default async function CategoryPage({
             return (
               <Link
                 key={s.slug}
-                href={`/${params.locale}/${active.id}/${s.slug}`}
+                href={`/${params.locale}/${active.id}/${
+                  s.slug
+                }?subcatId=${encodeURIComponent(s.slug)}`}
                 aria-label={`${sName} subcategory`}
                 title={sName}
                 style={{
