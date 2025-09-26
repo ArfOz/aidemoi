@@ -5,23 +5,20 @@ export class QuestionsDBService {
 
   async findAll({
     where,
-    orderBy,
     language,
     select,
+    orderBy,
   }: {
     where?: Prisma.QuestionWhereInput;
-    orderBy?: Prisma.QuestionOrderByWithRelationInput[];
     language?: string;
     select?: Prisma.QuestionSelect;
+    orderBy?: Prisma.QuestionOrderByWithRelationInput[];
   } = {}): Promise<Question[]> {
     if (language) {
       // Ensure translations and options translations are filtered by language
       where = {
         ...where,
         translations: { some: { locale: language } },
-        options: {
-          some: { translations: { some: { locale: language } } },
-        },
       };
     }
 

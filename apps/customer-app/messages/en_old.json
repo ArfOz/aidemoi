@@ -814,57 +814,6 @@
           "required": false
         }
       ],
-      "intercityItem": [
-        {
-          "id": "itemType",
-          "type": "single",
-          "text": "What item will be transported?",
-          "required": true,
-          "options": [
-            { "value": "furniture", "label": "Furniture" },
-            { "value": "appliance", "label": "Appliance" },
-            { "value": "boxes", "label": "Boxes" },
-            { "value": "other", "label": "Other" }
-          ],
-          "allowOther": true,
-          "otherLabel": "Other (specify)",
-          "placeholder": "Describe the item"
-        },
-        {
-          "id": "jobDate",
-          "type": "date",
-          "text": "When to transport?",
-          "required": true
-        },
-        {
-          "id": "jobTime",
-          "type": "time",
-          "text": "Preferred time",
-          "required": false
-        },
-        {
-          "id": "address",
-          "type": "text",
-          "text": "Pickup and delivery",
-          "placeholder": "From/To addresses",
-          "required": true
-        },
-        {
-          "id": "budget",
-          "type": "number",
-          "text": "Budget (optional)",
-          "required": false,
-          "min": 0,
-          "unit": "TL"
-        },
-        {
-          "id": "details",
-          "type": "text",
-          "text": "Additional details",
-          "placeholder": "Packaging, insurance, etc.",
-          "required": false
-        }
-      ],
       "chauffeurCar": [
         {
           "id": "duration",

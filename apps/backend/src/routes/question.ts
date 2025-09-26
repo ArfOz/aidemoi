@@ -463,7 +463,9 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
         const { lang } = request.query;
 
         const questions = await questionsDBService.findAll({
-          where: { subcategoryId: parseInt(subcategoryId, 10) },
+          where: {
+            subcategoryId: parseInt(subcategoryId, 10),
+          },
           language: lang,
           select: {
             id: true,
@@ -484,6 +486,8 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
             },
           },
         });
+
+        console.log(questions);
 
         return reply.status(200).send({
           success: true,
