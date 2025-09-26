@@ -124,7 +124,7 @@ export default async function CategoryPage({
                 key={s.slug}
                 href={`/${params.locale}/${active.id}/${
                   s.slug
-                }?subcatId=${encodeURIComponent(s.slug)}`}
+                }?subcatId=${encodeURIComponent(s.id)}`}
                 aria-label={`${sName} subcategory`}
                 title={sName}
                 style={{
