@@ -25,7 +25,7 @@ export default function Page() {
       try {
         const { category, subcategory, locale } = params;
 
-        // Fetch category data
+        // Fetch category data with proper locale
         const catRes = await apiAideMoi.get<CategoryDetailSuccessResponse>(
           `/categories/category/${category}?languages=${locale}`
         );
@@ -41,7 +41,7 @@ export default function Page() {
 
         setActiveSubcat(subcat);
 
-        // Fetch questions
+        // Fetch questions with proper locale
         const questionsRes = await apiAideMoi.get<QuestionGetSuccessResponse>(
           `/questions/subcategory/${subcat.id}?lang=${locale}`
         );
@@ -85,19 +85,31 @@ export default function Page() {
   if (!activeSubcat)
     return <div style={{ padding: 12 }}>Subcategory not found.</div>;
 
+  // Get localized subcategory name
+  const subcatI18n =
+    activeSubcat.i18n?.find((x: any) => x.locale === params.locale) ||
+    activeSubcat.i18n?.find((x: any) => x.locale?.startsWith('en')) ||
+    activeSubcat.i18n?.[0];
+  const subcatName = subcatI18n?.name || activeSubcat.name || activeSubcat.slug;
+
   return (
     <div style={{ padding: 12, fontFamily: 'sans-serif' }}>
-      <p>Subcategory: {activeSubcat.name}</p>
+      <p>Subcategory: {subcatName}</p>
       <p>ID: {activeSubcat.id}</p>
 
       <h2 style={{ marginTop: 24, marginBottom: 16 }}>Questions</h2>
       {questions.length > 0 ? (
         <div>
           {questions.map((question) => {
+            // Find the translation for current locale
             const translation =
               question.translations?.find(
                 (t: any) => t.locale === params.locale
-              ) || question.translations?.[0];
+              ) ||
+              question.translations?.find((t: any) =>
+                t.locale?.startsWith('en')
+              ) ||
+              question.translations?.[0];
 
             return (
               <div
@@ -146,10 +158,15 @@ export default function Page() {
                     </strong>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                       {question.options.map((option: any) => {
+                        // Find option translation for current locale
                         const optionTranslation =
                           option.translations?.find(
                             (t: any) => t.locale === params.locale
-                          ) || option.translations?.[0];
+                          ) ||
+                          option.translations?.find((t: any) =>
+                            t.locale?.startsWith('en')
+                          ) ||
+                          option.translations?.[0];
 
                         const isSelected =
                           selectedOptions[question.id]?.includes(

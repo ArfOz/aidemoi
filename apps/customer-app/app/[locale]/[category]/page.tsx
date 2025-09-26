@@ -116,7 +116,7 @@ export default async function CategoryPage({
               s.i18n?.find((x) => x.locale === locale) ||
               s.i18n?.find((x) => x.locale?.startsWith('en')) ||
               s.i18n?.[0];
-            const sName = sI18n?.name || s.slug;
+            const sName = sI18n?.name || s.name || s.slug;
             const sDesc = sI18n?.description || '';
             const sIcon = s.icon || '📌';
             return (
