@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import {
   apiAideMoi,
@@ -115,34 +115,43 @@ export default function Page() {
     }
   };
 
-  const isQuestionAnswered = (question: any) => {
-    if (!question) return false;
+  const isQuestionAnswered = useCallback(
+    (question: any) => {
+      if (!question) {
+        return false;
+      }
 
-    const questionId = question.id;
+      const questionId = question.id;
 
-    // If question is not required, it's always considered answered
-    if (!question.required) return true;
-
-    // For required questions, check if they have valid answers
-    switch (question.type) {
-      case 'date':
-      case 'time':
-        return dateValues[questionId] && dateValues[questionId].trim() !== '';
-      case 'text':
-        return textValues[questionId] && textValues[questionId].trim() !== '';
-      case 'number':
-        return (
-          numberValues[questionId] && numberValues[questionId].trim() !== ''
-        );
-      case 'single':
-      case 'multi':
-        return (
-          selectedOptions[questionId] && selectedOptions[questionId].length > 0
-        );
-      default:
+      // If not required, always return true
+      if (!question.required) {
         return true;
-    }
-  };
+      }
+
+      // For required questions, check if they have valid answers
+      switch (question.type) {
+        case 'date':
+        case 'time':
+          return dateValues[questionId] && dateValues[questionId].trim() !== '';
+        case 'text':
+          return textValues[questionId] && textValues[questionId].trim() !== '';
+        case 'number':
+          return (
+            numberValues[questionId] && numberValues[questionId].trim() !== ''
+          );
+        case 'single':
+        case 'multi':
+        case 'select':
+          return (
+            selectedOptions[questionId] &&
+            selectedOptions[questionId].length > 0
+          );
+        default:
+          return false;
+      }
+    },
+    [dateValues, textValues, numberValues, selectedOptions]
+  );
 
   const goToNextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
@@ -166,7 +175,6 @@ export default function Page() {
     activeSubcat.i18n?.find((x: any) => x.locale?.startsWith('en')) ||
     activeSubcat.i18n?.[0];
   const subcatName = subcatI18n?.name || activeSubcat.name || activeSubcat.slug;
-
   return (
     <div style={{ padding: 12, fontFamily: 'sans-serif' }}>
       <p>Subcategory: {subcatName}</p>
@@ -411,11 +419,16 @@ export default function Page() {
             </button>
 
             <button
-              onClick={goToNextQuestion}
+              onClick={() => {
+                console.log(
+                  'Next button clicked, current question answered:',
+                  isQuestionAnswered(questions[currentQuestionIndex])
+                );
+                goToNextQuestion();
+              }}
               disabled={
                 currentQuestionIndex >= questions.length - 1 ||
-                (questions[currentQuestionIndex] &&
-                  !isQuestionAnswered(questions[currentQuestionIndex]))
+                !isQuestionAnswered(questions[currentQuestionIndex])
               }
               style={{
                 padding: '10px 20px',
@@ -423,20 +436,17 @@ export default function Page() {
                 borderRadius: 6,
                 backgroundColor:
                   currentQuestionIndex >= questions.length - 1 ||
-                  (questions[currentQuestionIndex] &&
-                    !isQuestionAnswered(questions[currentQuestionIndex]))
+                  !isQuestionAnswered(questions[currentQuestionIndex])
                     ? '#f3f4f6'
                     : '#3b82f6',
                 color:
                   currentQuestionIndex >= questions.length - 1 ||
-                  (questions[currentQuestionIndex] &&
-                    !isQuestionAnswered(questions[currentQuestionIndex]))
+                  !isQuestionAnswered(questions[currentQuestionIndex])
                     ? '#9ca3af'
                     : 'white',
                 cursor:
                   currentQuestionIndex >= questions.length - 1 ||
-                  (questions[currentQuestionIndex] &&
-                    !isQuestionAnswered(questions[currentQuestionIndex]))
+                  !isQuestionAnswered(questions[currentQuestionIndex])
                     ? 'not-allowed'
                     : 'pointer',
                 fontSize: 14,
