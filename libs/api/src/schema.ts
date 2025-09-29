@@ -243,3 +243,123 @@ export const CategoryDetailSuccessResponseSchema = Type.Object({
     category: CategoryDetailSchema,
   }),
 });
+
+export const SubcategoryDetailRequestSchema = Type.Object({
+  includeSubcategories: Type.Optional(Type.Boolean({ default: false })),
+  languages: Type.Optional(
+    Type.Array(Type.String({ minLength: 2, maxLength: 8 }))
+  ),
+});
+
+export const SubcategoryDetailSuccessResponseSchema = Type.Object({
+  success: Type.Literal(true),
+  message: Type.String(),
+  data: Type.Object({
+    subcategory: SubcategoryOutSchema,
+  }),
+});
+
+export const QuestionAddSuccessResponseSchema = Type.Object({
+  success: Type.Literal(true),
+  message: Type.String(),
+  data: Type.Object({
+    questionId: Type.Integer(),
+    submittedAt: Type.String({ format: 'date-time' }),
+  }),
+});
+
+// add Question i18n schema
+export const QuestionI18nSchema = Type.Object({
+  id: Type.Optional(Type.Integer()),
+  locale: Type.String({ minLength: 2, maxLength: 8 }),
+  label: Type.String({ minLength: 1, maxLength: 255 }),
+  description: Type.Optional(Type.Union([Type.String(), Type.Null()])),
+});
+
+// Option Translation Schema
+export const OptionTranslationSchema = Type.Object({
+  locale: Type.String({ minLength: 2, maxLength: 8 }),
+  label: Type.String({ minLength: 1, maxLength: 255 }),
+});
+
+// Option Schema
+export const OptionSchema = Type.Object({
+  value: Type.String(),
+  key: Type.Optional(Type.String()),
+  sortOrder: Type.Optional(Type.Integer({ default: 0 })),
+  meta: Type.Optional(Type.String()),
+  translations: Type.Array(OptionTranslationSchema, { minItems: 1 }),
+});
+
+// Main Question Upsert Schema
+export const QuestionUpsertRequestSchema = Type.Object({
+  subcategoryId: Type.Integer(),
+  type: Type.String({ minLength: 1, maxLength: 50 }),
+  required: Type.Optional(Type.Boolean({ default: false })),
+  sortOrder: Type.Optional(Type.Integer({ default: 0 })),
+  isActive: Type.Optional(Type.Boolean({ default: true })),
+  i18n: Type.Optional(Type.Array(QuestionI18nSchema, { minItems: 1 })),
+  translations: Type.Array(QuestionI18nSchema, { minItems: 1 }),
+  options: Type.Optional(Type.Array(OptionSchema)),
+});
+
+export const QuestionGetRequestSchema = Type.Object({
+  includeInactive: Type.Optional(Type.Boolean({ default: false })),
+  lang: Type.String({ minLength: 1, maxLength: 8 }),
+});
+
+export const QuestionGetSuccessResponseSchema = Type.Object({
+  success: Type.Literal(true),
+  message: Type.String(),
+  data: Type.Object({
+    // allow any shape for question to avoid serializer schema mismatch
+    questions: Type.Any(),
+  }),
+});
+
+// Questions helper removed — not used
+
+// Question Update Request Schema (partial upsert)
+export const QuestionUpdateRequestSchema = Type.Object({
+  subcategoryId: Type.Optional(Type.Integer()),
+  type: Type.Optional(Type.String({ minLength: 1, maxLength: 50 })),
+  required: Type.Optional(Type.Boolean()),
+  sortOrder: Type.Optional(Type.Integer()),
+  isActive: Type.Optional(Type.Boolean()),
+  translations: Type.Optional(
+    Type.Array(
+      Type.Object({
+        locale: Type.String({ minLength: 2, maxLength: 8 }),
+        label: Type.String({ minLength: 1, maxLength: 255 }),
+        description: Type.Optional(Type.Union([Type.String(), Type.Null()])),
+      }),
+      { minItems: 1 }
+    )
+  ),
+  options: Type.Optional(
+    Type.Array(
+      Type.Object({
+        value: Type.String(),
+        translations: Type.Optional(
+          Type.Array(
+            Type.Object({
+              locale: Type.String({ minLength: 2, maxLength: 8 }),
+              label: Type.String({ minLength: 1, maxLength: 255 }),
+            }),
+            { minItems: 1 }
+          )
+        ),
+      }),
+      { minItems: 1 }
+    )
+  ),
+});
+
+export const QuestionUpdateSuccessResponseSchema = Type.Object({
+  success: Type.Literal(true),
+  message: Type.String(),
+  data: Type.Object({
+    questionId: Type.Integer(),
+    updatedAt: Type.String({ format: 'date-time' }),
+  }),
+});

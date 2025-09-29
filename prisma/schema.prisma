@@ -3,17 +3,17 @@ generator client {
 }
 
 datasource db {
-    provider = "postgresql" // postgresql | sqlite | mysql
-    url      = "postgresql://neondb_owner:npg_yUhiR5YxcQD9@ep-wild-bonus-a9w5sjg0-pooler.gwc.azure.neon.tech:5432/neondb"
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 model Category {
     id            String         @id
-    icon          String?        @map("icon")
-    sortOrder     Int            @default(0) @map("sortOrder")
-    name          String         @map("name")
-    createdAt     DateTime       @default(now()) @map("createdAt")
-    updatedAt     DateTime       @updatedAt @map("updatedAt")
+    icon          String?
+    sortOrder     Int            @default(0)
+    name          String
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @updatedAt
     i18n          CategoryI18n[]
     subcategories Subcategory[]
 }
@@ -40,6 +40,7 @@ model Subcategory {
     updatedAt  DateTime          @updatedAt
     category   Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
     i18n       SubcategoryI18n[]
+    questions  Question[]
 
     @@unique([categoryId, slug], name: "uq_subcategory_cat_slug")
 }
@@ -93,4 +94,50 @@ model Company {
     status        String   @default("active")
     createdAt     DateTime @default(now())
     updatedAt     DateTime @updatedAt
+}
+
+model Question {
+    id            Int     @id @default(autoincrement())
+    subcategoryId Int
+    type          String
+    required      Boolean
+    sortOrder     Int
+    validation    String?
+    isActive      Boolean @default(true)
+
+    subcategory  Subcategory           @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
+    options      Option[]
+    translations QuestionTranslation[]
+}
+
+model QuestionTranslation {
+    id          Int     @id @default(autoincrement())
+    questionId  Int
+    locale      String  @db.VarChar(8) // "en" veya "fr"
+    label       String
+    description String?
+
+    question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+    @@unique([questionId, locale])
+}
+
+model Option {
+    id         Int      @id @default(autoincrement())
+    value      String
+    questionId Int
+    question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+    translations OptionTranslation[]
+}
+
+model OptionTranslation {
+    id       Int    @id @default(autoincrement())
+    optionId Int
+    locale   String @db.VarChar(8) // "en" veya "fr"
+    label    String
+
+    option Option @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+    @@unique([optionId, locale])
 }

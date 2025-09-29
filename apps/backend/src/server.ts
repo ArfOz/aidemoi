@@ -1,9 +1,11 @@
 import 'dotenv/config';
 import 'reflect-metadata';
 import build from './app';
+import dotenv from 'dotenv';
 
 const start = async (): Promise<void> => {
   const app = build();
+  dotenv.config();
 
   try {
     const host = process.env.HOST || '0.0.0.0';

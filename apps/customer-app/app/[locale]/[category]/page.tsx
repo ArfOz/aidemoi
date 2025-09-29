@@ -1,28 +1,6 @@
 import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
-import {
-  apiAideMoi,
-  CategoriesListSuccessResponse,
-  CategoryDetailSuccessResponse,
-} from '@api';
-
-type BackendI18n = {
-  locale: string;
-  name: string;
-  description?: string | null;
-};
-type BackendSubcategory = {
-  slug: string;
-  icon?: string | null;
-  i18n?: BackendI18n[];
-};
-type BackendCategory = {
-  id: string;
-  name?: string | null;
-  icon?: string | null;
-  i18n?: BackendI18n[];
-  subcategories?: BackendSubcategory[];
-};
+import { apiAideMoi, CategoryDetailSuccessResponse } from '@api';
 
 export default async function CategoryPage({
   params,
@@ -31,8 +9,7 @@ export default async function CategoryPage({
 }) {
   const locale = await getLocale();
   const { category } = params;
-
-  let active: BackendCategory | undefined;
+  let active: CategoryDetailSuccessResponse['data']['category'] | undefined;
   try {
     const json = await apiAideMoi.get<CategoryDetailSuccessResponse>(
       `/categories/category/${category}?languages=${locale}`
@@ -133,13 +110,15 @@ export default async function CategoryPage({
               s.i18n?.find((x) => x.locale === locale) ||
               s.i18n?.find((x) => x.locale?.startsWith('en')) ||
               s.i18n?.[0];
-            const sName = sI18n?.name || s.slug;
+            const sName = sI18n?.name || s.name || s.slug;
             const sDesc = sI18n?.description || '';
             const sIcon = s.icon || '📌';
             return (
               <Link
                 key={s.slug}
-                href={`/${params.locale}/${active.id}/${s.slug}`}
+                href={`/${params.locale}/${active.id}/${
+                  s.slug
+                }?subcatId=${encodeURIComponent(s.id)}`}
                 aria-label={`${sName} subcategory`}
                 title={sName}
                 style={{
