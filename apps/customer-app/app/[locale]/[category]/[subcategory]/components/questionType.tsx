@@ -147,7 +147,7 @@ export const QuestionType = ({
                 option.translations?.[0];
 
               const isSelected =
-                selectedOptions[question.id]?.includes(option.value) || false;
+                answers.options[question.id]?.includes(option.value) || false;
               const isMulti = question.type === 'multi';
 
               return (

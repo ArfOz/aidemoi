@@ -1,19 +1,21 @@
 import React from 'react';
+import { QuestionGetSuccessResponse } from '@api';
 
-// interface NavigationButtonProps {
-//   goToPreviousQuestion: () => void;
-//   currentQuestionIndex: number;
-//   isQuestionAnswered: () => boolean;
-//   goToNextQuestion: () => void;
-// }
+interface NavigationButtonProps {
+  question: QuestionGetSuccessResponse['data']['questions'][number];
+  goToPreviousQuestion: () => void;
+  currentQuestionIndex: number;
+  isQuestionAnswered: boolean;
+  goToNextQuestion: () => void;
+}
 
 export const NavigationButton = ({
-  questions,
+  question,
   goToPreviousQuestion,
   currentQuestionIndex,
   isQuestionAnswered,
   goToNextQuestion,
-}: any) => {
+}: NavigationButtonProps) => {
   return (
     <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
       <button
@@ -34,41 +36,20 @@ export const NavigationButton = ({
       </button>
 
       <button
-        onClick={() => {
-          console.log(
-            'Next button clicked, current question answered:',
-            isQuestionAnswered(questions[currentQuestionIndex])
-          );
-          goToNextQuestion();
-        }}
-        disabled={
-          currentQuestionIndex >= questions.length - 1 ||
-          !isQuestionAnswered(questions[currentQuestionIndex])
-        }
+        onClick={goToNextQuestion}
+        disabled={!isQuestionAnswered}
         style={{
           padding: '10px 20px',
           border: '2px solid #3b82f6',
           borderRadius: 6,
-          backgroundColor:
-            currentQuestionIndex >= questions.length - 1 ||
-            !isQuestionAnswered(questions[currentQuestionIndex])
-              ? '#f3f4f6'
-              : '#3b82f6',
-          color:
-            currentQuestionIndex >= questions.length - 1 ||
-            !isQuestionAnswered(questions[currentQuestionIndex])
-              ? '#9ca3af'
-              : 'white',
-          cursor:
-            currentQuestionIndex >= questions.length - 1 ||
-            !isQuestionAnswered(questions[currentQuestionIndex])
-              ? 'not-allowed'
-              : 'pointer',
+          backgroundColor: !isQuestionAnswered ? '#f3f4f6' : '#3b82f6',
+          color: !isQuestionAnswered ? '#9ca3af' : 'white',
+          cursor: !isQuestionAnswered ? 'not-allowed' : 'pointer',
           fontSize: 14,
           fontWeight: 500,
         }}
       >
-        {currentQuestionIndex >= questions.length - 1 ? 'Complete' : 'Next'}
+        Next
       </button>
     </div>
   );
