@@ -1,11 +1,6 @@
 import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
-import {
-  apiAideMoi,
-  CategoriesListSuccessResponse,
-  CategoryDetailSuccessResponse,
-  SubcategoryDetailSuccessResponse,
-} from '@api';
+import { apiAideMoi, CategoryDetailSuccessResponse } from '@api';
 
 export default async function CategoryPage({
   params,
@@ -20,7 +15,6 @@ export default async function CategoryPage({
       `/categories/category/${category}?languages=${locale}`
     );
     active = json?.data?.category;
-    const id = active.subcategories?.[0]?.id;
   } catch {
     active = undefined;
   }
