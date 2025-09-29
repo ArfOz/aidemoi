@@ -1,7 +1,36 @@
 import React from 'react';
 
+// Option tipi
+interface OptionTranslation {
+  locale: string;
+  label?: string;
+}
+
+interface Option {
+  id: number;
+  value: string;
+  translations?: OptionTranslation[];
+}
+
+// Question tipi
+type QuestionTypeEnum =
+  | 'text'
+  | 'number'
+  | 'date'
+  | 'time'
+  | 'multi'
+  | 'single';
+
+interface Question {
+  id: number;
+  type: QuestionTypeEnum;
+  required?: boolean;
+  options?: Option[];
+}
+
+// Props tipi
 interface QuestionTypeProps {
-  question: any;
+  question: Question;
   dateValues: Record<number, string>;
   textValues: Record<number, string>;
   numberValues: Record<number, string>;
@@ -18,7 +47,8 @@ interface QuestionTypeProps {
   params: { locale: string };
 }
 
-export const QuestionType = ({
+// Bileşen
+export const QuestionType: React.FC<QuestionTypeProps> = ({
   question,
   selectedOptions,
   params,
@@ -30,20 +60,14 @@ export const QuestionType = ({
   handleOptionClick,
   handleDateChange,
   handleNumberChange,
-}: QuestionTypeProps) => {
+}) => {
   return (
     <div>
-      {/* Date/DateTime Input */}
+      {/* Date / Time input */}
       {(question.type === 'date' || question.type === 'time') && (
         <div style={{ marginTop: 12 }}>
           <input
-            type={
-              question.type === 'date'
-                ? 'date'
-                : question.type === 'time'
-                ? 'time'
-                : 'datetime-local'
-            }
+            type={question.type === 'date' ? 'date' : 'time'}
             value={dateValues[question.id] || ''}
             onChange={(e) => handleDateChange(question.id, e.target.value)}
             style={{
@@ -52,7 +76,7 @@ export const QuestionType = ({
               borderRadius: 6,
               fontSize: 14,
               width: '100%',
-              maxWidth: '300px',
+              maxWidth: 300,
               fontFamily: 'inherit',
             }}
             required={question.required}
@@ -60,7 +84,7 @@ export const QuestionType = ({
         </div>
       )}
 
-      {/* Text Input */}
+      {/* Text input */}
       {question.type === 'text' && (
         <div style={{ marginTop: 12 }}>
           <input
@@ -74,7 +98,7 @@ export const QuestionType = ({
               borderRadius: 6,
               fontSize: 14,
               width: '100%',
-              maxWidth: '400px',
+              maxWidth: 400,
               fontFamily: 'inherit',
             }}
             required={question.required}
@@ -82,7 +106,7 @@ export const QuestionType = ({
         </div>
       )}
 
-      {/* Number Input */}
+      {/* Number input */}
       {question.type === 'number' && (
         <div style={{ marginTop: 12 }}>
           <input
@@ -92,7 +116,6 @@ export const QuestionType = ({
             value={numberValues[question.id] || ''}
             onChange={(e) => handleNumberChange(question.id, e.target.value)}
             onKeyPress={(e) => {
-              // Allow only numbers, decimal point, and control keys
               if (
                 !/[0-9.]/.test(e.key) &&
                 ![
@@ -113,7 +136,7 @@ export const QuestionType = ({
               borderRadius: 6,
               fontSize: 14,
               width: '100%',
-              maxWidth: '200px',
+              maxWidth: 200,
               fontFamily: 'inherit',
             }}
             required={question.required}
@@ -121,9 +144,9 @@ export const QuestionType = ({
         </div>
       )}
 
-      {/* Options for multi/single select */}
+      {/* Options (single/multi select) */}
       {question.options && question.options.length > 0 && (
-        <div>
+        <div style={{ marginTop: 12 }}>
           <strong
             style={{
               fontSize: 14,
@@ -135,15 +158,10 @@ export const QuestionType = ({
             Options:
           </strong>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            {question.options.map((option: any) => {
-              // Find option translation for current locale
+            {question.options.map((option) => {
               const optionTranslation =
-                option.translations?.find(
-                  (t: any) => t.locale === params.locale
-                ) ||
-                option.translations?.find((t: any) =>
-                  t.locale?.startsWith('en')
-                ) ||
+                option.translations?.find((t) => t.locale === params.locale) ||
+                option.translations?.find((t) => t.locale.startsWith('en')) ||
                 option.translations?.[0];
 
               const isSelected =
