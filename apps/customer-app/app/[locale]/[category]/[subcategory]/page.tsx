@@ -6,7 +6,7 @@ import {
   CategoryDetailSuccessResponse,
   QuestionGetSuccessResponse,
 } from '@api';
-import { NavigationButton, QuestionType } from './components';
+import { NavigationButton, QuestionSection } from './components';
 
 export default function Page() {
   const params = useParams() as {
@@ -14,14 +14,27 @@ export default function Page() {
     category: string;
     subcategory: string;
   };
-  const [questions, setQuestions] = useState<any[]>([]);
+
+  const [questions, setQuestions] = useState<
+    QuestionGetSuccessResponse['data']['questions']
+  >([]);
   const [activeSubcat, setActiveSubcat] = useState<any>(null);
-  const [selectedOptions, setSelectedOptions] = useState<
-    Record<number, string[]>
-  >({});
-  const [dateValues, setDateValues] = useState<Record<number, string>>({});
-  const [textValues, setTextValues] = useState<Record<number, string>>({});
-  const [numberValues, setNumberValues] = useState<Record<number, string>>({});
+
+  // Tek state altında tüm cevapları topluyoruz
+  const [answers, setAnswers] = useState<{
+    date: Record<string, string>;
+    time: Record<string, string>;
+    text: Record<string, string>;
+    number: Record<string, string>;
+    options: Record<string, string[]>;
+  }>({
+    date: {},
+    time: {},
+    text: {},
+    number: {},
+    options: {},
+  });
+
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -30,7 +43,6 @@ export default function Page() {
       try {
         const { category, subcategory, locale } = params;
 
-        // Fetch category data with proper locale
         const catRes = await apiAideMoi.get<CategoryDetailSuccessResponse>(
           `/categories/category/${category}?languages=${locale}`
         );
@@ -41,12 +53,10 @@ export default function Page() {
         const subcat = activeCat.subcategories?.find(
           (s: any) => s.slug === subcategory
         );
-
         if (!subcat) return;
 
         setActiveSubcat(subcat);
 
-        // Fetch questions with proper locale
         const questionsRes = await apiAideMoi.get<QuestionGetSuccessResponse>(
           `/questions/subcategory/${subcat.id}?lang=${locale}`
         );
@@ -61,99 +71,98 @@ export default function Page() {
     fetchData();
   }, [params]);
 
+  // --- Handlers ---
   const handleOptionClick = (
-    questionId: number,
+    questionId: string,
     optionValue: string,
     isMulti: boolean
   ) => {
-    setSelectedOptions((prev) => {
-      const current = prev[questionId] || [];
-
-      if (isMulti) {
-        // Multi-select: toggle option
-        if (current.includes(optionValue)) {
-          return {
-            ...prev,
-            [questionId]: current.filter((v) => v !== optionValue),
-          };
-        } else {
-          return { ...prev, [questionId]: [...current, optionValue] };
-        }
-      } else {
-        // Single select: toggle selection (allow deselection)
-        if (current.includes(optionValue)) {
-          // If already selected, deselect it
-          return { ...prev, [questionId]: [] };
-        } else {
-          // If not selected, select it (replace any existing selection)
-          return { ...prev, [questionId]: [optionValue] };
-        }
-      }
+    setAnswers((prev) => {
+      const current = prev.options[questionId] || [];
+      return {
+        ...prev,
+        options: {
+          ...prev.options,
+          [questionId]: isMulti
+            ? current.includes(optionValue)
+              ? current.filter((v) => v !== optionValue)
+              : [...current, optionValue]
+            : current.includes(optionValue)
+            ? []
+            : [optionValue],
+        },
+      };
     });
   };
 
-  const handleDateChange = (questionId: number, value: string) => {
-    setDateValues((prev) => ({
+  const handleDateChange = (questionId: string, value: string) => {
+    setAnswers((prev) => ({
       ...prev,
-      [questionId]: value,
-    }));
-  };
-
-  const handleTextChange = (questionId: number, value: string) => {
-    setTextValues((prev) => ({
-      ...prev,
-      [questionId]: value,
-    }));
-  };
-
-  const handleNumberChange = (questionId: number, value: string) => {
-    // Only allow numeric values
-    if (value === '' || /^\d*\.?\d*$/.test(value)) {
-      setNumberValues((prev) => ({
-        ...prev,
+      date: {
+        ...prev.date,
         [questionId]: value,
+      },
+    }));
+  };
+
+  const handleTextChange = (questionId: string, value: string) => {
+    setAnswers((prev) => ({
+      ...prev,
+      text: {
+        ...prev.text,
+        [questionId]: value,
+      },
+    }));
+  };
+
+  const handleNumberChange = (questionId: string, value: string) => {
+    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+      setAnswers((prev) => ({
+        ...prev,
+        number: {
+          ...prev.number,
+          [questionId]: value,
+        },
       }));
     }
   };
 
+  // --- Validation ---
   const isQuestionAnswered = useCallback(
-    (question: any) => {
-      if (!question) {
-        return false;
+    (question: QuestionGetSuccessResponse['data']['questions'][number]) => {
+      if (!question) return false;
+      if (!question.required) return true;
+
+      const { id, type } = question;
+
+      const value =
+        type === 'date'
+          ? answers.date[id]
+          : type === 'time'
+          ? answers.time[id]
+          : type === 'text'
+          ? answers.text[id]
+          : type === 'number'
+          ? answers.number[id]
+          : ['single', 'multi', 'select'].includes(type)
+          ? answers.options[id]
+          : null;
+
+      if (!value) return false;
+
+      if (Array.isArray(value)) return value.length > 0;
+      if (typeof value === 'string') {
+        return type === 'number'
+          ? value.trim() !== '' && !isNaN(Number(value))
+          : value.trim() !== '';
       }
 
-      const questionId = question.id;
-
-      // If not required, always return true
-      if (!question.required) {
-        return true;
-      }
-
-      // For required questions, check if they have valid answers
-      switch (question.type) {
-        case 'date':
-        case 'time':
-          return dateValues[questionId] && dateValues[questionId].trim() !== '';
-        case 'text':
-          return textValues[questionId] && textValues[questionId].trim() !== '';
-        case 'number':
-          return (
-            numberValues[questionId] && numberValues[questionId].trim() !== ''
-          );
-        case 'single':
-        case 'multi':
-        case 'select':
-          return (
-            selectedOptions[questionId] &&
-            selectedOptions[questionId].length > 0
-          );
-        default:
-          return false;
-      }
+      return false;
     },
-    [dateValues, textValues, numberValues, selectedOptions]
+    [answers]
   );
 
+  // --- Navigation ---
   const goToNextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
@@ -166,16 +175,17 @@ export default function Page() {
     }
   };
 
+  // --- UI ---
   if (loading) return <div style={{ padding: 12 }}>Loading...</div>;
   if (!activeSubcat)
     return <div style={{ padding: 12 }}>Subcategory not found.</div>;
 
-  // Get localized subcategory name
   const subcatI18n =
     activeSubcat.i18n?.find((x: any) => x.locale === params.locale) ||
     activeSubcat.i18n?.find((x: any) => x.locale?.startsWith('en')) ||
     activeSubcat.i18n?.[0];
   const subcatName = subcatI18n?.name || activeSubcat.name || activeSubcat.slug;
+
   return (
     <div style={{ padding: 12, fontFamily: 'sans-serif' }}>
       <p>Subcategory: {subcatName}</p>
@@ -188,76 +198,25 @@ export default function Page() {
             Question {currentQuestionIndex + 1} of {questions.length}
           </div>
 
-          {(() => {
-            const question = questions[currentQuestionIndex];
-            if (!question) return null;
+          <QuestionSection
+            questions={questions}
+            currentQuestionIndex={currentQuestionIndex}
+            params={params}
+            answers={answers}
+            handleDateChange={handleDateChange}
+            handleTextChange={handleTextChange}
+            handleNumberChange={handleNumberChange}
+            handleOptionClick={handleOptionClick}
+          />
 
-            // Find the translation for current locale
-            const translation =
-              question.translations?.find(
-                (t: any) => t.locale === params.locale
-              ) ||
-              question.translations?.find((t: any) =>
-                t.locale?.startsWith('en')
-              ) ||
-              question.translations?.[0];
-
-            return (
-              <div
-                key={question.id}
-                style={{
-                  marginBottom: 24,
-                  padding: 16,
-                  border: '1px solid #e5e7eb',
-                  borderRadius: 8,
-                  backgroundColor: '#f9fafb',
-                }}
-              >
-                <h3
-                  style={{
-                    margin: '0 0 12px 0',
-                    fontSize: 18,
-                    color: '#111827',
-                  }}
-                >
-                  {translation?.label || `Question ${question.id}`}
-                </h3>
-                {translation?.description && (
-                  <p style={{ margin: '0 0 12px 0', color: '#6b7280' }}>
-                    {translation.description}
-                  </p>
-                )}
-                <div
-                  style={{ marginBottom: 8, fontSize: 14, color: '#374151' }}
-                >
-                  Type: {question.type} {question.required && '(Required)'}
-                </div>
-                <QuestionType
-                  question={question}
-                  dateValues={dateValues}
-                  textValues={textValues}
-                  numberValues={numberValues}
-                  translation={translation}
-                  selectedOptions={selectedOptions}
-                  params={params}
-                  handleDateChange={handleDateChange}
-                  handleTextChange={handleTextChange}
-                  handleNumberChange={handleNumberChange}
-                  handleOptionClick={handleOptionClick}
-                />
-              </div>
-            );
-          })()}
-
-          {/* Navigation Buttons */}
           <NavigationButton
-            questions={questions[currentQuestionIndex]}
-            goToPreviousQuestion={() => goToPreviousQuestion()}
-            currentQuestionIndex={() => currentQuestionIndex}
-            isQuestionAnswered={() =>
-              isQuestionAnswered(questions[currentQuestionIndex])
-            }
-            goToNextQuestion={() => goToNextQuestion()}
+            question={questions[currentQuestionIndex]}
+            goToPreviousQuestion={goToPreviousQuestion}
+            currentQuestionIndex={currentQuestionIndex}
+            isQuestionAnswered={isQuestionAnswered(
+              questions[currentQuestionIndex]
+            )}
+            goToNextQuestion={goToNextQuestion}
           />
         </div>
       ) : (
