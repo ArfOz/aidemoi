@@ -1,13 +1,5 @@
 import React from 'react';
-import { QuestionGetSuccessResponse } from '@api';
-
-interface NavigationButtonProps {
-  question: QuestionGetSuccessResponse['data']['questions'][number];
-  goToPreviousQuestion: () => void;
-  currentQuestionIndex: number;
-  isQuestionAnswered: boolean;
-  goToNextQuestion: () => void;
-}
+import { NavigationButtonProps } from './types';
 
 export const NavigationButton = ({
   question,
@@ -18,6 +10,18 @@ export const NavigationButton = ({
 }: NavigationButtonProps) => {
   return (
     <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
+      <button
+        onClick={goToPreviousQuestion}
+        disabled={currentQuestionIndex === 0}
+        style={{
+          padding: '10px 20px',
+          border: '2px solid #d1d5db',
+          borderRadius: 6,
+        }}
+      >
+        Previous
+      </button>
+
       <button
         onClick={goToPreviousQuestion}
         disabled={currentQuestionIndex === 0}

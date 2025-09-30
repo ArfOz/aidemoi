@@ -7,40 +7,19 @@ import {
   QuestionGetSuccessResponse,
 } from '@api';
 import { NavigationButton, QuestionSection } from './components';
+import {
+  AnswersState,
+  I18nTranslation,
+  Question,
+  SubcategoryWithI18n,
+} from './components/types';
 
-// --- Tipler ---
-interface PageParams {
-  locale: string;
-  category: string;
-  subcategory: string;
-}
-
-interface SubcategoryTranslation {
-  locale: string;
-  name?: string | undefined | null;
-}
-
-interface Subcategory {
-  id: number;
-  slug: string;
-  name?: string | undefined | null;
-  i18n?: SubcategoryTranslation[];
-}
-
-interface Answers {
-  date: Record<string, string>;
-  time: Record<string, string>;
-  text: Record<string, string>;
-  number: Record<string, string>;
-  options: Record<string, string[]>;
-}
-
-// --- Page Bileşeni ---
+// --- Page Component ---
 export default function Page() {
   // --- useParams ---
   const rawParams = useParams();
 
-  // --- Güvenli parametreler ---
+  // --- Safe parameters ---
   const locale = Array.isArray(rawParams?.locale)
     ? rawParams.locale[0]
     : rawParams?.locale;
@@ -51,12 +30,10 @@ export default function Page() {
     ? rawParams.subcategory[0]
     : rawParams?.subcategory;
 
-  // --- Hooks: her zaman üstte ---
-  const [questions, setQuestions] = useState<
-    QuestionGetSuccessResponse['data']['questions']
-  >([]);
-  const [activeSubcat, setActiveSubcat] = useState<Subcategory | null>(null);
-  const [answers, setAnswers] = useState<Answers>({
+  // --- Hooks: always at the top ---
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [activeSubcat, setActiveSubcat] = useState<any>(null);
+  const [answers, setAnswers] = useState<AnswersState>({
     date: {},
     time: {},
     text: {},
@@ -116,9 +93,7 @@ export default function Page() {
   );
 
   const isQuestionAnswered = useCallback(
-    (
-      question: QuestionGetSuccessResponse['data']['questions'][number]
-    ): boolean => {
+    (question: Question) => {
       if (!question) return false;
       if (!question.required) return true;
 
@@ -156,7 +131,7 @@ export default function Page() {
     setCurrentQuestionIndex((prev) => Math.max(prev - 1, 0));
   }, []);
 
-  // --- useEffect: koşulsuz, üstte ---
+  // --- useEffect: unconditional, at the top ---
   useEffect(() => {
     if (!locale || !category || !subcategory) {
       setLoading(false);
@@ -192,17 +167,24 @@ export default function Page() {
     fetchData();
   }, [locale, category, subcategory]);
 
-  // --- Early returns sadece render kısmında ---
+  // --- Early returns only in render section ---
   if (!locale || !category || !subcategory)
     return <div>Invalid URL parameters</div>;
   if (loading) return <div style={{ padding: 12 }}>Loading...</div>;
   if (!activeSubcat)
     return <div style={{ padding: 12 }}>Subcategory not found.</div>;
 
-  const subcatI18n =
-    activeSubcat.i18n?.find((x) => x.locale === locale) ||
-    activeSubcat.i18n?.find((x) => x.locale.startsWith('en')) ||
-    activeSubcat.i18n?.[0];
+  // Add these interfaces at the top of the file, after the existing imports
+
+  // Then the selected code becomes:
+  const subcatI18n: I18nTranslation | undefined =
+    (activeSubcat as SubcategoryWithI18n).i18n?.find(
+      (x: I18nTranslation) => x.locale === locale
+    ) ||
+    (activeSubcat as SubcategoryWithI18n).i18n?.find((x: I18nTranslation) =>
+      x.locale.startsWith('en')
+    ) ||
+    (activeSubcat as SubcategoryWithI18n).i18n?.[0];
   const subcatName = subcatI18n?.name || activeSubcat.name || activeSubcat.slug;
 
   // --- Render ---

@@ -1,51 +1,5 @@
 import React from 'react';
-
-// Option tipi
-interface OptionTranslation {
-  locale: string;
-  label?: string;
-}
-
-interface Option {
-  id: number;
-  value: string;
-  translations?: OptionTranslation[];
-}
-
-// Question tipi
-type QuestionTypeEnum =
-  | 'text'
-  | 'number'
-  | 'date'
-  | 'time'
-  | 'multi'
-  | 'single';
-
-interface Question {
-  id: number;
-  type: QuestionTypeEnum;
-  required?: boolean;
-  options?: Option[];
-}
-
-// Props tipi
-interface QuestionTypeProps {
-  question: Question;
-  dateValues: Record<number, string>;
-  textValues: Record<number, string>;
-  numberValues: Record<number, string>;
-  translation?: { label?: string; description?: string };
-  selectedOptions: Record<number, string[]>;
-  handleTextChange: (id: number, value: string) => void;
-  handleNumberChange: (id: number, value: string) => void;
-  handleOptionClick: (
-    questionId: number,
-    optionValue: string,
-    isMulti: boolean
-  ) => void;
-  handleDateChange: (id: number, value: string) => void;
-  params: { locale: string };
-}
+import { Option, QuestionTypeProps } from './types';
 
 // Bileşen
 export const QuestionType: React.FC<QuestionTypeProps> = ({
@@ -158,7 +112,7 @@ export const QuestionType: React.FC<QuestionTypeProps> = ({
             Options:
           </strong>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            {question.options.map((option) => {
+            {question.options.map((option: Option) => {
               const optionTranslation =
                 option.translations?.find((t) => t.locale === params.locale) ||
                 option.translations?.find((t) => t.locale.startsWith('en')) ||

@@ -1,26 +1,5 @@
 import React from 'react';
-import { QuestionGetSuccessResponse } from '@api';
-
-interface QuestionSectionProps {
-  questions: QuestionGetSuccessResponse['data']['questions'];
-  currentQuestionIndex: number;
-  params: { locale: string; category: string; subcategory: string };
-  answers: {
-    date: Record<string, string>;
-    time: Record<string, string>;
-    text: Record<string, string>;
-    number: Record<string, string>;
-    options: Record<string, string[]>;
-  };
-  handleDateChange: (questionId: string, value: string) => void;
-  handleTextChange: (questionId: string, value: string) => void;
-  handleNumberChange: (questionId: string, value: string) => void;
-  handleOptionClick: (
-    questionId: string,
-    optionValue: string,
-    isMulti: boolean
-  ) => void;
-}
+import { QuestionSectionProps } from './types';
 
 export const QuestionSection = ({
   questions,
