@@ -1,11 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../components/context/AuthContext';
-import { LoginForm, SignUpButton } from './components';
-import { SocialLoginButton } from './components/socialLoginButton';
+import {
+  LoginForm,
+  LogoHeaderLogin,
+  SignUpButton,
+  SocialLoginButton,
+} from './components';
 import { LoginRequestType } from '@api';
 
 const LoginPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
@@ -85,17 +88,7 @@ const LoginPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
     <div className="min-h-screen bg-gradient-to-br from-purple-800 via-fuchsia-700 to-pink-600 flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
         {/* Logo/Header */}
-        <div className="text-center mb-8">
-          <Link href={`/${resolvedParams.locale}`} className="inline-block">
-            <h1 className="text-4xl font-logo font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              AideMoi
-            </h1>
-          </Link>
-          <p className="text-gray-600 mt-2">
-            Welcome back! Please sign in to your account.
-          </p>
-        </div>
-
+        <LogoHeaderLogin resolvedParams={resolvedParams} />
         {/* Login Form */}
         <LoginForm
           handleSubmit={() => handleSubmit}
@@ -107,10 +100,8 @@ const LoginPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
           isLoading={isLoading}
           resolvedParams={resolvedParams}
         />
-
         {/* Sign Up Link */}
         <SignUpButton resolvedParams={resolvedParams} />
-
         {/* Social Login (Optional) */}
         <SocialLoginButton />
       </div>
