@@ -55,7 +55,10 @@ export async function authRoutes(
       const { email, password } = request.body;
 
       try {
+        console.log('Attempting login for user:', email);
         const user = await userService.authenticateUser(email, password);
+
+        console.log('user', user);
         if (!user) {
           return reply.status(401).send({
             success: false,
@@ -149,7 +152,9 @@ export async function authRoutes(
         const existingUser = await userService.findAll({
           where: { email },
         });
-        if (existingUser) {
+
+        console.log('existingUser', existingUser);
+        if (existingUser.length > 0) {
           return reply.status(409).send({
             success: false,
             error: {
@@ -163,7 +168,7 @@ export async function authRoutes(
         const existingUsername = await userService.findAll({
           where: { username },
         });
-        if (existingUsername) {
+        if (existingUsername.length > 0) {
           return reply.status(409).send({
             success: false,
             error: {
