@@ -4,12 +4,9 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../components/context/AuthContext';
-import { LoginForm } from './components';
-
-interface LoginData {
-  email: string;
-  password: string;
-}
+import { LoginForm, SignUpButton } from './components';
+import { SocialLoginButton } from './components/socialLoginButton';
+import { LoginRequestType } from '@api';
 
 const LoginPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
   params,
@@ -17,7 +14,7 @@ const LoginPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
   const resolvedParams = React.use(params);
   const router = useRouter();
   const { login } = useAuth();
-  const [formData, setFormData] = useState<LoginData>({
+  const [formData, setFormData] = useState<LoginRequestType>({
     email: '',
     password: '',
   });
@@ -70,8 +67,6 @@ const LoginPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
     setIsLoading(true);
 
     try {
-      console.log('Sending login data:', formData);
-
       // Use the AuthContext login function which handles the API call
       await login(formData);
 
@@ -114,46 +109,10 @@ const LoginPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
         />
 
         {/* Sign Up Link */}
-        <div className="text-center mt-6">
-          <p className="text-gray-600">
-            Don&apos;t have an account?{' '}
-            <Link
-              href={`/${resolvedParams.locale}/register`}
-              className="text-pink-600 hover:text-pink-500 font-semibold"
-            >
-              Sign up
-            </Link>
-          </p>
-        </div>
+        <SignUpButton resolvedParams={resolvedParams} />
 
         {/* Social Login (Optional) */}
-        <div className="mt-6">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">
-                Or continue with
-              </span>
-            </div>
-          </div>
-
-          <div className="mt-6 grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-            >
-              <span>Google</span>
-            </button>
-            <button
-              type="button"
-              className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-            >
-              <span>Facebook</span>
-            </button>
-          </div>
-        </div>
+        <SocialLoginButton />
       </div>
     </div>
   );
