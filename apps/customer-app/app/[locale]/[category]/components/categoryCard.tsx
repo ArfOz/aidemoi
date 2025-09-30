@@ -1,75 +1,56 @@
-import { CategoryDetailSuccessResponse } from '@api';
-import Link from 'next/link';
 import React from 'react';
 
-export const CategoryCard = ({
-  subs,
-  locale,
-  params,
-  active,
+export const CategoryDetailCard = ({
+  activeIcon,
+  activeName,
+  activeDesc,
 }: {
-  subs: CategoryDetailSuccessResponse['data']['category']['subcategories'];
-  locale: string;
-  params: { locale: string; category: string };
-  active: CategoryDetailSuccessResponse['data']['category'] | undefined;
+  activeIcon: string;
+  activeName: string;
+  activeDesc: string;
 }) => {
-  if (!active) return null;
-
-  console.log('active category:', active);
   return (
-    <section>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-          gap: 16,
-        }}
-      >
-        {subs.map((s) => {
-          const sI18n =
-            s.i18n?.find((x) => x.locale === locale) ||
-            s.i18n?.find((x) => x.locale?.startsWith('en')) ||
-            s.i18n?.[0];
-          const sName = sI18n?.name || s.name || s.slug;
-          const sDesc = sI18n?.description || '';
-          const sIcon = s.icon || '📌';
-          return (
-            <Link
-              key={s.slug}
-              href={`/${params.locale}/${active.id}/${
-                s.slug
-              }?subcatId=${encodeURIComponent(s.id)}`}
-              aria-label={`${sName} subcategory`}
-              title={sName}
-              style={{
-                display: 'block',
-                textDecoration: 'none',
-                color: 'inherit',
-                border: '1px solid #e5e7eb',
-                borderRadius: 12,
-                background: 'white',
-                overflow: 'hidden',
-              }}
-            >
-              <div style={{ padding: 14 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ fontSize: 28 }}>{sIcon}</div>
-                  <div style={{ fontWeight: 700 }}>{sName}</div>
-                </div>
-                <div style={{ marginTop: 6, color: '#6b7280', fontSize: 13 }}>
-                  {sDesc}
-                </div>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
-
-      {subs.length === 0 && (
-        <div style={{ color: '#6b7280', marginTop: 12 }}>
-          No subcategories found.
+    <section
+      style={{
+        marginBottom: 16,
+        borderRadius: 12,
+        overflow: 'hidden',
+        border: '1px solid #e5e7eb',
+      }}
+    >
+      <div style={{ position: 'relative', height: 180, background: '#f3f4f6' }}>
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 56,
+          }}
+        >
+          {activeIcon}
         </div>
-      )}
+        {(activeIcon || activeName) && (
+          <div
+            style={{
+              position: 'absolute',
+              left: 16,
+              bottom: 16,
+              background: 'rgba(255,255,255,0.9)',
+              borderRadius: 10,
+              padding: '8px 12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            <span style={{ fontSize: 22 }}>{activeIcon}</span>
+            <strong style={{ fontSize: 18 }}>{activeName}</strong>
+          </div>
+        )}
+      </div>
+      <div style={{ padding: '12px 14px', color: '#374151' }}>{activeDesc}</div>
     </section>
   );
 };
