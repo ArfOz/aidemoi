@@ -17,18 +17,6 @@ export const NavigationButton = ({
           padding: '10px 20px',
           border: '2px solid #d1d5db',
           borderRadius: 6,
-        }}
-      >
-        Previous
-      </button>
-
-      <button
-        onClick={goToPreviousQuestion}
-        disabled={currentQuestionIndex === 0}
-        style={{
-          padding: '10px 20px',
-          border: '2px solid #d1d5db',
-          borderRadius: 6,
           backgroundColor: currentQuestionIndex === 0 ? '#f3f4f6' : 'white',
           color: currentQuestionIndex === 0 ? '#9ca3af' : '#374151',
           cursor: currentQuestionIndex === 0 ? 'not-allowed' : 'pointer',
