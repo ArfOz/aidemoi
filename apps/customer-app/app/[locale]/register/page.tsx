@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../components/context/AuthContext';
 
 interface CreateUserData {
-  name: string;
+  username: string;
   email: string;
   password: string;
   role: 'customer' | 'repairman';
@@ -19,7 +19,7 @@ const RegisterPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
   const router = useRouter();
   const { register } = useAuth();
   const [formData, setFormData] = useState<CreateUserData>({
-    name: '',
+    username: '',
     email: '',
     password: '',
     role: 'customer',
@@ -51,8 +51,8 @@ const RegisterPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
     const newErrors: { [key: string]: string } = {};
 
     // Validate name (required, minLength: 1)
-    if (!formData.name || formData.name.trim().length === 0) {
-      newErrors.name = 'Name is required';
+    if (!formData.username || formData.username.trim().length === 0) {
+      newErrors.username = 'Name is required';
     }
 
     // Validate email (required, format: email)
@@ -125,25 +125,25 @@ const RegisterPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
           {/* Name Field */}
           <div>
             <label
-              htmlFor="name"
+              htmlFor="username"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Name *
+              Username *
             </label>
             <input
               type="text"
-              id="name"
-              name="name"
-              value={formData.name}
+              id="username"
+              name="username"
+              value={formData.username}
               onChange={handleInputChange}
               className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 transition-colors ${
-                errors.name ? 'border-red-300' : 'border-gray-300'
+                errors.username ? 'border-red-300' : 'border-gray-300'
               }`}
-              placeholder="Enter your name"
+              placeholder="Enter your username"
               required
             />
-            {errors.name && (
-              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+            {errors.username && (
+              <p className="text-red-500 text-sm mt-1">{errors.username}</p>
             )}
           </div>
 
