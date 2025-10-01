@@ -1,13 +1,5 @@
 import React from 'react';
-import { QuestionGetSuccessResponse } from '@api';
-
-interface NavigationButtonProps {
-  question: QuestionGetSuccessResponse['data']['questions'][number];
-  goToPreviousQuestion: () => void;
-  currentQuestionIndex: number;
-  isQuestionAnswered: boolean;
-  goToNextQuestion: () => void;
-}
+import { NavigationButtonProps } from './types';
 
 export const NavigationButton = ({
   question,

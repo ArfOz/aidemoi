@@ -1,8 +1,11 @@
-import './global.css';
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 
-export const metadata = {
-  title: 'Welcome to AideMoi',
-  description: 'Your trusted service marketplace',
+const inter = Inter({ subsets: ['latin'] });
+
+export const metadata: Metadata = {
+  title: 'AideMoi Customer App',
+  description: 'Customer application for AideMoi services',
 };
 
 export default function RootLayout({
@@ -11,8 +14,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body>{children}</body>
+    <html lang="en">
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }
