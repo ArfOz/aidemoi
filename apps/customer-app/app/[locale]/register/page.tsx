@@ -4,13 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../components/context/AuthContext';
-
-interface CreateUserData {
-  username: string;
-  email: string;
-  password: string;
-  role: 'customer' | 'repairman';
-}
+import { RegisterRequestType } from '@api';
 
 const RegisterPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
   params,
@@ -18,11 +12,10 @@ const RegisterPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
   const resolvedParams = React.use(params);
   const router = useRouter();
   const { register } = useAuth();
-  const [formData, setFormData] = useState<CreateUserData>({
+  const [formData, setFormData] = useState<RegisterRequestType>({
     username: '',
     email: '',
     password: '',
-    role: 'customer',
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(false);
