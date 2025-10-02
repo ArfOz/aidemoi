@@ -65,6 +65,7 @@ model User {
     updatedAt DateTime @updatedAt
     tokens    Token[]
     username  String?  @unique
+    answers   Answer[]
 }
 
 model Token {
@@ -108,6 +109,7 @@ model Question {
     subcategory  Subcategory           @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
     options      Option[]
     translations QuestionTranslation[]
+    answers      Answer[]
 }
 
 model QuestionTranslation {
@@ -129,6 +131,7 @@ model Option {
     question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
     translations OptionTranslation[]
+    answers      Answer[]
 }
 
 model OptionTranslation {
@@ -140,4 +143,24 @@ model OptionTranslation {
     option Option @relation(fields: [optionId], references: [id], onDelete: Cascade)
 
     @@unique([optionId, locale])
+}
+
+model Answer {
+    id          Int       @id @default(autoincrement())
+    userId      Int
+    questionId  Int
+    optionId    Int? // For single/multi/select type questions
+    textValue   String? // For text type questions
+    numberValue Float? // For number type questions
+    dateValue   DateTime? // For date/time type questions
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+
+    user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+    option   Option?  @relation(fields: [optionId], references: [id], onDelete: SetNull)
+
+    @@unique([userId, questionId, optionId], name: "unique_user_question_option")
+    @@index([userId])
+    @@index([questionId])
 }

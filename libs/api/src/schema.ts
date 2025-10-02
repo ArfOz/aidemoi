@@ -363,3 +363,20 @@ export const QuestionUpdateSuccessResponseSchema = Type.Object({
     updatedAt: Type.String({ format: 'date-time' }),
   }),
 });
+
+export const QuestionsCreateRequestSchema = Type.Object({
+  questionId: Type.Number(),
+  optionId: Type.Optional(Type.Number()),
+  textValue: Type.Optional(Type.String()),
+  numberValue: Type.Optional(Type.Number()),
+  dateValue: Type.Optional(Type.String()),
+});
+
+export const AnswerAddSuccessResponseSchema = Type.Object({
+  success: Type.Literal(true),
+  message: Type.String(),
+  data: Type.Object({
+    answerId: Type.Integer(),
+    submittedAt: Type.String({ format: 'date-time' }),
+  }),
+});
