@@ -391,3 +391,26 @@ export const AnswerAddSuccessResponseSchema = Type.Object({
     ),
   }),
 });
+
+export const AnswerGetSuccessResponseSchema = Type.Object({
+  success: Type.Boolean(),
+  message: Type.String(),
+  data: Type.Object({
+    answers: Type.Array(
+      Type.Object({
+        id: Type.Number(),
+        questionId: Type.Number(),
+        userId: Type.Number(),
+        optionId: Type.Union([Type.Number(), Type.Null()]),
+        textValue: Type.Union([Type.String(), Type.Null()]),
+        numberValue: Type.Union([Type.Number(), Type.Null()]),
+        inputLanguage: Type.Union([Type.String(), Type.Null()]),
+
+        //These are any because of serializer issues after it will be fixed we can change it to string with date-time format
+        createdAt: Type.Any(),
+        dateValue: Type.Any(),
+        updatedAt: Type.Any(),
+      })
+    ),
+  }),
+});

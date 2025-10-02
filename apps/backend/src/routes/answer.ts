@@ -4,6 +4,8 @@ import { Type } from '@sinclair/typebox';
 import {
   AnswerAddSuccessResponse,
   AnswerAddSuccessResponseSchema,
+  AnswerGetSuccessResponse,
+  AnswerGetSuccessResponseSchema,
   AnswersCreateRequest,
   AnswersCreateRequestSchema,
   ApiErrorResponseType,
@@ -190,6 +192,58 @@ export async function answerRoutes(
         return reply.status(500).send({
           success: false,
           error: { message: 'Failed to create answers', code: 500 },
+        });
+      }
+    }
+  );
+
+  fastify.get<{
+    Headers: { authorization: string };
+    Reply: AnswerGetSuccessResponse | ApiErrorResponseType;
+  }>(
+    '/answers',
+    {
+      preHandler: authenticateToken,
+      schema: {
+        headers: Type.Object({
+          authorization: Type.String(),
+        }),
+        response: {
+          200: AnswerGetSuccessResponseSchema,
+          400: ApiErrorSchema,
+          401: ApiErrorSchema,
+          500: ApiErrorSchema,
+        },
+      },
+    },
+
+    async (request, reply) => {
+      try {
+        const userId =
+          (request as any).user?.userId ??
+          (request as any).user?.id ??
+          (request as any).userId;
+
+        if (!userId) {
+          return reply.status(401).send({
+            success: false,
+            error: { message: 'Unauthorized', code: 401 },
+          });
+        }
+        const answers = await answerService.findAll({
+          userId: userId,
+        });
+
+        return reply.status(200).send({
+          success: true,
+          message: 'Answers retrieved successfully',
+          data: { answers: answers },
+        });
+      } catch (error) {
+        fastify.log.error(error);
+        return reply.status(500).send({
+          success: false,
+          error: { message: 'Failed to retrieve answers', code: 500 },
         });
       }
     }
