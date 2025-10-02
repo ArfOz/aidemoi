@@ -364,19 +364,30 @@ export const QuestionUpdateSuccessResponseSchema = Type.Object({
   }),
 });
 
-export const QuestionsCreateRequestSchema = Type.Object({
-  questionId: Type.Number(),
-  optionId: Type.Optional(Type.Number()),
-  textValue: Type.Optional(Type.String()),
-  numberValue: Type.Optional(Type.Number()),
-  dateValue: Type.Optional(Type.String()),
+export const AnswersCreateRequestSchema = Type.Object({
+  answers: Type.Array(
+    Type.Object({
+      questionId: Type.Number(),
+      optionId: Type.Optional(Type.Number()),
+      textValue: Type.Optional(Type.String()),
+      numberValue: Type.Optional(Type.Number()),
+      dateValue: Type.Optional(Type.String()),
+      inputLanguage: Type.Optional(Type.String()),
+    })
+  ),
 });
 
 export const AnswerAddSuccessResponseSchema = Type.Object({
-  success: Type.Literal(true),
+  success: Type.Boolean(),
   message: Type.String(),
   data: Type.Object({
-    answerId: Type.Integer(),
-    submittedAt: Type.String({ format: 'date-time' }),
+    answersCreated: Type.Number(),
+    answers: Type.Array(
+      Type.Object({
+        answerId: Type.Number(),
+        questionId: Type.Number(),
+        submittedAt: Type.String(),
+      })
+    ),
   }),
 });

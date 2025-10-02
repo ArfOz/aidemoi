@@ -115,7 +115,7 @@ model Question {
 model QuestionTranslation {
     id          Int     @id @default(autoincrement())
     questionId  Int
-    locale      String  @db.VarChar(8) // "en" veya "fr"
+    locale      String  @db.VarChar(8)
     label       String
     description String?
 
@@ -137,7 +137,7 @@ model Option {
 model OptionTranslation {
     id       Int    @id @default(autoincrement())
     optionId Int
-    locale   String @db.VarChar(8) // "en" veya "fr"
+    locale   String @db.VarChar(8)
     label    String
 
     option Option @relation(fields: [optionId], references: [id], onDelete: Cascade)
@@ -146,15 +146,16 @@ model OptionTranslation {
 }
 
 model Answer {
-    id          Int       @id @default(autoincrement())
-    userId      Int
-    questionId  Int
-    optionId    Int? // For single/multi/select type questions
-    textValue   String? // For text type questions
-    numberValue Float? // For number type questions
-    dateValue   DateTime? // For date/time type questions
-    createdAt   DateTime  @default(now())
-    updatedAt   DateTime  @updatedAt
+    id            Int       @id @default(autoincrement())
+    userId        Int
+    questionId    Int
+    optionId      Int?
+    textValue     String?
+    numberValue   Float?
+    dateValue     DateTime?
+    inputLanguage String?   @db.VarChar(8) // "en", "fr" vs.
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
 
     user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)

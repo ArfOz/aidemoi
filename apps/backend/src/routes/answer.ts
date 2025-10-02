@@ -4,10 +4,10 @@ import { Type } from '@sinclair/typebox';
 import {
   AnswerAddSuccessResponse,
   AnswerAddSuccessResponseSchema,
+  AnswersCreateRequest,
+  AnswersCreateRequestSchema,
   ApiErrorResponseType,
   ApiErrorSchema,
-  QuestionsCreateRequest,
-  QuestionsCreateRequestSchema,
 } from '@api';
 import {
   AnswersDBService,
@@ -19,35 +19,30 @@ export async function answerRoutes(
   _options: FastifyPluginOptions
 ) {
   const answerService = new AnswersDBService(fastify.prisma);
-  const questionsDBService = new QuestionsDBService(fastify.prisma);
+  const questionsService = new QuestionsDBService(fastify.prisma);
 
   fastify.setErrorHandler(async (error, request, reply) => {
     fastify.log.error(error);
 
-    const statusCode =
-      (error && (error as unknown as { statusCode?: number }).statusCode) ||
-      500;
+    const statusCode = (error && (error as any).statusCode) || 500;
+
     const message =
       process.env.NODE_ENV === 'development' && error instanceof Error
         ? error.message
         : statusCode >= 500
         ? 'Internal Server Error'
-        : String(
-            (error as unknown as { message?: unknown }).message || 'Error'
-          );
+        : String((error as any).message || 'Error');
 
-    // Always include the required "success" field and format "error" per ApiErrorSchema
     return reply.status(statusCode).send({
       success: false,
       error: { message, code: statusCode },
-      message,
     });
   });
 
-  // Create a new answer
+  // ✅ POST /answers → çoklu cevap kaydetme
   fastify.post<{
     Headers: { authorization: string };
-    Body: QuestionsCreateRequest;
+    Body: AnswersCreateRequest;
     Reply: AnswerAddSuccessResponse | ApiErrorResponseType;
   }>(
     '/answers',
@@ -57,7 +52,7 @@ export async function answerRoutes(
         headers: Type.Object({
           authorization: Type.String(),
         }),
-        body: QuestionsCreateRequestSchema,
+        body: AnswersCreateRequestSchema,
         response: {
           201: AnswerAddSuccessResponseSchema,
           400: ApiErrorSchema,
@@ -68,8 +63,10 @@ export async function answerRoutes(
     },
     async (request, reply) => {
       try {
-        const anyReq = request as any;
-        const userId = anyReq.user?.userId ?? anyReq.user?.id ?? anyReq.userId;
+        const userId =
+          (request as any).user?.userId ??
+          (request as any).user?.id ??
+          (request as any).userId;
 
         if (!userId) {
           return reply.status(401).send({
@@ -78,299 +75,123 @@ export async function answerRoutes(
           });
         }
 
-        console.log('Creating answer for userId:', userId);
+        const { answers } = request.body;
 
-        const { questionId, optionId, textValue, numberValue, dateValue } =
-          request.body;
-
-        const answer = await answerService.create({
-          user: { connect: { id: Number(userId) } },
-          question: { connect: { id: questionId } },
-          ...(optionId && { option: { connect: { id: optionId } } }),
-          textValue,
-          numberValue,
-          dateValue: dateValue ? new Date(dateValue) : undefined,
-        });
-        if (!answer) {
+        if (!answers || answers.length === 0) {
           return reply.status(400).send({
             success: false,
-            error: { message: 'Failed to create answer', code: 400 },
+            error: { message: 'No answers provided', code: 400 },
           });
         }
 
+        const createdAnswers = [];
+        const errors = [];
+
+        for (const answerData of answers) {
+          const {
+            questionId,
+            optionId = null,
+            textValue = null,
+            numberValue = null,
+            dateValue,
+            inputLanguage = null,
+          } = answerData;
+
+          try {
+            // Validate question exists
+            const question = await questionsService.findById({
+              where: {
+                id: questionId,
+              },
+            });
+            if (!question) {
+              errors.push(`Question with ID ${questionId} not found`);
+              continue;
+            }
+
+            // Validate option exists if provided
+            if (optionId) {
+              // Use Prisma directly to check if option exists and belongs to question
+              const option = await fastify.prisma.option.findFirst({
+                where: {
+                  id: optionId,
+                  questionId: questionId,
+                },
+              });
+
+              if (!option) {
+                errors.push(
+                  `Option with ID ${optionId} not found or does not belong to question ${questionId}`
+                );
+                continue;
+              }
+            }
+
+            // Create the answer
+            const answerCreateData: any = {
+              user: { connect: { id: Number(userId) } },
+              question: { connect: { id: questionId } },
+              textValue,
+              numberValue,
+              dateValue: dateValue ? new Date(dateValue) : undefined,
+              inputLanguage,
+            };
+
+            // Only connect option if optionId is provided and valid
+            if (optionId) {
+              answerCreateData.option = { connect: { id: optionId } };
+            }
+
+            const answer = await answerService.create(answerCreateData);
+
+            if (answer) {
+              createdAnswers.push({
+                answerId: answer.id,
+                questionId,
+                submittedAt: answer.createdAt.toISOString(),
+              });
+            }
+          } catch (answerError) {
+            fastify.log.error(answerError);
+            errors.push(
+              `Failed to create answer for question ${questionId}: ${
+                (answerError as Error).message
+              }`
+            );
+          }
+        }
+
+        // If all answers failed
+        if (createdAnswers.length === 0 && errors.length > 0) {
+          return reply.status(400).send({
+            success: false,
+            error: {
+              message: `Failed to create any answers. Errors: ${errors.join(
+                ', '
+              )}`,
+              code: 400,
+            },
+          });
+        }
+
+        // Return success response
         return reply.status(201).send({
           success: true,
-          message: 'Answer created successfully',
+          message: `${createdAnswers.length} answers created successfully${
+            errors.length > 0 ? ` (${errors.length} failed)` : ''
+          }`,
           data: {
-            answerId: answer.id,
-            submittedAt: answer.createdAt.toString(),
+            answersCreated: createdAnswers.length,
+            answers: createdAnswers,
           },
         });
       } catch (error) {
         fastify.log.error(error);
         return reply.status(500).send({
           success: false,
-          error: { message: 'Failed to create answer', code: 500 },
+          error: { message: 'Failed to create answers', code: 500 },
         });
       }
     }
   );
-
-  //   // Get user's answers by subcategory
-  //   fastify.get<{
-  //     Params: { subcategoryId: string };
-  //     Reply: any | ApiErrorResponseType;
-  //   }>(
-  //     '/answers/subcategory/:subcategoryId',
-  //     {
-  //       preHandler: authenticateToken,
-  //       schema: {
-  //         headers: Type.Object({
-  //           authorization: Type.String(),
-  //         }),
-  //         params: Type.Object({
-  //           subcategoryId: Type.String(),
-  //         }),
-  //         response: {
-  //           200: Type.Object({
-  //             success: Type.Boolean(),
-  //             message: Type.String(),
-  //             data: Type.Object({
-  //               answers: Type.Array(Type.Any()),
-  //             }),
-  //           }),
-  //           401: ApiErrorSchema,
-  //           500: ApiErrorSchema,
-  //         },
-  //       },
-  //     },
-  //     async (request, reply) => {
-  //       try {
-  //         const anyReq = request as any;
-  //         const userId = anyReq.user?.userId ?? anyReq.user?.id ?? anyReq.userId;
-
-  //         if (!userId) {
-  //           return reply.status(401).send({
-  //             success: false,
-  //             error: { message: 'Unauthorized', code: 401 },
-  //           });
-  //         }
-
-  //         const { subcategoryId } = request.params;
-
-  //         const answers = await answerService.findAnswersBySubcategoryId(
-  //           Number(subcategoryId),
-  //           Number(userId)
-  //         );
-
-  //         return reply.status(200).send({
-  //           success: true,
-  //           message: 'Answers retrieved successfully',
-  //           data: { answers },
-  //         });
-  //       } catch (error) {
-  //         fastify.log.error(error);
-  //         return reply.status(500).send({
-  //           success: false,
-  //           error: { message: 'Failed to retrieve answers', code: 500 },
-  //         });
-  //       }
-  //     }
-  //   );
-
-  //   // Get user's answer for a specific question
-  //   fastify.get<{
-  //     Params: { questionId: string };
-  //     Reply: any | ApiErrorResponseType;
-  //   }>(
-  //     '/answers/question/:questionId',
-  //     {
-  //       preHandler: authenticateToken,
-  //       schema: {
-  //         headers: Type.Object({
-  //           authorization: Type.String(),
-  //         }),
-  //         params: Type.Object({
-  //           questionId: Type.String(),
-  //         }),
-  //         response: {
-  //           200: Type.Object({
-  //             success: Type.Boolean(),
-  //             message: Type.String(),
-  //             data: Type.Object({
-  //               answers: Type.Array(Type.Any()),
-  //             }),
-  //           }),
-  //           401: ApiErrorSchema,
-  //           500: ApiErrorSchema,
-  //         },
-  //       },
-  //     },
-  //     async (request, reply) => {
-  //       try {
-  //         const anyReq = request as any;
-  //         const userId = anyReq.user?.userId ?? anyReq.user?.id ?? anyReq.userId;
-
-  //         if (!userId) {
-  //           return reply.status(401).send({
-  //             success: false,
-  //             error: { message: 'Unauthorized', code: 401 },
-  //           });
-  //         }
-
-  //         const { questionId } = request.params;
-
-  //         const answers = await answerService.findUserAnswerForQuestion(
-  //           Number(userId),
-  //           Number(questionId)
-  //         );
-
-  //         return reply.status(200).send({
-  //           success: true,
-  //           message: 'Answers retrieved successfully',
-  //           data: { answers },
-  //         });
-  //       } catch (error) {
-  //         fastify.log.error(error);
-  //         return reply.status(500).send({
-  //           success: false,
-  //           error: { message: 'Failed to retrieve answers', code: 500 },
-  //         });
-  //       }
-  //     }
-  //   );
-
-  //   // Update an answer
-  //   fastify.put<{
-  //     Params: { id: string };
-  //     Body: {
-  //       optionId?: number;
-  //       textValue?: string;
-  //       numberValue?: number;
-  //       dateValue?: string;
-  //     };
-  //     Reply: any | ApiErrorResponseType;
-  //   }>(
-  //     '/answers/:id',
-  //     {
-  //       preHandler: authenticateToken,
-  //       schema: {
-  //         headers: Type.Object({
-  //           authorization: Type.String(),
-  //         }),
-  //         params: Type.Object({
-  //           id: Type.String(),
-  //         }),
-  //         body: Type.Object({
-  //           optionId: Type.Optional(Type.Number()),
-  //           textValue: Type.Optional(Type.String()),
-  //           numberValue: Type.Optional(Type.Number()),
-  //           dateValue: Type.Optional(Type.String()),
-  //         }),
-  //         response: {
-  //           200: Type.Object({
-  //             success: Type.Boolean(),
-  //             message: Type.String(),
-  //             data: Type.Object({
-  //               answer: Type.Any(),
-  //             }),
-  //           }),
-  //           401: ApiErrorSchema,
-  //           404: ApiErrorSchema,
-  //           500: ApiErrorSchema,
-  //         },
-  //       },
-  //     },
-  //     async (request, reply) => {
-  //       try {
-  //         const anyReq = request as any;
-  //         const userId = anyReq.user?.userId ?? anyReq.user?.id ?? anyReq.userId;
-
-  //         if (!userId) {
-  //           return reply.status(401).send({
-  //             success: false,
-  //             error: { message: 'Unauthorized', code: 401 },
-  //           });
-  //         }
-
-  //         const { id } = request.params;
-  //         const { optionId, textValue, numberValue, dateValue } = request.body;
-
-  //         const answer = await answerService.update(Number(id), {
-  //           ...(optionId && { option: { connect: { id: optionId } } }),
-  //           textValue,
-  //           numberValue,
-  //           dateValue: dateValue ? new Date(dateValue) : undefined,
-  //         });
-
-  //         return reply.status(200).send({
-  //           success: true,
-  //           message: 'Answer updated successfully',
-  //           data: { answer },
-  //         });
-  //       } catch (error) {
-  //         fastify.log.error(error);
-  //         return reply.status(500).send({
-  //           success: false,
-  //           error: { message: 'Failed to update answer', code: 500 },
-  //         });
-  //       }
-  //     }
-  //   );
-
-  //   // Delete an answer
-  //   fastify.delete<{
-  //     Params: { id: string };
-  //     Reply: any | ApiErrorResponseType;
-  //   }>(
-  //     '/answers/:id',
-  //     {
-  //       preHandler: authenticateToken,
-  //       schema: {
-  //         headers: Type.Object({
-  //           authorization: Type.String(),
-  //         }),
-  //         params: Type.Object({
-  //           id: Type.String(),
-  //         }),
-  //         response: {
-  //           200: Type.Object({
-  //             success: Type.Boolean(),
-  //             message: Type.String(),
-  //           }),
-  //           401: ApiErrorSchema,
-  //           404: ApiErrorSchema,
-  //           500: ApiErrorSchema,
-  //         },
-  //       },
-  //     },
-  //     async (request, reply) => {
-  //       try {
-  //         const anyReq = request as any;
-  //         const userId = anyReq.user?.userId ?? anyReq.user?.id ?? anyReq.userId;
-
-  //         if (!userId) {
-  //           return reply.status(401).send({
-  //             success: false,
-  //             error: { message: 'Unauthorized', code: 401 },
-  //           });
-  //         }
-
-  //         const { id } = request.params;
-
-  //         await answerService.delete(Number(id));
-
-  //         return reply.status(200).send({
-  //           success: true,
-  //           message: 'Answer deleted successfully',
-  //         });
-  //       } catch (error) {
-  //         fastify.log.error(error);
-  //         return reply.status(500).send({
-  //           success: false,
-  //           error: { message: 'Failed to delete answer', code: 500 },
-  //         });
-  //       }
-  //     }
-  //   );
 }
