@@ -20,6 +20,7 @@ async function apiRoutes(
   fastify.register(authRoutes, { prefix: '/auth' });
   fastify.register(categoriesRoutes, { prefix: '/categories' });
   fastify.register(questionRoutes, { prefix: '/questions' });
+  fastify.register(require('./answer').answerRoutes, { prefix: '/answers' });
 
   // Root API endpoint
   fastify.get(
