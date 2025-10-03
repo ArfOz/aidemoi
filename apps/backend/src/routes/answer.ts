@@ -100,14 +100,16 @@ export async function answerRoutes(
           } = answerData;
 
           try {
-            // Validate question exists
-            const question = await questionsService.findById({
-              where: {
-                id: questionId,
-              },
+            // Validate question exists using Prisma directly
+            const question = await fastify.prisma.question.findUnique({
+              where: { id: questionId },
+              select: { id: true, isActive: true },
             });
-            if (!question) {
-              errors.push(`Question with ID ${questionId} not found`);
+
+            if (!question || !question.isActive) {
+              errors.push(
+                `Question with ID ${questionId} not found or inactive`
+              );
               continue;
             }
 
@@ -197,6 +199,7 @@ export async function answerRoutes(
     }
   );
 
+  // ✅ GET /answers → with questions
   fastify.get<{
     Headers: { authorization: string };
     Reply: AnswerGetSuccessResponse | ApiErrorResponseType;
@@ -230,8 +233,31 @@ export async function answerRoutes(
             error: { message: 'Unauthorized', code: 401 },
           });
         }
-        const answers = await answerService.findAll({
-          userId: userId,
+
+        // Use Prisma directly to ensure we get the exact structure needed
+        const answers = await fastify.prisma.answer.findMany({
+          where: {
+            userId: userId,
+            question: {
+              isActive: true,
+            },
+          },
+          include: {
+            question: {
+              include: {
+                translations: true,
+                subcategory: true,
+              },
+            },
+            option: {
+              include: {
+                translations: true,
+              },
+            },
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
         });
 
         return reply.status(200).send({

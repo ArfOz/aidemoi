@@ -410,6 +410,7 @@ export const AnswerGetSuccessResponseSchema = Type.Object({
         createdAt: Type.Any(),
         dateValue: Type.Any(),
         updatedAt: Type.Any(),
+        question: Type.Union([Type.Any(), Type.Null()]),
       })
     ),
   }),

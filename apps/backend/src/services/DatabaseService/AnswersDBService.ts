@@ -83,10 +83,16 @@ export class AnswersDBService {
     if (filters?.questionId) where.questionId = filters.questionId;
     if (filters?.optionId) where.optionId = filters.optionId;
 
-    return this.prisma.answer.findMany({
+    const answers = await this.prisma.answer.findMany({
       where,
       include: {
-        user: true,
+        user: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+          },
+        },
         question: {
           include: {
             translations: true,
@@ -101,6 +107,10 @@ export class AnswersDBService {
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    console.log('Fetched answers:', answers);
+
+    return answers;
   }
 
   /**
