@@ -199,9 +199,10 @@ export async function answerRoutes(
     }
   );
 
-  // ✅ GET /answers → with questions
+  // ✅ GET /answers → with questions and optional locale filtering
   fastify.get<{
     Headers: { authorization: string };
+    Querystring: { lang?: string };
     Reply: AnswerGetSuccessResponse | ApiErrorResponseType;
   }>(
     '/answers',
@@ -210,6 +211,11 @@ export async function answerRoutes(
       schema: {
         headers: Type.Object({
           authorization: Type.String(),
+        }),
+        querystring: Type.Object({
+          lang: Type.Optional(
+            Type.Union([Type.Literal('en'), Type.Literal('fr')])
+          ),
         }),
         response: {
           200: AnswerGetSuccessResponseSchema,
@@ -234,6 +240,11 @@ export async function answerRoutes(
           });
         }
 
+        const { lang } = request.query;
+
+        // Build translation filters based on lang
+        const translationWhere = lang ? { locale: lang } : undefined;
+
         // Use Prisma directly to ensure we get the exact structure needed
         const answers = await fastify.prisma.answer.findMany({
           where: {
@@ -245,13 +256,17 @@ export async function answerRoutes(
           include: {
             question: {
               include: {
-                translations: true,
+                translations: translationWhere
+                  ? { where: translationWhere }
+                  : true,
                 subcategory: true,
               },
             },
             option: {
               include: {
-                translations: true,
+                translations: translationWhere
+                  ? { where: translationWhere }
+                  : true,
                 answers: true,
               },
             },
