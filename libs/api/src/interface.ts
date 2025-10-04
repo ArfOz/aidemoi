@@ -28,6 +28,7 @@ import {
   AnswerAddSuccessResponseSchema,
   AnswersCreateRequestSchema,
   AnswerGetSuccessResponseSchema,
+  AnswerGetRequestSchema,
 } from './schema';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -122,3 +123,5 @@ export type AnswerAddSuccessResponse = Static<
 export type AnswerGetSuccessResponse = Static<
   typeof AnswerGetSuccessResponseSchema
 >;
+
+export type AnswerGetRequest = Static<typeof AnswerGetRequestSchema>;

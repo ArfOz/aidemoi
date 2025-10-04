@@ -416,3 +416,7 @@ export const AnswerGetSuccessResponseSchema = Type.Object({
     ),
   }),
 });
+
+export const AnswerGetRequestSchema = Type.Object({
+  lang: Type.Optional(Type.Union([Type.Literal('en'), Type.Literal('fr')])),
+});

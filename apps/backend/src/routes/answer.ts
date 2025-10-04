@@ -4,6 +4,8 @@ import { Type } from '@sinclair/typebox';
 import {
   AnswerAddSuccessResponse,
   AnswerAddSuccessResponseSchema,
+  AnswerGetRequest,
+  AnswerGetRequestSchema,
   AnswerGetSuccessResponse,
   AnswerGetSuccessResponseSchema,
   AnswersCreateRequest,
@@ -202,7 +204,7 @@ export async function answerRoutes(
   // ✅ GET /answers → with questions and optional locale filtering
   fastify.get<{
     Headers: { authorization: string };
-    Querystring: { lang?: string };
+    Querystring: AnswerGetRequest;
     Reply: AnswerGetSuccessResponse | ApiErrorResponseType;
   }>(
     '/answers',
@@ -212,11 +214,7 @@ export async function answerRoutes(
         headers: Type.Object({
           authorization: Type.String(),
         }),
-        querystring: Type.Object({
-          lang: Type.Optional(
-            Type.Union([Type.Literal('en'), Type.Literal('fr')])
-          ),
-        }),
+        querystring: AnswerGetRequestSchema,
         response: {
           200: AnswerGetSuccessResponseSchema,
           400: ApiErrorSchema,
