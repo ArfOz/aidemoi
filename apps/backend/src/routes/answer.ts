@@ -20,7 +20,7 @@ export async function answerRoutes(
   fastify: FastifyInstance,
   _options: FastifyPluginOptions
 ) {
-  const answerService = new AnswersDBService(fastify.prisma);
+  const answerDBService = new AnswersDBService(fastify.prisma);
   const questionsService = new QuestionsDBService(fastify.prisma);
 
   fastify.setErrorHandler(async (error, request, reply) => {
@@ -146,7 +146,7 @@ export async function answerRoutes(
               answerCreateData.option = { connect: { id: optionId } };
             }
 
-            const answer = await answerService.create(answerCreateData);
+            const answer = await answerDBService.create(answerCreateData);
 
             if (answer) {
               createdAnswers.push({
@@ -252,6 +252,7 @@ export async function answerRoutes(
             option: {
               include: {
                 translations: true,
+                answers: true,
               },
             },
           },

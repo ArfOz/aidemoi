@@ -76,37 +76,32 @@ export class AnswersDBService {
   /**
    * Find all with filters
    */
-  async findAll(filters?: Prisma.AnswerWhereInput): Promise<Answer[]> {
-    const where: Prisma.AnswerWhereInput = {};
+  async findAll({
+    where,
+    select,
+    include,
+    orderBy,
+  }: {
+    where?: Prisma.AnswerWhereInput;
+    select?: Prisma.AnswerSelect;
+    include?: Prisma.AnswerInclude;
+    orderBy?: Prisma.AnswerOrderByWithRelationInput;
+  }): Promise<Answer[]> {
+    const queryWhere: Prisma.AnswerWhereInput = where || {};
 
-    if (filters?.userId) where.userId = filters.userId;
-    if (filters?.questionId) where.questionId = filters.questionId;
-    if (filters?.optionId) where.optionId = filters.optionId;
+    const queryOptions: any = {
+      where: queryWhere,
+      orderBy,
+    };
 
-    const answers = await this.prisma.answer.findMany({
-      where,
-      include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            email: true,
-          },
-        },
-        question: {
-          include: {
-            translations: true,
-            subcategory: true,
-          },
-        },
-        option: {
-          include: {
-            translations: true,
-          },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+    // Use either select or include, but not both
+    if (select) {
+      queryOptions.select = select;
+    } else if (include) {
+      queryOptions.include = include;
+    }
+
+    const answers = await this.prisma.answer.findMany(queryOptions);
 
     console.log('Fetched answers:', answers);
 
