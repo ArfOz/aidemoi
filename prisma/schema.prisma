@@ -41,6 +41,7 @@ model Subcategory {
     category   Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
     i18n       SubcategoryI18n[]
     questions  Question[]
+    jobs       Job[] // Yeni ilişki
 
     @@unique([categoryId, slug], name: "uq_subcategory_cat_slug")
 }
@@ -66,6 +67,10 @@ model User {
     tokens    Token[]
     username  String?  @unique
     answers   Answer[]
+    // Yeni ilişkiler
+    jobs      Job[]    @relation("JobOwner") // Kullanıcının oluşturduğu işler
+    bids      Bid[] // Kullanıcının verdiği teklifler
+    reviews   Review[] // Kullanıcının aldığı değerlendirmeler
 }
 
 model Token {
@@ -153,15 +158,95 @@ model Answer {
     textValue     String?
     numberValue   Float?
     dateValue     DateTime?
-    inputLanguage String?   @db.VarChar(8) // "en", "fr" vs.
+    inputLanguage String?   @db.VarChar(8)
     createdAt     DateTime  @default(now())
     updatedAt     DateTime  @updatedAt
+
+    // Job ilişkisi ekleme
+    jobId Int? // Hangi işe ait (opsiyonel)
 
     user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
     option   Option?  @relation(fields: [optionId], references: [id], onDelete: SetNull)
+    job      Job?     @relation("JobAnswers", fields: [jobId], references: [id], onDelete: SetNull)
 
     @@unique([userId, questionId, optionId], name: "unique_user_question_option")
     @@index([userId])
     @@index([questionId])
+    @@index([jobId]) // Yeni index
+}
+
+// Yeni Job modeli
+model Job {
+    id            Int       @id @default(autoincrement())
+    title         String
+    description   String?   @db.Text
+    subcategoryId Int
+    userId        Int // İşi oluşturan kullanıcı
+    status        JobStatus @default(OPEN)
+    location      String?
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
+
+    // İlişkiler
+    user        User        @relation("JobOwner", fields: [userId], references: [id], onDelete: Cascade)
+    subcategory Subcategory @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
+    answers     Answer[]    @relation("JobAnswers") // Direkt Answer'lara bağlı
+    bids        Bid[] // İş için gelen teklifler
+    reviews     Review[] // İş için değerlendirmeler
+
+    @@index([userId])
+    @@index([subcategoryId])
+    @@index([status])
+}
+
+// Job durumları
+enum JobStatus {
+    OPEN // Açık - teklifler bekleniyor
+    IN_PROGRESS // Devam ediyor
+    COMPLETED // Tamamlandı
+    CANCELLED // İptal edildi
+}
+
+// Teklif modeli
+model Bid {
+    id        Int       @id @default(autoincrement())
+    jobId     Int
+    userId    Int // Teklif veren kullanıcı
+    amount    Float? // Opsiyonel - bazı işlerde sabit fiyat olabilir
+    message   String?   @db.Text
+    status    BidStatus @default(PENDING)
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+
+    job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([jobId, userId]) // Her kullanıcı bir işe sadece bir teklif verebilir
+    @@index([jobId])
+    @@index([userId])
+}
+
+// Teklif durumları
+enum BidStatus {
+    PENDING // Beklemede
+    ACCEPTED // Kabul edildi
+    REJECTED // Reddedildi
+}
+
+// Değerlendirme modeli
+model Review {
+    id         Int      @id @default(autoincrement())
+    jobId      Int
+    reviewerId Int // Değerlendiren kullanıcı
+    revieweeId Int // Değerlendirilen kullanıcı
+    rating     Int // 1-5 arası puan
+    comment    String?  @db.Text
+    createdAt  DateTime @default(now())
+
+    job      Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+    reviewer User @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+
+    @@unique([jobId, reviewerId, revieweeId])
+    @@index([revieweeId])
 }
