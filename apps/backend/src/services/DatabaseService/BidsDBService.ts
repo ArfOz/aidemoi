@@ -1,4 +1,4 @@
-import { PrismaClient, Bid, BidStatus, Prisma } from '@prisma/client';
+import { PrismaClient, Bid, Prisma } from '@prisma/client';
 
 export class BidsDBService {
   constructor(private prisma: PrismaClient) {}

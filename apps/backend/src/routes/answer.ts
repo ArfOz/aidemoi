@@ -16,14 +16,16 @@ import {
 import {
   AnswersDBService,
   QuestionsDBService,
+  JobsDBService,
 } from '../services/DatabaseService';
 
-export async function answerRoutes(
+export async function jobRoutes(
   fastify: FastifyInstance,
   _options: FastifyPluginOptions
 ) {
   const answerDBService = new AnswersDBService(fastify.prisma);
   const questionsService = new QuestionsDBService(fastify.prisma);
+  // const jobDBservice = new JobsDBService(fastify.prisma);
 
   fastify.setErrorHandler(async (error, request, reply) => {
     fastify.log.error(error);
@@ -43,7 +45,7 @@ export async function answerRoutes(
     });
   });
 
-  // ✅ POST /answers → çoklu cevap kaydetme
+  // ✅ POST /answers → create multiple answers
   fastify.post<{
     Headers: { authorization: string };
     Body: AnswersCreateRequest;

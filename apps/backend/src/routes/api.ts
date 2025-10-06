@@ -7,7 +7,8 @@ import {
 // import userRoutes from './users';
 import { authRoutes } from './auth';
 import { categoriesRoutes } from './categories';
-import questionRoutes from './question';
+import { questionsRoutes } from './question';
+import { jobRoutes } from './answer';
 // import { categoriesRoutes } from './categories';
 
 async function apiRoutes(
@@ -19,8 +20,8 @@ async function apiRoutes(
   // fastify.register(companyRoutes, { prefix: '/companies' });
   fastify.register(authRoutes, { prefix: '/auth' });
   fastify.register(categoriesRoutes, { prefix: '/categories' });
-  fastify.register(questionRoutes, { prefix: '/questions' });
-  fastify.register(require('./answer').answerRoutes, { prefix: '/answers' });
+  fastify.register(questionsRoutes, { prefix: '/questions' });
+  fastify.register(jobRoutes, { prefix: '/jobs' });
 
   // Root API endpoint
   fastify.get(
