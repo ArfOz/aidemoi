@@ -41,7 +41,7 @@ model Subcategory {
     category   Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
     i18n       SubcategoryI18n[]
     questions  Question[]
-    jobs       Job[] // Yeni ilişki
+    jobs       Job[] // New relationship
 
     @@unique([categoryId, slug], name: "uq_subcategory_cat_slug")
 }
@@ -67,10 +67,10 @@ model User {
     tokens    Token[]
     username  String?  @unique
     answers   Answer[]
-    // Yeni ilişkiler
-    jobs      Job[]    @relation("JobOwner") // Kullanıcının oluşturduğu işler
-    bids      Bid[] // Kullanıcının verdiği teklifler
-    reviews   Review[] // Kullanıcının aldığı değerlendirmeler
+    // New relationships
+    jobs      Job[]    @relation("JobOwner") // Jobs created by the user
+    bids      Bid[] // Bids placed by the user
+    reviews   Review[] // Reviews received by the user
 }
 
 model Token {
@@ -162,8 +162,8 @@ model Answer {
     createdAt     DateTime  @default(now())
     updatedAt     DateTime  @updatedAt
 
-    // Job ilişkisi ekleme
-    jobId Int? // Hangi işe ait (opsiyonel)
+    // Job relationship
+    jobId Int? // Which job this answer belongs to (optional)
 
     user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
@@ -173,47 +173,47 @@ model Answer {
     @@unique([userId, questionId, optionId], name: "unique_user_question_option")
     @@index([userId])
     @@index([questionId])
-    @@index([jobId]) // Yeni index
+    @@index([jobId]) // New index
 }
 
-// Yeni Job modeli
+// New Job model
 model Job {
     id            Int       @id @default(autoincrement())
     title         String
     description   String?   @db.Text
     subcategoryId Int
-    userId        Int // İşi oluşturan kullanıcı
+    userId        Int // User who created the job
     status        JobStatus @default(OPEN)
     location      String?
     createdAt     DateTime  @default(now())
     updatedAt     DateTime  @updatedAt
 
-    // İlişkiler
+    // Relationships
     user        User        @relation("JobOwner", fields: [userId], references: [id], onDelete: Cascade)
     subcategory Subcategory @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
-    answers     Answer[]    @relation("JobAnswers") // Direkt Answer'lara bağlı
-    bids        Bid[] // İş için gelen teklifler
-    reviews     Review[] // İş için değerlendirmeler
+    answers     Answer[]    @relation("JobAnswers") // Directly linked to Answers
+    bids        Bid[] // Bids received for this job
+    reviews     Review[] // Reviews for this job
 
     @@index([userId])
     @@index([subcategoryId])
     @@index([status])
 }
 
-// Job durumları
+// Job statuses
 enum JobStatus {
-    OPEN // Açık - teklifler bekleniyor
-    IN_PROGRESS // Devam ediyor
-    COMPLETED // Tamamlandı
-    CANCELLED // İptal edildi
+    OPEN // Open - waiting for bids
+    IN_PROGRESS // In progress
+    COMPLETED // Completed
+    CANCELLED // Cancelled
 }
 
-// Teklif modeli
+// Bid model
 model Bid {
     id        Int       @id @default(autoincrement())
     jobId     Int
-    userId    Int // Teklif veren kullanıcı
-    amount    Float? // Opsiyonel - bazı işlerde sabit fiyat olabilir
+    userId    Int // User who placed the bid
+    amount    Float? // Optional - some jobs might have fixed prices
     message   String?   @db.Text
     status    BidStatus @default(PENDING)
     createdAt DateTime  @default(now())
@@ -222,25 +222,25 @@ model Bid {
     job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@unique([jobId, userId]) // Her kullanıcı bir işe sadece bir teklif verebilir
+    @@unique([jobId, userId]) // Each user can only bid once per job
     @@index([jobId])
     @@index([userId])
 }
 
-// Teklif durumları
+// Bid statuses
 enum BidStatus {
-    PENDING // Beklemede
-    ACCEPTED // Kabul edildi
-    REJECTED // Reddedildi
+    PENDING // Pending
+    ACCEPTED // Accepted
+    REJECTED // Rejected
 }
 
-// Değerlendirme modeli
+// Review model
 model Review {
     id         Int      @id @default(autoincrement())
     jobId      Int
-    reviewerId Int // Değerlendiren kullanıcı
-    revieweeId Int // Değerlendirilen kullanıcı
-    rating     Int // 1-5 arası puan
+    reviewerId Int // User who gives the review
+    revieweeId Int // User who receives the review
+    rating     Int // Rating from 1-5
     comment    String?  @db.Text
     createdAt  DateTime @default(now())
 
