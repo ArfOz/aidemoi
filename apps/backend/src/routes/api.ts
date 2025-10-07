@@ -8,7 +8,7 @@ import {
 import { authRoutes } from './auth';
 import { categoriesRoutes } from './categories';
 import { questionsRoutes } from './question';
-import { jobRoutes } from './answer';
+import { jobRoutes } from './job';
 // import { categoriesRoutes } from './categories';
 
 async function apiRoutes(

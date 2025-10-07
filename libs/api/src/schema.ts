@@ -420,3 +420,33 @@ export const AnswerGetSuccessResponseSchema = Type.Object({
 export const AnswerGetRequestSchema = Type.Object({
   lang: Type.Optional(Type.Union([Type.Literal('en'), Type.Literal('fr')])),
 });
+
+export const JobCreateRequestSchema = Type.Object({
+  subcategoryId: Type.Number(),
+  title: Type.String({ minLength: 1, maxLength: 255 }),
+  description: Type.String({ minLength: 1 }),
+
+  budgetMin: Type.Optional(Type.Number()),
+  budgetMax: Type.Optional(Type.Number()),
+  isPublished: Type.Optional(Type.Boolean({ default: false })),
+  answers: Type.Array(
+    Type.Object({
+      questionId: Type.Number(),
+      optionId: Type.Optional(Type.Number()),
+      textValue: Type.Optional(Type.String()),
+      numberValue: Type.Optional(Type.Number()),
+      dateValue: Type.Optional(Type.String()),
+      inputLanguage: Type.Optional(Type.String()),
+    })
+  ),
+  // Add other fields as necessary
+});
+
+export const JobCreateSuccessResponseSchema = Type.Object({
+  success: Type.Boolean(),
+  message: Type.String(),
+  data: Type.Object({
+    jobId: Type.Number(),
+    createdAt: Type.String({ format: 'date-time' }),
+  }),
+});
