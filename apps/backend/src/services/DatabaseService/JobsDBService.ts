@@ -1,4 +1,4 @@
-import { PrismaClient, Job, JobStatus, Prisma } from '@prisma/client';
+import { Prisma, PrismaClient, Job, JobStatus } from '@prisma/client';
 
 export class JobsDBService {
   constructor(private prisma: PrismaClient) {}
@@ -285,5 +285,51 @@ export class JobsDBService {
       completed,
       cancelled,
     };
+  }
+
+  async findUniqueWithAnswersAndQuestions(
+    where: Prisma.JobWhereUniqueInput
+  ): Promise<Job | null> {
+    return await this.prisma.job.findUnique({
+      where,
+      include: {
+        answers: {
+          include: {
+            question: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async findManyWithAnswersAndQuestions(
+    opts: {
+      where?: Prisma.JobWhereInput;
+      orderBy?: Prisma.JobOrderByWithRelationInput;
+      take?: number;
+      skip?: number;
+    } = {}
+  ): Promise<Job[]> {
+    return await this.prisma.job.findMany({
+      where: opts.where,
+      include: {
+        answers: {
+          include: {
+            question: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: opts.orderBy,
+      take: opts.take,
+      skip: opts.skip,
+    });
   }
 }
