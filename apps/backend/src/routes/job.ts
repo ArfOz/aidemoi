@@ -52,6 +52,191 @@ export async function jobRoutes(
     });
   });
 
+  // GET /jobs/:id - Get job with detailed answers and questions
+  fastify.get<{
+    Params: { id: string };
+    Querystring: { locale?: string };
+  }>(
+    '/jobs/:id',
+    {
+      schema: {
+        params: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: { type: 'string' },
+          },
+        },
+        querystring: {
+          type: 'object',
+          properties: {
+            locale: { type: 'string', pattern: '^[a-z]{2}(-[A-Z]{2})?$' },
+          },
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              id: { type: 'integer' },
+              title: { type: 'string' },
+              description: { type: ['string', 'null'] },
+              location: { type: ['string', 'null'] },
+              status: {
+                type: 'string',
+                enum: ['OPEN', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'],
+              },
+              createdAt: { type: 'string', format: 'date-time' },
+              updatedAt: { type: 'string', format: 'date-time' },
+              subcategory: {
+                type: 'object',
+                properties: {
+                  id: { type: 'integer' },
+                  slug: { type: 'string' },
+                  name: { type: ['string', 'null'] },
+                  i18n: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        locale: { type: 'string' },
+                        name: { type: 'string' },
+                        description: { type: ['string', 'null'] },
+                      },
+                    },
+                  },
+                },
+              },
+              user: {
+                type: 'object',
+                properties: {
+                  id: { type: 'integer' },
+                  email: { type: 'string' },
+                  username: { type: ['string', 'null'] },
+                },
+              },
+              answers: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    id: { type: 'integer' },
+                    textValue: { type: ['string', 'null'] },
+                    numberValue: { type: ['number', 'null'] },
+                    dateValue: {
+                      type: ['string', 'null'],
+                      format: 'date-time',
+                    },
+                    inputLanguage: { type: ['string', 'null'] },
+                    createdAt: { type: 'string', format: 'date-time' },
+                    updatedAt: { type: 'string', format: 'date-time' },
+                    question: {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'integer' },
+                        type: { type: 'string' },
+                        required: { type: 'boolean' },
+                        sortOrder: { type: 'integer' },
+                        validation: { type: ['string', 'null'] },
+                        translations: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              locale: { type: 'string' },
+                              label: { type: 'string' },
+                              description: { type: ['string', 'null'] },
+                            },
+                          },
+                        },
+                        options: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              id: { type: 'integer' },
+                              value: { type: 'string' },
+                              translations: {
+                                type: 'array',
+                                items: {
+                                  type: 'object',
+                                  properties: {
+                                    locale: { type: 'string' },
+                                    label: { type: 'string' },
+                                  },
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                    option: {
+                      type: ['object', 'null'],
+                      properties: {
+                        id: { type: 'integer' },
+                        value: { type: 'string' },
+                        translations: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              locale: { type: 'string' },
+                              label: { type: 'string' },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          404: {
+            type: 'object',
+            properties: {
+              error: { type: 'string' },
+              message: { type: 'string' },
+            },
+          },
+        },
+      },
+    },
+    async function (request, reply) {
+      try {
+        const jobId = parseInt(request.params.id);
+        if (isNaN(jobId)) {
+          return reply.status(400).send({
+            error: 'Bad Request',
+            message: 'Invalid job ID',
+          });
+        }
+
+        const job = await jobDBService.findUniqueWithAnswersAndQuestions(
+          { id: jobId },
+          request.query.locale
+        );
+
+        if (!job) {
+          return reply.status(404).send({
+            error: 'Not Found',
+            message: `Job with id ${jobId} not found`,
+          });
+        }
+
+        return reply.send(job);
+      } catch (error) {
+        fastify.log.error(error);
+        return reply.status(500).send({
+          error: 'Internal Server Error',
+          message: 'Failed to retrieve job',
+        });
+      }
+    }
+  );
+
+  // GET /jobs - Get all jobs with detailed answers and questions (with pagination)
+
   // ✅ POST /jobs → Create a new job with answers
   fastify.post<{
     Headers: { authorization: string };

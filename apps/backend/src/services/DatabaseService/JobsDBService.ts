@@ -1,5 +1,60 @@
 import { Prisma, PrismaClient, Job, JobStatus } from '@prisma/client';
 
+export type JobWithDetailsAndAnswers = Job & {
+  subcategory: {
+    id: number;
+    slug: string;
+    name: string | null;
+    i18n: Array<{
+      locale: string;
+      name: string;
+      description: string | null;
+    }>;
+  };
+  user: {
+    id: number;
+    email: string;
+    username: string | null;
+  };
+  answers: Array<{
+    id: number;
+    textValue: string | null;
+    numberValue: number | null;
+    dateValue: Date | null;
+    inputLanguage: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    question: {
+      id: number;
+      type: string;
+      required: boolean;
+      sortOrder: number;
+      validation: string | null;
+      translations: Array<{
+        locale: string;
+        label: string;
+        description: string | null;
+      }>;
+      options: Array<{
+        id: number;
+        value: string;
+        translations: Array<{
+          locale: string;
+          label: string;
+        }>;
+      }>;
+    };
+    option: {
+      id: number;
+      value: string;
+      translations: Array<{
+        locale: string;
+        label: string;
+      }>;
+    } | null;
+  }>;
+};
+
 export class JobsDBService {
   constructor(private prisma: PrismaClient) {}
 
@@ -288,17 +343,61 @@ export class JobsDBService {
   }
 
   async findUniqueWithAnswersAndQuestions(
-    where: Prisma.JobWhereUniqueInput
-  ): Promise<Job | null> {
+    where: Prisma.JobWhereUniqueInput,
+    locale?: string
+  ): Promise<JobWithDetailsAndAnswers | null> {
     return await this.prisma.job.findUnique({
       where,
       include: {
+        subcategory: {
+          include: {
+            i18n: locale
+              ? {
+                  where: { locale },
+                }
+              : true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            email: true,
+            username: true,
+          },
+        },
         answers: {
           include: {
             question: {
-              select: {
-                id: true,
+              include: {
+                translations: locale
+                  ? {
+                      where: { locale },
+                    }
+                  : true,
+                options: {
+                  include: {
+                    translations: locale
+                      ? {
+                          where: { locale },
+                        }
+                      : true,
+                  },
+                },
               },
+            },
+            option: {
+              include: {
+                translations: locale
+                  ? {
+                      where: { locale },
+                    }
+                  : true,
+              },
+            },
+          },
+          orderBy: {
+            question: {
+              sortOrder: 'asc',
             },
           },
         },
@@ -312,17 +411,61 @@ export class JobsDBService {
       orderBy?: Prisma.JobOrderByWithRelationInput;
       take?: number;
       skip?: number;
+      locale?: string;
     } = {}
-  ): Promise<Job[]> {
+  ): Promise<JobWithDetailsAndAnswers[]> {
     return await this.prisma.job.findMany({
       where: opts.where,
       include: {
+        subcategory: {
+          include: {
+            i18n: opts.locale
+              ? {
+                  where: { locale: opts.locale },
+                }
+              : true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            email: true,
+            username: true,
+          },
+        },
         answers: {
           include: {
             question: {
-              select: {
-                id: true,
+              include: {
+                translations: opts.locale
+                  ? {
+                      where: { locale: opts.locale },
+                    }
+                  : true,
+                options: {
+                  include: {
+                    translations: opts.locale
+                      ? {
+                          where: { locale: opts.locale },
+                        }
+                      : true,
+                  },
+                },
               },
+            },
+            option: {
+              include: {
+                translations: opts.locale
+                  ? {
+                      where: { locale: opts.locale },
+                    }
+                  : true,
+              },
+            },
+          },
+          orderBy: {
+            question: {
+              sortOrder: 'asc',
             },
           },
         },
