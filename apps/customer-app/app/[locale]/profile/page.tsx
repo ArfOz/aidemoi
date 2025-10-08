@@ -66,7 +66,7 @@ const ProfilePage: React.FC<{ params: Promise<{ locale: string }> }> = ({
 
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
-              href={`/${resolvedParams.locale}/jobs`}
+              href={`/${resolvedParams.locale}/myjobs`}
               className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-colors text-center flex items-center justify-center gap-2"
             >
               <svg

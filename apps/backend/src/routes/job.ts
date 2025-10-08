@@ -17,6 +17,9 @@ import {
   JobCreateRequestSchema,
   JobCreateSuccessResponse,
   JobCreateSuccessResponseSchema,
+  JobDetailSuccessResponseSchema,
+  MyJobsGetRequest,
+  MyJobsGetSuccessResponseSchema,
 } from '@api';
 import {
   AnswersDBService,
@@ -74,134 +77,12 @@ export async function jobRoutes(
           },
         },
         response: {
-          200: {
-            type: 'object',
-            properties: {
-              id: { type: 'integer' },
-              title: { type: 'string' },
-              description: { type: ['string', 'null'] },
-              location: { type: ['string', 'null'] },
-              status: {
-                type: 'string',
-                enum: ['OPEN', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'],
-              },
-              createdAt: { type: 'string', format: 'date-time' },
-              updatedAt: { type: 'string', format: 'date-time' },
-              subcategory: {
-                type: 'object',
-                properties: {
-                  id: { type: 'integer' },
-                  slug: { type: 'string' },
-                  name: { type: ['string', 'null'] },
-                  i18n: {
-                    type: 'array',
-                    items: {
-                      type: 'object',
-                      properties: {
-                        locale: { type: 'string' },
-                        name: { type: 'string' },
-                        description: { type: ['string', 'null'] },
-                      },
-                    },
-                  },
-                },
-              },
-              user: {
-                type: 'object',
-                properties: {
-                  id: { type: 'integer' },
-                  email: { type: 'string' },
-                  username: { type: ['string', 'null'] },
-                },
-              },
-              answers: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    id: { type: 'integer' },
-                    textValue: { type: ['string', 'null'] },
-                    numberValue: { type: ['number', 'null'] },
-                    dateValue: {
-                      type: ['string', 'null'],
-                      format: 'date-time',
-                    },
-                    inputLanguage: { type: ['string', 'null'] },
-                    createdAt: { type: 'string', format: 'date-time' },
-                    updatedAt: { type: 'string', format: 'date-time' },
-                    question: {
-                      type: 'object',
-                      properties: {
-                        id: { type: 'integer' },
-                        type: { type: 'string' },
-                        required: { type: 'boolean' },
-                        sortOrder: { type: 'integer' },
-                        validation: { type: ['string', 'null'] },
-                        translations: {
-                          type: 'array',
-                          items: {
-                            type: 'object',
-                            properties: {
-                              locale: { type: 'string' },
-                              label: { type: 'string' },
-                              description: { type: ['string', 'null'] },
-                            },
-                          },
-                        },
-                        options: {
-                          type: 'array',
-                          items: {
-                            type: 'object',
-                            properties: {
-                              id: { type: 'integer' },
-                              value: { type: 'string' },
-                              translations: {
-                                type: 'array',
-                                items: {
-                                  type: 'object',
-                                  properties: {
-                                    locale: { type: 'string' },
-                                    label: { type: 'string' },
-                                  },
-                                },
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                    option: {
-                      type: ['object', 'null'],
-                      properties: {
-                        id: { type: 'integer' },
-                        value: { type: 'string' },
-                        translations: {
-                          type: 'array',
-                          items: {
-                            type: 'object',
-                            properties: {
-                              locale: { type: 'string' },
-                              label: { type: 'string' },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-          404: {
-            type: 'object',
-            properties: {
-              error: { type: 'string' },
-              message: { type: 'string' },
-            },
-          },
+          200: MyJobsGetSuccessResponseSchema,
+          404: ApiErrorSchema,
         },
       },
     },
+
     async function (request, reply) {
       try {
         const jobId = parseInt(request.params.id);
@@ -235,18 +116,10 @@ export async function jobRoutes(
     }
   );
 
-  // GET /jobs - Get all jobs with detailed answers and questions (with pagination)
-
   // ✅ GET /my-jobs → Get current user's jobs
   fastify.get<{
     Headers: { authorization: string };
-    Querystring: {
-      page?: number;
-      limit?: number;
-      locale?: string;
-      status?: string;
-      subcategoryId?: number;
-    };
+    Querystring: MyJobsGetRequest;
   }>(
     '/my-jobs',
     {
@@ -269,76 +142,8 @@ export async function jobRoutes(
           },
         },
         response: {
-          200: {
-            type: 'object',
-            properties: {
-              success: { type: 'boolean' },
-              message: { type: 'string' },
-              data: {
-                type: 'object',
-                properties: {
-                  jobs: {
-                    type: 'array',
-                    items: {
-                      type: 'object',
-                      properties: {
-                        id: { type: 'integer' },
-                        title: { type: 'string' },
-                        description: { type: ['string', 'null'] },
-                        location: { type: ['string', 'null'] },
-                        status: {
-                          type: 'string',
-                          enum: [
-                            'OPEN',
-                            'IN_PROGRESS',
-                            'COMPLETED',
-                            'CANCELLED',
-                          ],
-                        },
-                        createdAt: { type: 'string', format: 'date-time' },
-                        updatedAt: { type: 'string', format: 'date-time' },
-                        subcategory: {
-                          type: 'object',
-                          properties: {
-                            id: { type: 'integer' },
-                            slug: { type: 'string' },
-                            name: { type: ['string', 'null'] },
-                            i18n: {
-                              type: 'array',
-                              items: {
-                                type: 'object',
-                                properties: {
-                                  locale: { type: 'string' },
-                                  name: { type: 'string' },
-                                  description: { type: ['string', 'null'] },
-                                },
-                              },
-                            },
-                          },
-                        },
-                        _count: {
-                          type: 'object',
-                          properties: {
-                            bids: { type: 'integer' },
-                            answers: { type: 'integer' },
-                          },
-                        },
-                      },
-                    },
-                  },
-                  pagination: {
-                    type: 'object',
-                    properties: {
-                      page: { type: 'integer' },
-                      limit: { type: 'integer' },
-                      total: { type: 'integer' },
-                      totalPages: { type: 'integer' },
-                    },
-                  },
-                },
-              },
-            },
-          },
+          200: JobDetailSuccessResponseSchema,
+          400: ApiErrorSchema,
           401: ApiErrorSchema,
           500: ApiErrorSchema,
         },

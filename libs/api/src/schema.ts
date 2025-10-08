@@ -450,3 +450,221 @@ export const JobCreateSuccessResponseSchema = Type.Object({
     createdAt: Type.String({ format: 'date-time' }),
   }),
 });
+
+// Job Schema for My Jobs Response
+export const JobSchema = Type.Object({
+  id: Type.Integer(),
+  title: Type.String(),
+  description: Type.Union([Type.String(), Type.Null()]),
+  location: Type.Union([Type.String(), Type.Null()]),
+  status: Type.Union([
+    Type.Literal('OPEN'),
+    Type.Literal('IN_PROGRESS'),
+    Type.Literal('COMPLETED'),
+    Type.Literal('CANCELLED'),
+  ]),
+  createdAt: Type.String({ format: 'date-time' }),
+  updatedAt: Type.String({ format: 'date-time' }),
+  subcategory: Type.Object({
+    id: Type.Integer(),
+    slug: Type.String(),
+    name: Type.Union([Type.String(), Type.Null()]),
+    i18n: Type.Array(
+      Type.Object({
+        locale: Type.String(),
+        name: Type.String(),
+        description: Type.Union([Type.String(), Type.Null()]),
+      })
+    ),
+  }),
+  user: Type.Optional(
+    Type.Object({
+      id: Type.Integer(),
+      email: Type.String(),
+      username: Type.Union([Type.String(), Type.Null()]),
+    })
+  ),
+  answers: Type.Optional(
+    Type.Array(
+      Type.Object({
+        id: Type.Integer(),
+        textValue: Type.Union([Type.String(), Type.Null()]),
+        numberValue: Type.Union([Type.Number(), Type.Null()]),
+        dateValue: Type.Union([
+          Type.String({ format: 'date-time' }),
+          Type.Null(),
+        ]),
+        inputLanguage: Type.Union([Type.String(), Type.Null()]),
+        createdAt: Type.String({ format: 'date-time' }),
+        updatedAt: Type.String({ format: 'date-time' }),
+        question: Type.Object({
+          id: Type.Integer(),
+          type: Type.String(),
+          required: Type.Boolean(),
+          sortOrder: Type.Integer(),
+          validation: Type.Union([Type.String(), Type.Null()]),
+          translations: Type.Array(
+            Type.Object({
+              locale: Type.String(),
+              label: Type.String(),
+              description: Type.Union([Type.String(), Type.Null()]),
+            })
+          ),
+          options: Type.Array(
+            Type.Object({
+              id: Type.Integer(),
+              value: Type.String(),
+              translations: Type.Array(
+                Type.Object({
+                  locale: Type.String(),
+                  label: Type.String(),
+                })
+              ),
+            })
+          ),
+        }),
+        option: Type.Union([
+          Type.Object({
+            id: Type.Integer(),
+            value: Type.String(),
+            translations: Type.Array(
+              Type.Object({
+                locale: Type.String(),
+                label: Type.String(),
+              })
+            ),
+          }),
+          Type.Null(),
+        ]),
+      })
+    )
+  ),
+  _count: Type.Object({
+    bids: Type.Integer(),
+    answers: Type.Integer(),
+  }),
+});
+
+// My Jobs Request Schema
+export const MyJobsGetRequestSchema = Type.Object({
+  page: Type.Optional(Type.Integer({ minimum: 1, default: 1 })),
+  limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 100, default: 10 })),
+  locale: Type.Optional(Type.String({ pattern: '^[a-z]{2}(-[A-Z]{2})?$' })),
+  status: Type.Optional(
+    Type.Union([
+      Type.Literal('OPEN'),
+      Type.Literal('IN_PROGRESS'),
+      Type.Literal('COMPLETED'),
+      Type.Literal('CANCELLED'),
+    ])
+  ),
+  subcategoryId: Type.Optional(Type.Integer()),
+});
+
+// My Jobs Success Response Schema
+export const MyJobsGetSuccessResponseSchema = Type.Object({
+  success: Type.Literal(true),
+  message: Type.String(),
+  data: Type.Object({
+    jobs: Type.Array(JobSchema),
+    pagination: Type.Object({
+      page: Type.Integer(),
+      limit: Type.Integer(),
+      total: Type.Integer(),
+      totalPages: Type.Integer(),
+    }),
+  }),
+});
+
+// Job Detail Schema (with full answers and questions)
+export const JobDetailSchema = Type.Object({
+  id: Type.Integer(),
+  title: Type.String(),
+  description: Type.Union([Type.String(), Type.Null()]),
+  location: Type.Union([Type.String(), Type.Null()]),
+  status: Type.Union([
+    Type.Literal('OPEN'),
+    Type.Literal('IN_PROGRESS'),
+    Type.Literal('COMPLETED'),
+    Type.Literal('CANCELLED'),
+  ]),
+  createdAt: Type.String({ format: 'date-time' }),
+  updatedAt: Type.String({ format: 'date-time' }),
+  subcategory: Type.Object({
+    id: Type.Integer(),
+    slug: Type.String(),
+    name: Type.Union([Type.String(), Type.Null()]),
+    i18n: Type.Array(
+      Type.Object({
+        locale: Type.String(),
+        name: Type.String(),
+        description: Type.Union([Type.String(), Type.Null()]),
+      })
+    ),
+  }),
+  user: Type.Object({
+    id: Type.Integer(),
+    email: Type.String(),
+    username: Type.Union([Type.String(), Type.Null()]),
+  }),
+  answers: Type.Array(
+    Type.Object({
+      id: Type.Integer(),
+      textValue: Type.Union([Type.String(), Type.Null()]),
+      numberValue: Type.Union([Type.Number(), Type.Null()]),
+      dateValue: Type.Union([
+        Type.String({ format: 'date-time' }),
+        Type.Null(),
+      ]),
+      inputLanguage: Type.Union([Type.String(), Type.Null()]),
+      createdAt: Type.String({ format: 'date-time' }),
+      updatedAt: Type.String({ format: 'date-time' }),
+      question: Type.Object({
+        id: Type.Integer(),
+        type: Type.String(),
+        required: Type.Boolean(),
+        sortOrder: Type.Integer(),
+        validation: Type.Union([Type.String(), Type.Null()]),
+        translations: Type.Array(
+          Type.Object({
+            locale: Type.String(),
+            label: Type.String(),
+            description: Type.Union([Type.String(), Type.Null()]),
+          })
+        ),
+        options: Type.Array(
+          Type.Object({
+            id: Type.Integer(),
+            value: Type.String(),
+            translations: Type.Array(
+              Type.Object({
+                locale: Type.String(),
+                label: Type.String(),
+              })
+            ),
+          })
+        ),
+      }),
+      option: Type.Union([
+        Type.Object({
+          id: Type.Integer(),
+          value: Type.String(),
+          translations: Type.Array(
+            Type.Object({
+              locale: Type.String(),
+              label: Type.String(),
+            })
+          ),
+        }),
+        Type.Null(),
+      ]),
+    })
+  ),
+});
+
+// Job Detail Success Response Schema
+export const JobDetailSuccessResponseSchema = Type.Object({
+  success: Type.Literal(true),
+  message: Type.String(),
+  data: JobDetailSchema,
+});
