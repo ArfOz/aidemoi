@@ -237,6 +237,195 @@ export async function jobRoutes(
 
   // GET /jobs - Get all jobs with detailed answers and questions (with pagination)
 
+  // ✅ GET /my-jobs → Get current user's jobs
+  fastify.get<{
+    Headers: { authorization: string };
+    Querystring: {
+      page?: number;
+      limit?: number;
+      locale?: string;
+      status?: string;
+      subcategoryId?: number;
+    };
+  }>(
+    '/my-jobs',
+    {
+      preHandler: authenticateToken,
+      schema: {
+        headers: Type.Object({
+          authorization: Type.String(),
+        }),
+        querystring: {
+          type: 'object',
+          properties: {
+            page: { type: 'integer', minimum: 1, default: 1 },
+            limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
+            locale: { type: 'string', pattern: '^[a-z]{2}(-[A-Z]{2})?$' },
+            status: {
+              type: 'string',
+              enum: ['OPEN', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'],
+            },
+            subcategoryId: { type: 'integer' },
+          },
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              success: { type: 'boolean' },
+              message: { type: 'string' },
+              data: {
+                type: 'object',
+                properties: {
+                  jobs: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'integer' },
+                        title: { type: 'string' },
+                        description: { type: ['string', 'null'] },
+                        location: { type: ['string', 'null'] },
+                        status: {
+                          type: 'string',
+                          enum: [
+                            'OPEN',
+                            'IN_PROGRESS',
+                            'COMPLETED',
+                            'CANCELLED',
+                          ],
+                        },
+                        createdAt: { type: 'string', format: 'date-time' },
+                        updatedAt: { type: 'string', format: 'date-time' },
+                        subcategory: {
+                          type: 'object',
+                          properties: {
+                            id: { type: 'integer' },
+                            slug: { type: 'string' },
+                            name: { type: ['string', 'null'] },
+                            i18n: {
+                              type: 'array',
+                              items: {
+                                type: 'object',
+                                properties: {
+                                  locale: { type: 'string' },
+                                  name: { type: 'string' },
+                                  description: { type: ['string', 'null'] },
+                                },
+                              },
+                            },
+                          },
+                        },
+                        _count: {
+                          type: 'object',
+                          properties: {
+                            bids: { type: 'integer' },
+                            answers: { type: 'integer' },
+                          },
+                        },
+                      },
+                    },
+                  },
+                  pagination: {
+                    type: 'object',
+                    properties: {
+                      page: { type: 'integer' },
+                      limit: { type: 'integer' },
+                      total: { type: 'integer' },
+                      totalPages: { type: 'integer' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          401: ApiErrorSchema,
+          500: ApiErrorSchema,
+        },
+      },
+    },
+    async (request, reply) => {
+      try {
+        const userId =
+          (request as any).user?.userId ??
+          (request as any).user?.id ??
+          (request as any).userId;
+
+        if (!userId) {
+          return reply.status(401).send({
+            success: false,
+            error: { message: 'Unauthorized', code: 401 },
+          });
+        }
+
+        const page = request.query.page || 1;
+        const limit = request.query.limit || 10;
+        const skip = (page - 1) * limit;
+
+        // Build where clause for user's jobs
+        const where: any = {
+          userId: Number(userId),
+        };
+
+        if (request.query.status) {
+          where.status = request.query.status;
+        }
+
+        if (request.query.subcategoryId) {
+          where.subcategoryId = request.query.subcategoryId;
+        }
+
+        // Build translation filters based on locale
+        const translationWhere = request.query.locale
+          ? { locale: request.query.locale }
+          : undefined;
+
+        const jobs = await fastify.prisma.job.findMany({
+          where,
+          include: {
+            subcategory: {
+              include: {
+                i18n: translationWhere ? { where: translationWhere } : true,
+              },
+            },
+            _count: {
+              select: {
+                bids: true,
+                answers: true,
+              },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+          take: limit,
+          skip,
+        });
+
+        const total = await fastify.prisma.job.count({ where });
+        const totalPages = Math.ceil(total / limit);
+
+        return reply.status(200).send({
+          success: true,
+          message: 'User jobs retrieved successfully',
+          data: {
+            jobs,
+            pagination: {
+              page,
+              limit,
+              total,
+              totalPages,
+            },
+          },
+        });
+      } catch (error) {
+        fastify.log.error(error);
+        return reply.status(500).send({
+          success: false,
+          error: { message: 'Failed to retrieve user jobs', code: 500 },
+        });
+      }
+    }
+  );
+
   // ✅ POST /jobs → Create a new job with answers
   fastify.post<{
     Headers: { authorization: string };
@@ -605,7 +794,6 @@ export async function jobRoutes(
         },
       },
     },
-
     async (request, reply) => {
       try {
         const userId =
