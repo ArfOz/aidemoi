@@ -14,6 +14,7 @@ import {
   ApiErrorSchema,
   AuthHeadersSchema,
   IdParamsSchema,
+  IdParamUrl,
   // Add job-related imports
   JobCreateRequest,
   JobCreateRequestSchema,
@@ -61,7 +62,7 @@ export async function jobRoutes(
 
   // GET /job/:id - Get job with detailed answers and questions
   fastify.get<{
-    Params: { id: string }; // TypeScript type for the parameter
+    Params: IdParamUrl; // TypeScript type for the parameter
     Querystring: { locale?: string };
   }>(
     '/job/:id', // Route with :id parameter

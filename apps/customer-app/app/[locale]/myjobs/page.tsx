@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '../components/context/AuthContext';
 import { apiAideMoi, MyJobsGetSuccessResponse } from '@api';
 
 interface Job {
@@ -29,10 +28,6 @@ interface Job {
 }
 
 const MyJobsPage = () => {
-  const auth = useAuth();
-  // Try different possible ways to get the token
-  const token = auth.tokens?.accessToken;
-
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,34 +44,15 @@ const MyJobsPage = () => {
 
   const fetchMyJobs = useCallback(
     async (page = 1, status = '') => {
-      if (!token) {
-        // Try to get token from localStorage as fallback
-        const storedToken =
-          localStorage.getItem('token') ||
-          localStorage.getItem('authToken') ||
-          localStorage.getItem('accessToken');
-        if (!storedToken) {
-          setError('No authentication token found. Please log in.');
-          setLoading(false);
-          return;
-        }
-      }
-
       try {
         setLoading(true);
         setError(null);
-
-        // const queryParams = new URLSearchParams({
-        //   page: page.toString(),
-        //   limit: '10',
-        //   ...(status && { status }),
-        // });
 
         const response = await apiAideMoi.get<MyJobsGetSuccessResponse>(
           `/jobs/my-jobs`,
           {
             headers: {
-              Authorization: `Bearer ${token || localStorage.getItem('token')}`,
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
               'Content-Type': 'application/json',
             },
           }
@@ -95,7 +71,7 @@ const MyJobsPage = () => {
         setLoading(false);
       }
     },
-    [token]
+    [] // No dependencies needed since useAuth handles token automatically
   );
 
   useEffect(() => {

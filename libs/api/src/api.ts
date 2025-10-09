@@ -1,8 +1,21 @@
 /**
  * API utilities for data fetching
+ *
+ * Usage examples:
+ *
+ * // Basic API call without authentication
+ * const data = await apiAideMoi.get('/public-endpoint');
+ *
+ * // API call with manual authentication
+ * const data = await apiAideMoi.get('/protected-endpoint', {
+ *   useAuth: true // Automatically includes Bearer token from localStorage
+ * });
+ *
+ * // API call with automatic authentication (recommended for protected routes)
+ * const data = await authApiAideMoi.get('/protected-endpoint');
  */
 
-import { ApiResponseType, HttpMethod } from './interface';
+import { HttpMethod } from './interface';
 
 // Base configuration for API calls
 export const API_CONFIG = {
@@ -28,6 +41,7 @@ export interface RequestOptions {
   body?: unknown;
   timeout?: number;
   cache?: RequestCache;
+  useAuth?: boolean; // If true, automatically include Bearer token from localStorage
 }
 
 /**
@@ -43,18 +57,33 @@ async function apiRequest<T extends object = object>(
     body,
     timeout = API_CONFIG.timeout,
     cache = 'no-cache',
+    useAuth = false,
   } = options;
 
   const url = endpoint.startsWith('http')
     ? endpoint
     : `${API_CONFIG.baseURL}${endpoint}`;
 
+  // Prepare headers
+  const requestHeaders: Record<string, string> = {
+    ...API_CONFIG.headers,
+    ...headers,
+  };
+
+  // Automatically add Bearer token if useAuth is true
+  if (useAuth && typeof window !== 'undefined') {
+    const token =
+      localStorage.getItem('token') ||
+      localStorage.getItem('authToken') ||
+      localStorage.getItem('accessToken');
+    if (token) {
+      requestHeaders.Authorization = `Bearer ${token}`;
+    }
+  }
+
   const config: RequestInit = {
     method,
-    headers: {
-      ...API_CONFIG.headers,
-      ...headers,
-    },
+    headers: requestHeaders,
     cache,
   };
 
@@ -131,4 +160,51 @@ export const apiAideMoi = {
     body?: unknown,
     options?: Omit<RequestOptions, 'method' | 'body'>
   ) => apiRequest<T>(endpoint, { ...options, method: 'PATCH', body }),
+};
+
+/**
+ * Authenticated API methods - automatically include Bearer token from localStorage
+ */
+export const authApiAideMoi = {
+  get: <T extends object>(
+    endpoint: string,
+    options?: Omit<RequestOptions, 'method' | 'useAuth'>
+  ): Promise<T> =>
+    apiRequest<T>(endpoint, { ...options, method: 'GET', useAuth: true }),
+
+  post: <T extends object>(
+    endpoint: string,
+    body?: unknown,
+    options?: Omit<RequestOptions, 'method' | 'body' | 'useAuth'>
+  ) =>
+    apiRequest<T>(endpoint, {
+      ...options,
+      method: 'POST',
+      body,
+      useAuth: true,
+    }),
+
+  put: <T extends object>(
+    endpoint: string,
+    body?: unknown,
+    options?: Omit<RequestOptions, 'method' | 'body' | 'useAuth'>
+  ) =>
+    apiRequest<T>(endpoint, { ...options, method: 'PUT', body, useAuth: true }),
+
+  delete: <T extends object>(
+    endpoint: string,
+    options?: Omit<RequestOptions, 'method' | 'useAuth'>
+  ) => apiRequest<T>(endpoint, { ...options, method: 'DELETE', useAuth: true }),
+
+  patch: <T extends object>(
+    endpoint: string,
+    body?: unknown,
+    options?: Omit<RequestOptions, 'method' | 'body' | 'useAuth'>
+  ) =>
+    apiRequest<T>(endpoint, {
+      ...options,
+      method: 'PATCH',
+      body,
+      useAuth: true,
+    }),
 };

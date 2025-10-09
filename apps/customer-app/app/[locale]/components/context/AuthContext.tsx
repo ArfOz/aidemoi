@@ -56,8 +56,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         const storedTokens = localStorage.getItem('auth_tokens');
 
         if (storedUser && storedTokens) {
-          setUser(JSON.parse(storedUser));
-          setTokens(JSON.parse(storedTokens));
+          const parsedUser = JSON.parse(storedUser);
+          const parsedTokens = JSON.parse(storedTokens);
+          setUser(parsedUser);
+          setTokens(parsedTokens);
+
+          // Ensure the main token is available for API calls
+          if (parsedTokens.token) {
+            localStorage.setItem('token', parsedTokens.token);
+          }
         }
       }
     } catch (error) {
@@ -89,18 +96,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setUser(user);
       setTokens(tokens);
 
-      // Optional: set default Authorization for future calls
-      try {
-        (apiAideMoi as any).defaults ||= { headers: { common: {} } };
-        (apiAideMoi as any).defaults.headers.common[
-          'Authorization'
-        ] = `Bearer ${tokens.token}`;
-      } catch {
-        console.error('Failed to set default Authorization header');
-      }
-
+      // Store tokens in localStorage for API calls
       localStorage.setItem('auth_user', JSON.stringify(user));
       localStorage.setItem('auth_tokens', JSON.stringify(tokens));
+      // Store the main token for easy access by API calls
+      localStorage.setItem('token', tokens.token);
+      localStorage.setItem('refreshToken', tokens.refreshToken);
 
       return response.data; // return data so callers can do: const { tokens } = await login(...)
     } catch (err) {
@@ -152,6 +153,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setError(null);
     localStorage.removeItem('auth_user');
     localStorage.removeItem('auth_tokens');
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
   };
 
   const updateUser = (data: Partial<User>) => {
