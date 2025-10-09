@@ -668,3 +668,14 @@ export const JobDetailSuccessResponseSchema = Type.Object({
   message: Type.String(),
   data: JobDetailSchema,
 });
+
+export const JobGetIdRequestSchema = Type.Object({
+  locale: Type.Optional(Type.String({ pattern: '^[a-z]{2}(-[A-Z]{2})?$' })),
+});
+
+export const AuthTokenSchema = Type.Object({
+  headers: Type.Object({
+    authorization: Type.String(),
+  }),
+  token: Type.String(),
+});

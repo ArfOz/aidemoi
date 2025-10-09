@@ -12,13 +12,16 @@ import {
   AnswersCreateRequestSchema,
   ApiErrorResponseType,
   ApiErrorSchema,
+  AuthTokenSchema,
   // Add job-related imports
   JobCreateRequest,
   JobCreateRequestSchema,
   JobCreateSuccessResponse,
   JobCreateSuccessResponseSchema,
   JobDetailSuccessResponseSchema,
+  JobGetIdRequestSchema,
   MyJobsGetRequest,
+  MyJobsGetRequestSchema,
   MyJobsGetSuccessResponseSchema,
 } from '@api';
 import {
@@ -55,27 +58,23 @@ export async function jobRoutes(
     });
   });
 
-  // GET /jobs/:id - Get job with detailed answers and questions
+  // GET /job/:id - Get job with detailed answers and questions
   fastify.get<{
-    Params: { id: string };
+    Params: { id: string }; // TypeScript type for the parameter
     Querystring: { locale?: string };
   }>(
-    '/jobs/:id',
+    '/job/:id', // Route with :id parameter
     {
       schema: {
         params: {
+          // Validates URL parameters
           type: 'object',
-          required: ['id'],
+          required: ['id'], // The 'id' parameter is required
           properties: {
-            id: { type: 'string' },
+            id: { type: 'string' }, // 'id' must be a string
           },
         },
-        querystring: {
-          type: 'object',
-          properties: {
-            locale: { type: 'string', pattern: '^[a-z]{2}(-[A-Z]{2})?$' },
-          },
-        },
+        querystring: JobGetIdRequestSchema,
         response: {
           200: MyJobsGetSuccessResponseSchema,
           404: ApiErrorSchema,
@@ -84,8 +83,9 @@ export async function jobRoutes(
     },
 
     async function (request, reply) {
+      // request.params.id will be validated as a string
+      const jobId = parseInt(request.params.id);
       try {
-        const jobId = parseInt(request.params.id);
         if (isNaN(jobId)) {
           return reply.status(400).send({
             error: 'Bad Request',
@@ -125,22 +125,8 @@ export async function jobRoutes(
     {
       preHandler: authenticateToken,
       schema: {
-        headers: Type.Object({
-          authorization: Type.String(),
-        }),
-        querystring: {
-          type: 'object',
-          properties: {
-            page: { type: 'integer', minimum: 1, default: 1 },
-            limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-            locale: { type: 'string', pattern: '^[a-z]{2}(-[A-Z]{2})?$' },
-            status: {
-              type: 'string',
-              enum: ['OPEN', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'],
-            },
-            subcategoryId: { type: 'integer' },
-          },
-        },
+        headers: AuthTokenSchema,
+        querystring: MyJobsGetRequestSchema,
         response: {
           200: JobDetailSuccessResponseSchema,
           400: ApiErrorSchema,
@@ -241,9 +227,7 @@ export async function jobRoutes(
     {
       preHandler: authenticateToken,
       schema: {
-        headers: Type.Object({
-          authorization: Type.String(),
-        }),
+        headers: AuthTokenSchema,
         body: JobCreateRequestSchema,
         response: {
           201: JobCreateSuccessResponseSchema,
@@ -429,9 +413,7 @@ export async function jobRoutes(
     {
       preHandler: authenticateToken,
       schema: {
-        headers: Type.Object({
-          authorization: Type.String(),
-        }),
+        headers: AuthTokenSchema,
         body: AnswersCreateRequestSchema,
         response: {
           201: AnswerAddSuccessResponseSchema,
@@ -587,9 +569,7 @@ export async function jobRoutes(
     {
       preHandler: authenticateToken,
       schema: {
-        headers: Type.Object({
-          authorization: Type.String(),
-        }),
+        headers: AuthTokenSchema,
         querystring: AnswerGetRequestSchema,
         response: {
           200: AnswerGetSuccessResponseSchema,

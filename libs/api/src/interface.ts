@@ -31,6 +31,7 @@ import {
   AnswerGetRequestSchema,
   JobCreateRequestSchema,
   JobCreateSuccessResponseSchema,
+  MyJobsGetRequestSchema,
 } from './schema';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -133,3 +134,5 @@ export type JobCreateRequest = Static<typeof JobCreateRequestSchema>;
 export type JobCreateSuccessResponse = Static<
   typeof JobCreateSuccessResponseSchema
 >;
+
+export type MyJobsGetRequest = Static<typeof MyJobsGetRequestSchema>;
