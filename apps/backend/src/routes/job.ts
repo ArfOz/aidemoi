@@ -12,7 +12,8 @@ import {
   AnswersCreateRequestSchema,
   ApiErrorResponseType,
   ApiErrorSchema,
-  AuthTokenSchema,
+  AuthHeadersSchema,
+  IdParamsSchema,
   // Add job-related imports
   JobCreateRequest,
   JobCreateRequestSchema,
@@ -66,14 +67,8 @@ export async function jobRoutes(
     '/job/:id', // Route with :id parameter
     {
       schema: {
-        params: {
-          // Validates URL parameters
-          type: 'object',
-          required: ['id'], // The 'id' parameter is required
-          properties: {
-            id: { type: 'string' }, // 'id' must be a string
-          },
-        },
+        params: IdParamsSchema,
+        headers: AuthHeadersSchema,
         querystring: JobGetIdRequestSchema,
         response: {
           200: MyJobsGetSuccessResponseSchema,
@@ -125,10 +120,10 @@ export async function jobRoutes(
     {
       preHandler: authenticateToken,
       schema: {
-        headers: AuthTokenSchema,
+        headers: AuthHeadersSchema,
         querystring: MyJobsGetRequestSchema,
         response: {
-          200: JobDetailSuccessResponseSchema,
+          200: MyJobsGetSuccessResponseSchema,
           400: ApiErrorSchema,
           401: ApiErrorSchema,
           500: ApiErrorSchema,
@@ -227,7 +222,7 @@ export async function jobRoutes(
     {
       preHandler: authenticateToken,
       schema: {
-        headers: AuthTokenSchema,
+        headers: AuthHeadersSchema,
         body: JobCreateRequestSchema,
         response: {
           201: JobCreateSuccessResponseSchema,
@@ -413,7 +408,7 @@ export async function jobRoutes(
     {
       preHandler: authenticateToken,
       schema: {
-        headers: AuthTokenSchema,
+        headers: AuthHeadersSchema,
         body: AnswersCreateRequestSchema,
         response: {
           201: AnswerAddSuccessResponseSchema,
@@ -569,7 +564,7 @@ export async function jobRoutes(
     {
       preHandler: authenticateToken,
       schema: {
-        headers: AuthTokenSchema,
+        headers: AuthHeadersSchema,
         querystring: AnswerGetRequestSchema,
         response: {
           200: AnswerGetSuccessResponseSchema,

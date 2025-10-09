@@ -679,3 +679,11 @@ export const AuthTokenSchema = Type.Object({
   }),
   token: Type.String(),
 });
+
+export const AuthHeadersSchema = Type.Object({
+  authorization: Type.String(),
+});
+
+export const IdParamsSchema = Type.Object({
+  id: Type.String(),
+});

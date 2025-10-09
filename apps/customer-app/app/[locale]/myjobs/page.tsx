@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../components/context/AuthContext';
-import { apiAideMoi } from '@api';
+import { apiAideMoi, MyJobsGetSuccessResponse } from '@api';
 
 interface Job {
   id: number;
@@ -28,20 +28,6 @@ interface Job {
   };
 }
 
-interface MyJobsResponse {
-  success: boolean;
-  message: string;
-  data: {
-    jobs: Job[];
-    pagination: {
-      page: number;
-      limit: number;
-      total: number;
-      totalPages: number;
-    };
-  };
-}
-
 const MyJobsPage = () => {
   const auth = useAuth();
   // Try different possible ways to get the token
@@ -61,63 +47,60 @@ const MyJobsPage = () => {
     page: 1,
   });
 
-  const fetchMyJobs = async (page = 1, status = '') => {
-    if (!token) {
-      // Try to get token from localStorage as fallback
-      const storedToken =
-        localStorage.getItem('token') ||
-        localStorage.getItem('authToken') ||
-        localStorage.getItem('accessToken');
-      if (!storedToken) {
-        setError('No authentication token found. Please log in.');
-        setLoading(false);
-        return;
-      }
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      const queryParams = new URLSearchParams({
-        page: page.toString(),
-        limit: '10',
-        ...(status && { status }),
-      });
-
-      const response = await apiAideMoi.get<
-        MyJobsResponse
-        `/jobs/my-jobs?${queryParams}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token || localStorage.getItem('token')}`,
-            'Content-Type': 'application/json',
-          },
+  const fetchMyJobs = useCallback(
+    async (page = 1, status = '') => {
+      if (!token) {
+        // Try to get token from localStorage as fallback
+        const storedToken =
+          localStorage.getItem('token') ||
+          localStorage.getItem('authToken') ||
+          localStorage.getItem('accessToken');
+        if (!storedToken) {
+          setError('No authentication token found. Please log in.');
+          setLoading(false);
+          return;
         }
-      );
-
-      if (!response.success) {
-        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data: MyJobsResponse = await response.json();
+      try {
+        setLoading(true);
+        setError(null);
 
-      if (data.success) {
-        setJobs(data.data.jobs);
-        setPagination(data.data.pagination);
-      } else {
-        setError('Failed to fetch jobs');
+        // const queryParams = new URLSearchParams({
+        //   page: page.toString(),
+        //   limit: '10',
+        //   ...(status && { status }),
+        // });
+
+        const response = await apiAideMoi.get<MyJobsGetSuccessResponse>(
+          `/jobs/my-jobs`,
+          {
+            headers: {
+              Authorization: `Bearer ${token || localStorage.getItem('token')}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        console.log('My Jobs Response:', response);
+
+        if (response.success) {
+          setJobs(response.data.jobs);
+          setPagination(response.data.pagination);
+        } else {
+          setError('Failed to fetch jobs');
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [token]
+  );
 
   useEffect(() => {
     fetchMyJobs(filters.page, filters.status);
-  }, [token, filters.page, filters.status]);
+  }, [fetchMyJobs, filters.page, filters.status]);
 
   const handleStatusFilter = (status: string) => {
     setFilters((prev) => ({ ...prev, status, page: 1 }));
@@ -326,7 +309,7 @@ const MyJobsPage = () => {
       {/* Loading overlay for pagination */}
       {loading && jobs.length > 0 && (
         <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 bg-white rounded-full"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 bg-white"></div>
         </div>
       )}
     </div>

@@ -15,7 +15,7 @@ export async function authenticateToken(
     if (!token) {
       return reply.status(401).send({
         success: false,
-        error: { message: 'No token provided', statusCode: 401 },
+        error: { message: 'No token provided', code: 401 },
       });
     }
     // Check if the token exists in the database token table
@@ -23,7 +23,7 @@ export async function authenticateToken(
     if (!exists) {
       return reply.status(401).send({
         success: false,
-        error: { message: 'Token not found in database', statusCode: 401 },
+        error: { message: 'Token not found in database', code: 401 },
       });
     }
 
@@ -31,7 +31,7 @@ export async function authenticateToken(
     if (!decoded) {
       return reply.status(401).send({
         success: false,
-        error: { message: 'Invalid token', statusCode: 401 },
+        error: { message: 'Invalid token', code: 401 },
       });
     }
 
@@ -39,7 +39,7 @@ export async function authenticateToken(
   } catch {
     return reply.status(401).send({
       success: false,
-      error: { message: 'Unauthorized', statusCode: 401 },
+      error: { message: 'Unauthorized', code: 401 },
     });
   }
 }

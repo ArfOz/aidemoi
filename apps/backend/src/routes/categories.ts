@@ -20,6 +20,7 @@ import {
   SubcategoryGetRequest,
   SubcategoryDetailSuccessResponse,
   SubcategoryDetailSuccessResponseSchema,
+  IdParamsSchema,
 } from '@api';
 import {
   CategoriesDBService,
@@ -247,11 +248,7 @@ export async function categoriesRoutes(
     '/category/:id',
     {
       schema: {
-        params: {
-          type: 'object',
-          properties: { id: { type: 'string' } },
-          required: ['id'],
-        },
+        params: IdParamsSchema,
         querystring: CategoryGetRequestSchema,
         response: {
           200: CategoryDetailSuccessResponseSchema,
@@ -315,11 +312,7 @@ export async function categoriesRoutes(
     '/subcategory/:id',
     {
       schema: {
-        params: {
-          type: 'object',
-          properties: { id: { type: 'string' } },
-          required: ['id'],
-        },
+        params: IdParamsSchema,
         response: {
           200: SubcategoryDetailSuccessResponseSchema,
           404: ApiErrorSchema,
