@@ -10,7 +10,6 @@ import {
   ProfileSuccessResponseSchema,
   RefreshTokenRequestSchema,
   LogoutSuccessResponseSchema,
-  TokenSchema,
   CategoryUpsertRequestSchema,
   CategoryUpsertSuccessResponseSchema,
   SubcategoryUpsertRequestSchema,
@@ -70,8 +69,6 @@ export type LogoutSuccessResponseType = Static<
 export interface LogoutHeaders {
   authorization: string;
 }
-
-export type TokenType = Static<typeof TokenSchema>;
 
 // export type LogoutRequest = Static<typeof LogoutRequestSchema>;
 export type CategoryUpsertRequest = Static<typeof CategoryUpsertRequestSchema>;

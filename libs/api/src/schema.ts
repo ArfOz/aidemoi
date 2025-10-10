@@ -1,4 +1,4 @@
-import { Type } from '@sinclair/typebox';
+import { Type, Static } from '@sinclair/typebox';
 
 export const ErrorSchema = Type.Object({
   code: Type.Number(),
@@ -20,6 +20,8 @@ export const TokenSchema = Type.Object({
   refreshExpiresIn: Type.String(),
   refreshExpiresAt: Type.String(),
 });
+
+export type TokenType = Static<typeof TokenSchema>;
 
 export const UserSchema = Type.Object({
   id: Type.String(),

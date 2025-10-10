@@ -2,33 +2,12 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { apiAideMoi, MyJobsGetSuccessResponse } from '@api';
-
-interface Job {
-  id: number;
-  title: string;
-  description: string | null;
-  location: string | null;
-  status: 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
-  createdAt: string;
-  updatedAt: string;
-  subcategory: {
-    id: number;
-    slug: string;
-    name: string | null;
-    i18n: Array<{
-      locale: string;
-      name: string;
-      description: string | null;
-    }>;
-  };
-  _count: {
-    bids: number;
-    answers: number;
-  };
-}
+import { StatusFilter } from './components';
 
 const MyJobsPage = () => {
-  const [jobs, setJobs] = useState<Job[]>([]);
+  const [jobs, setJobs] = useState<MyJobsGetSuccessResponse['data']['jobs']>(
+    []
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
@@ -48,16 +27,22 @@ const MyJobsPage = () => {
         setLoading(true);
         setError(null);
 
+        // Build query parameters
+        const params = new URLSearchParams({
+          page: page.toString(),
+          limit: '10',
+        });
+
+        if (status) {
+          params.append('status', status);
+        }
+
         const response = await apiAideMoi.get<MyJobsGetSuccessResponse>(
-          `/jobs/my-jobs`,
+          `/jobs/my-jobs?${params.toString()}`,
           {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-              'Content-Type': 'application/json',
-            },
+            useAuth: true,
           }
         );
-        console.log('My Jobs Response:', response);
 
         if (response.success) {
           setJobs(response.data.jobs);
@@ -124,32 +109,10 @@ const MyJobsPage = () => {
         <p className="text-gray-600">Manage and view your posted jobs</p>
       </div>
 
-      {/* Filters */}
-      <div className="mb-6 flex flex-wrap gap-2">
-        <button
-          onClick={() => handleStatusFilter('')}
-          className={`px-4 py-2 rounded-lg transition-colors ${
-            filters.status === ''
-              ? 'bg-blue-500 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-          }`}
-        >
-          All Jobs
-        </button>
-        {['OPEN', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'].map((status) => (
-          <button
-            key={status}
-            onClick={() => handleStatusFilter(status)}
-            className={`px-4 py-2 rounded-lg transition-colors ${
-              filters.status === status
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            {status.replace('_', ' ')}
-          </button>
-        ))}
-      </div>
+      <StatusFilter
+        handleStatusFilter={handleStatusFilter}
+        currentStatus={filters.status}
+      />
 
       {/* Error State */}
       {error && (

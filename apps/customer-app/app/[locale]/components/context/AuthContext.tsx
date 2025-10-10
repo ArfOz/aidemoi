@@ -13,7 +13,7 @@ import {
 
 interface AuthContextType {
   user: User | null;
-  tokens: any | null;
+  tokens: TokenType | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -87,7 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const response = await apiAideMoi.post<LoginSuccessResponseType>(
         '/auth/login',
         credentials,
-        { cache: 'no-store' } as any
+        { cache: 'no-store' }
       );
 
       if (!response.success) throw new Error(response.message);
