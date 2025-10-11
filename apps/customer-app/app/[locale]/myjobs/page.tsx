@@ -2,8 +2,14 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { apiAideMoi, MyJobsGetSuccessResponse } from '@api';
-import { PaginationButton, StatusFilter } from './components';
-import { JobsCard } from './components/jobsCard';
+import {
+  JobsError,
+  PaginationButton,
+  StatusFilter,
+  JobsCard,
+  LoadingCard,
+  CardsHeader,
+} from './components';
 
 const MyJobsPage = () => {
   const [jobs, setJobs] = useState<MyJobsGetSuccessResponse['data']['jobs']>(
@@ -82,38 +88,15 @@ const MyJobsPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">My Jobs</h1>
-        <p className="text-gray-600">Manage and view your posted jobs</p>
-      </div>
+      <CardsHeader />
       <StatusFilter
         handleStatusFilter={handleStatusFilter}
         currentStatus={filters.status}
       />
       {/* Error State */}
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-          <p>Error: {error}</p>
-          <button
-            onClick={() => fetchMyJobs(filters.page, filters.status)}
-            className="mt-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-          >
-            Retry
-          </button>
-        </div>
-      )}
+      <JobsError error={error} fetchMyJobs={fetchMyJobs} filters={filters} />
       {/* Jobs List */}
-      {jobs.length === 0 && !loading ? (
-        <div className="text-center py-12">
-          <div className="text-gray-400 text-6xl mb-4">📋</div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            No jobs found
-          </h3>
-          <p className="text-gray-600">You haven&apos;t posted any jobs yet.</p>
-        </div>
-      ) : (
-        <JobsCard jobs={jobs} />
-      )}
+      <JobsCard jobs={jobs} loading={loading} />
       {/* Pagination */}
       <PaginationButton
         pagination={pagination}
@@ -121,11 +104,7 @@ const MyJobsPage = () => {
         loading={loading}
       />
       {/* Loading overlay for pagination */}
-      {loading && jobs.length > 0 && (
-        <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 bg-white"></div>
-        </div>
-      )}
+      <LoadingCard loading={loading} jobs={jobs} />
     </div>
   );
 };
