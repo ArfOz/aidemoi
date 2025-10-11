@@ -9,7 +9,40 @@ import {
   RegisterSuccessResponseType,
   TokenType,
   User,
+  APIError,
 } from '@api';
+
+type ApiOptions = {
+  headers?: Record<string, string>;
+  timeout?: number;
+  cache?: RequestCache;
+};
+
+interface AuthenticatedApi {
+  get: <T extends object>(
+    endpoint: string,
+    options?: ApiOptions
+  ) => Promise<T | null>;
+  post: <T extends object>(
+    endpoint: string,
+    body?: unknown,
+    options?: ApiOptions
+  ) => Promise<T | null>;
+  put: <T extends object>(
+    endpoint: string,
+    body?: unknown,
+    options?: ApiOptions
+  ) => Promise<T | null>;
+  delete: <T extends object>(
+    endpoint: string,
+    options?: ApiOptions
+  ) => Promise<T | null>;
+  patch: <T extends object>(
+    endpoint: string,
+    body?: unknown,
+    options?: ApiOptions
+  ) => Promise<T | null>;
+}
 
 interface AuthContextType {
   user: User | null;
@@ -17,6 +50,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  api: AuthenticatedApi;
   login: (
     credentials: LoginRequestType
   ) => Promise<LoginSuccessResponseType['data']>;
@@ -157,6 +191,66 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.removeItem('refreshToken');
   };
 
+  // Simple API wrapper with 401 handling
+  const handleApiCall = async <T extends object>(
+    apiCall: () => Promise<T>
+  ): Promise<T | null> => {
+    try {
+      return await apiCall();
+    } catch (error: unknown) {
+      if (
+        (error instanceof APIError && error.status === 401) ||
+        (error instanceof Error &&
+          (error.message.includes('401') ||
+            error.message.includes('Unauthorized')))
+      ) {
+        console.warn('401 Unauthorized detected, logging out user');
+        logout();
+        return null;
+      }
+      throw error;
+    }
+  };
+
+  const api: AuthenticatedApi = {
+    get: <T extends object>(endpoint: string, options?: ApiOptions) =>
+      handleApiCall(() =>
+        apiAideMoi.get<T>(endpoint, { ...options, useAuth: true })
+      ),
+
+    post: <T extends object>(
+      endpoint: string,
+      body?: unknown,
+      options?: ApiOptions
+    ) =>
+      handleApiCall(() =>
+        apiAideMoi.post<T>(endpoint, body, { ...options, useAuth: true })
+      ),
+
+    put: <T extends object>(
+      endpoint: string,
+      body?: unknown,
+      options?: ApiOptions
+    ) =>
+      handleApiCall(() =>
+        apiAideMoi.put<T>(endpoint, body, { ...options, useAuth: true })
+      ),
+
+    delete: <T extends object>(endpoint: string, options?: ApiOptions) =>
+      handleApiCall(() =>
+        apiAideMoi.delete<T>(endpoint, { ...options, useAuth: true })
+      ),
+
+    patch: <T extends object>(
+      endpoint: string,
+      body?: unknown,
+      options?: ApiOptions
+    ) =>
+      handleApiCall(() =>
+        apiAideMoi.patch<T>(endpoint, body, { ...options, useAuth: true })
+      ),
+  };
+
   const updateUser = (data: Partial<User>) => {
     if (user) {
       const updatedUser = { ...user, ...data };
@@ -175,6 +269,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     isAuthenticated,
     isLoading,
     error,
+    api,
     login,
     register,
     logout,

@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { apiAideMoi, MyJobsGetSuccessResponse } from '@api';
+import { MyJobsGetSuccessResponse } from '@api';
+import { useAuth } from '../components/context/AuthContext';
 import {
   JobsError,
   PaginationButton,
@@ -12,6 +13,7 @@ import {
 } from './components';
 
 const MyJobsPage = () => {
+  const { api } = useAuth();
   const [jobs, setJobs] = useState<MyJobsGetSuccessResponse['data']['jobs']>(
     []
   );
@@ -44,12 +46,14 @@ const MyJobsPage = () => {
           params.append('status', status);
         }
 
-        const response = await apiAideMoi.get<MyJobsGetSuccessResponse>(
-          `/jobs/my-jobs?${params.toString()}`,
-          {
-            useAuth: true,
-          }
+        const response = await api.get<MyJobsGetSuccessResponse>(
+          `/jobs/my-jobs?${params.toString()}`
         );
+
+        // If response is null, it means 401 was handled and user was logged out
+        if (response === null) {
+          return;
+        }
 
         if (response.success) {
           setJobs(response.data.jobs);
@@ -63,7 +67,7 @@ const MyJobsPage = () => {
         setLoading(false);
       }
     },
-    [] // No dependencies needed since useAuth handles token automatically
+    [api] // Only depend on the api wrapper
   );
 
   useEffect(() => {
