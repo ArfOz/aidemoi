@@ -2,7 +2,9 @@ import { NextIntlClientProvider } from 'next-intl';
 import { notFound } from 'next/navigation';
 import { routing } from '../../i18n/routing';
 import './styles/globals.css';
-import { AuthProvider, Navbar } from '@components';
+import { AuthProvider } from '@components/context';
+import { Navbar } from '@components/Navbar';
+import { Footer } from '@components/Footer';
 
 export default async function LocaleLayout({
   children,
@@ -11,7 +13,7 @@ export default async function LocaleLayout({
   children: React.ReactNode;
   params: { locale: string };
 }) {
-  const { locale } = await params; // fixed destructure
+  const { locale } = await params;
   if (!routing.locales.includes(locale as (typeof routing.locales)[number])) {
     notFound();
   }
@@ -26,8 +28,11 @@ export default async function LocaleLayout({
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <AuthProvider>
-        <Navbar lang={locale} />
-        {children}
+        <div className="min-h-screen flex flex-col">
+          <Navbar lang={locale} />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </div>
       </AuthProvider>
     </NextIntlClientProvider>
   );
