@@ -1,5 +1,5 @@
 import { getLocale, getTranslations } from 'next-intl/server';
-import { CategoryCard } from './components/category-card';
+import { CategoryCard } from '../../components/category-card';
 import { apiAideMoi, CategoriesListSuccessResponse } from '@api';
 
 // Cache all fetches in this route for 60s
