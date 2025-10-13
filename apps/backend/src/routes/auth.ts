@@ -25,6 +25,7 @@ import {
   RefreshRequest,
   LogoutSuccessResponseType,
   LogoutHeaders,
+  AuthHeadersSchema,
 } from '@api';
 import { TokenDBService } from '../services/DatabaseService/TokenDBService';
 
@@ -219,9 +220,7 @@ export async function authRoutes(
     {
       preHandler: authenticateToken, // use auth middleware
       schema: {
-        headers: Type.Object({
-          authorization: Type.String(),
-        }),
+        headers: AuthHeadersSchema,
         response: {
           200: ProfileSuccessResponseSchema,
           401: ApiErrorSchema,
@@ -375,9 +374,7 @@ export async function authRoutes(
     {
       preHandler: authenticateToken,
       schema: {
-        headers: Type.Object({
-          authorization: Type.String(),
-        }),
+        headers: AuthHeadersSchema,
         response: {
           200: LogoutSuccessResponseSchema,
           401: ApiErrorSchema,

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../components/context/AuthContext';
+import { useAuth } from '@components';
 import { RegisterRequestType } from '@api';
 import { LogoHeader, SignInLink, SocialSignUp, SubmitForm } from './components';
 

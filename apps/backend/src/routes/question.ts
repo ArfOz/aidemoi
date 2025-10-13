@@ -1,7 +1,9 @@
-// removed unused import
 import { FastifyInstance } from 'fastify';
-// import { CategoriesDBService } from '../services/DatabaseService';
-import { QuestionsDBService } from '../services/DatabaseService/QuestionsDBService';
+// Fix: Import from the index file, not individual files
+import {
+  QuestionsDBService,
+  SubCategoriesDBService,
+} from '../services/DatabaseService';
 import {
   ApiErrorResponseType,
   ApiErrorSchema,
@@ -16,12 +18,12 @@ import {
   QuestionUpsertRequestSchema,
   QuestionAddSuccessResponseSchema,
 } from '@api';
-import { SubCategoriesDBServices } from '../services/DatabaseService/SubCategoriesDBServices';
 import { Prisma } from '@prisma/client';
 
-async function questionRoutes(fastify: FastifyInstance): Promise<void> {
+export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
   const questionsDBService = new QuestionsDBService(fastify.prisma);
-  const subCategoriesDBService = new SubCategoriesDBServices(fastify.prisma);
+  // Fix: Use correct service name
+  const subcategoriesDBService = new SubCategoriesDBService(fastify.prisma);
 
   // Ensure all thrown errors are serialized into the project's ApiErrorSchema shape
   fastify.setErrorHandler(async (error, request, reply) => {
@@ -133,7 +135,8 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
       try {
         const payload = request.body;
 
-        const hasSubcategoryId = await subCategoriesDBService.findUnique({
+        // Fix: Use correct service variable name
+        const hasSubcategoryId = await subcategoriesDBService.findUnique({
           where: { id: payload.subcategoryId },
         });
 
@@ -220,7 +223,7 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
     }
   );
 
-  // GET /question/categories
+  // GET /question/:id
   fastify.get<{
     Params: { id: string };
     Querystring: QuestionGetRequest;
@@ -241,18 +244,15 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
         },
       },
     },
-
     async (request, reply) => {
       try {
         const { id } = request.params;
         const { lang } = request.query;
-        console.log('lang', lang);
+
         const questions = await questionsDBService.findById({
           where: { id: parseInt(id, 10) },
           language: lang,
         });
-
-        console.log(questions);
 
         return reply.status(200).send({
           success: true,
@@ -265,13 +265,13 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
         fastify.log.error(err);
         return reply.status(500).send({
           success: false,
-          error: { message: 'Failed to fetch categories', code: 500 },
+          error: { message: 'Failed to fetch questions', code: 500 },
         });
       }
     }
   );
 
-  // PATCH /question/:id -> update existing question (including translations and options)
+  // PATCH /question/:id -> update existing question
   fastify.patch<{
     Params: { id: string };
     Body: Partial<QuestionUpsertRequest> & {
@@ -332,7 +332,8 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
 
         // validate subcategory if provided
         if (payload.subcategoryId) {
-          const sub = await subCategoriesDBService.findUnique({
+          // Fix: Use correct service and method
+          const sub = await subcategoriesDBService.findUnique({
             where: { id: payload.subcategoryId },
           });
           if (!sub) {
@@ -364,13 +365,11 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
             : undefined,
         };
 
-        // If translations provided, remove existing translations and create new ones
+        // Handle translations update
         if (Array.isArray(payload.translations)) {
-          // delete existing translations
           await fastify.prisma.questionTranslation.deleteMany({
             where: { questionId: id },
           });
-          // create new translations
           updateData.translations = {
             create: payload.translations.map((t) => ({
               locale: t.locale,
@@ -380,9 +379,8 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
           } as Prisma.QuestionUpdateInput['translations'];
         }
 
-        // If options provided, replace existing options and their translations
+        // Handle options update
         if (Array.isArray(payload.options)) {
-          // delete existing option translations and options
           const existingOptions = await fastify.prisma.option.findMany({
             where: { questionId: id },
           });
@@ -431,7 +429,7 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
     }
   );
 
-  //Get aLL qUESTIONS Subcategory
+  // GET /subcategory/:subcategoryId -> Get all questions for a subcategory
   fastify.get<{
     Params: { subcategoryId: string };
     Querystring: { lang: string };
@@ -487,8 +485,6 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
           },
         });
 
-        console.log(questions);
-
         return reply.status(200).send({
           success: true,
           message: 'Questions fetched',
@@ -509,5 +505,3 @@ async function questionRoutes(fastify: FastifyInstance): Promise<void> {
     }
   );
 }
-
-export default questionRoutes;

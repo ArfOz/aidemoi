@@ -1,32 +1,6 @@
 import { Prisma, PrismaClient, Subcategory } from '@prisma/client';
 
-export type SubcategoryWithI18n = Prisma.SubcategoryGetPayload<{
-  include: { i18n: true };
-}>;
-
-export type SubcategoryId = string;
-
-export interface SubcategoryI18nInput {
-  locale: string;
-  name: string;
-  description?: string | null;
-}
-
-export interface CreateSubcategoryInput {
-  categoryId: string;
-  slug?: string;
-  icon?: string | null;
-  sortOrder?: number;
-  i18n: SubcategoryI18nInput[];
-}
-
-export interface UpdateSubcategoryInput {
-  icon?: string | null;
-  sortOrder?: number;
-  i18n?: SubcategoryI18nInput[];
-}
-
-export class SubCategoriesDBServices {
+export class SubCategoriesDBService {
   constructor(private prisma: PrismaClient) {} // Will be injected by Fastify plugin
 
   async findAll(
@@ -34,7 +8,7 @@ export class SubCategoriesDBServices {
       where?: Prisma.SubcategoryWhereInput;
       order?: Prisma.SubcategoryOrderByWithRelationInput;
     } = {}
-  ): Promise<SubcategoryWithI18n[]> {
+  ): Promise<Subcategory[]> {
     return await this.prisma.subcategory.findMany({
       where: opts.where,
       include: { i18n: true },
@@ -53,29 +27,23 @@ export class SubCategoriesDBServices {
     });
   }
 
-  async findBySlugAndCategory(
-    categoryId: string,
-    slug: SubcategoryId
-  ): Promise<SubcategoryWithI18n | null> {
-    return await this.prisma.subcategory.findFirst({
-      where: { categoryId, slug },
-      include: { i18n: true },
-    });
-  }
-
-  async create(
-    input: CreateSubcategoryInput
-  ): Promise<{ categoryId: string; slug: SubcategoryId; created: true }> {
+  async create(input: {
+    categoryId: string;
+    i18n: { locale: string; name: string; description?: string }[];
+    slug?: string;
+    icon?: string;
+    sortOrder?: number;
+  }): Promise<Subcategory> {
     if (!input.i18n || input.i18n.length === 0) {
       throw new Error('At least one i18n entry is required');
     }
 
-    const category = await this.prisma.category.findUnique({
-      where: { id: input.categoryId },
-    });
-    if (!category) {
-      throw new Error(`Category not found: ${input.categoryId}`);
-    }
+    // const category = await this.prisma.category.findUnique({
+    //   where: { id: input.categoryId },
+    // });
+    // if (!category) {
+    //   throw new Error(`Category not found: ${input.categoryId}`);
+    // }
 
     const preferred =
       input.i18n.find((e) => e.locale.toLowerCase() === 'en') ?? input.i18n[0];
@@ -112,72 +80,22 @@ export class SubCategoriesDBServices {
       },
     });
 
-    return {
-      categoryId: created.categoryId,
-      slug: created.slug,
-      created: true,
-    };
+    return created;
   }
 
   async update(
-    categoryId: string,
-    slug: SubcategoryId,
-    input: UpdateSubcategoryInput
-  ): Promise<{
-    categoryId: string;
-    slug: SubcategoryId;
-    updated: true;
-    updatedLocales: string[];
-  }> {
-    const existing = await this.prisma.subcategory.findFirst({
-      where: { categoryId, slug },
+    where: Prisma.SubcategoryWhereUniqueInput,
+    input: Prisma.SubcategoryUpdateInput
+  ): Promise<Subcategory> {
+    return await this.prisma.subcategory.update({
+      where,
+      data: input,
     });
-    if (!existing)
-      throw new Error(`Subcategory not found: ${categoryId}/${slug}`);
-
-    await this.prisma.subcategory.update({
-      where: { id: existing.id },
-      data: {
-        icon: input.icon ?? existing.icon,
-        sortOrder:
-          typeof input.sortOrder === 'number'
-            ? input.sortOrder
-            : existing.sortOrder,
-      },
-    });
-
-    const updatedLocales: string[] = [];
-    if (input.i18n && input.i18n.length > 0) {
-      for (const entry of input.i18n) {
-        const found = await this.prisma.subcategoryI18n.findFirst({
-          where: { subcategoryId: existing.id, locale: entry.locale },
-        });
-
-        if (found) {
-          await this.prisma.subcategoryI18n.update({
-            where: { id: found.id },
-            data: { name: entry.name, description: entry.description ?? null },
-          });
-        } else {
-          await this.prisma.subcategoryI18n.create({
-            data: {
-              subcategoryId: existing.id,
-              locale: entry.locale,
-              name: entry.name,
-              description: entry.description ?? null,
-            },
-          });
-        }
-        updatedLocales.push(entry.locale);
-      }
-    }
-
-    return { categoryId, slug, updated: true, updatedLocales };
   }
 
-  async delete(categoryId: string, slug: SubcategoryId): Promise<boolean> {
+  async delete(where: Prisma.SubcategoryWhereUniqueInput): Promise<boolean> {
     const res = await this.prisma.subcategory.deleteMany({
-      where: { categoryId, slug },
+      where,
     });
     return res.count > 0;
   }

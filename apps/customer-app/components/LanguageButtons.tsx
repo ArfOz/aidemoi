@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
-import { locales } from '../../../i18n/routing';
+import { locales } from '../i18n/routing';
 
 export default function LanguageButtons({
   currentLang,

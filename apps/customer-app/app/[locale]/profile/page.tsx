@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useAuth } from '../components/context/AuthContext';
+import { useAuth } from '@components';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -61,21 +61,32 @@ const ProfilePage: React.FC<{ params: Promise<{ locale: string }> }> = ({
                 </label>
                 <p className="text-lg text-gray-900">{user.id}</p>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Account Created
-                </label>
-                <p className="text-lg text-gray-900">
-                  {new Date(user.createdAt).toLocaleDateString()}
-                </p>
-              </div>
             </div>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Link
+              href={`/${resolvedParams.locale}/myjobs`}
+              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-colors text-center flex items-center justify-center gap-2"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m-8 0V6a2 2 0 00-2 2v6.341"
+                />
+              </svg>
+              My Jobs
+            </Link>
             <Link
               href={`/${resolvedParams.locale}`}
-              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-colors"
+              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-colors text-center"
             >
               Back to Home
             </Link>

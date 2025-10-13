@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../components/context/AuthContext';
+import { useAuth } from '@components';
 import {
   LoginForm,
   LogoHeaderLogin,
@@ -61,7 +61,7 @@ const LoginPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<Element>) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -72,6 +72,8 @@ const LoginPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
     try {
       // Use the AuthContext login function which handles the API call
       await login(formData);
+
+      console.log('Login successful');
 
       // Redirect to dashboard or home page
       router.push(`/${resolvedParams.locale}`);
@@ -91,7 +93,7 @@ const LoginPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
         <LogoHeaderLogin resolvedParams={resolvedParams} />
         {/* Login Form */}
         <LoginForm
-          handleSubmit={() => handleSubmit}
+          handleSubmit={handleSubmit}
           handleInputChange={handleInputChange}
           formData={formData}
           errors={errors}

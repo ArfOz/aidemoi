@@ -6,13 +6,14 @@ import {
   CategoryDetailSuccessResponse,
   QuestionGetSuccessResponse,
 } from '@api';
-import { NavigationButton, QuestionSection } from './components';
 import {
+  NavigationButton,
+  QuestionSection,
   AnswersState,
   I18nTranslation,
   Question,
   SubcategoryWithI18n,
-} from './components/types';
+} from './components';
 
 // --- Page Component ---
 export default function Page() {

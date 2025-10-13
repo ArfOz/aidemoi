@@ -9,14 +9,48 @@ import {
   RegisterSuccessResponseType,
   TokenType,
   User,
+  APIError,
 } from '@api';
+
+type ApiOptions = {
+  headers?: Record<string, string>;
+  timeout?: number;
+  cache?: RequestCache;
+};
+
+interface AuthenticatedApi {
+  get: <T extends object>(
+    endpoint: string,
+    options?: ApiOptions
+  ) => Promise<T | null>;
+  post: <T extends object>(
+    endpoint: string,
+    body?: unknown,
+    options?: ApiOptions
+  ) => Promise<T | null>;
+  put: <T extends object>(
+    endpoint: string,
+    body?: unknown,
+    options?: ApiOptions
+  ) => Promise<T | null>;
+  delete: <T extends object>(
+    endpoint: string,
+    options?: ApiOptions
+  ) => Promise<T | null>;
+  patch: <T extends object>(
+    endpoint: string,
+    body?: unknown,
+    options?: ApiOptions
+  ) => Promise<T | null>;
+}
 
 interface AuthContextType {
   user: User | null;
-  tokens: any | null;
+  tokens: TokenType | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  api: AuthenticatedApi;
   login: (
     credentials: LoginRequestType
   ) => Promise<LoginSuccessResponseType['data']>;
@@ -56,8 +90,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         const storedTokens = localStorage.getItem('auth_tokens');
 
         if (storedUser && storedTokens) {
-          setUser(JSON.parse(storedUser));
-          setTokens(JSON.parse(storedTokens));
+          const parsedUser = JSON.parse(storedUser);
+          const parsedTokens = JSON.parse(storedTokens);
+          setUser(parsedUser);
+          setTokens(parsedTokens);
+
+          // Ensure the main token is available for API calls
+          if (parsedTokens.token) {
+            localStorage.setItem('token', parsedTokens.token);
+          }
         }
       }
     } catch (error) {
@@ -80,7 +121,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const response = await apiAideMoi.post<LoginSuccessResponseType>(
         '/auth/login',
         credentials,
-        { cache: 'no-store' } as any
+        { cache: 'no-store' }
       );
 
       if (!response.success) throw new Error(response.message);
@@ -89,18 +130,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setUser(user);
       setTokens(tokens);
 
-      // Optional: set default Authorization for future calls
-      try {
-        (apiAideMoi as any).defaults ||= { headers: { common: {} } };
-        (apiAideMoi as any).defaults.headers.common[
-          'Authorization'
-        ] = `Bearer ${tokens.token}`;
-      } catch {
-        console.error('Failed to set default Authorization header');
-      }
-
+      // Store tokens in localStorage for API calls
       localStorage.setItem('auth_user', JSON.stringify(user));
       localStorage.setItem('auth_tokens', JSON.stringify(tokens));
+      // Store the main token for easy access by API calls
+      localStorage.setItem('token', tokens.token);
+      localStorage.setItem('refreshToken', tokens.refreshToken);
 
       return response.data; // return data so callers can do: const { tokens } = await login(...)
     } catch (err) {
@@ -152,6 +187,68 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setError(null);
     localStorage.removeItem('auth_user');
     localStorage.removeItem('auth_tokens');
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+  };
+
+  // Simple API wrapper with 401 handling
+  const handleApiCall = async <T extends object>(
+    apiCall: () => Promise<T>
+  ): Promise<T | null> => {
+    try {
+      return await apiCall();
+    } catch (error: unknown) {
+      if (
+        (error instanceof APIError && error.status === 401) ||
+        (error instanceof Error &&
+          (error.message.includes('401') ||
+            error.message.includes('Unauthorized')))
+      ) {
+        console.warn('401 Unauthorized detected, logging out user');
+        logout();
+        return null;
+      }
+      throw error;
+    }
+  };
+
+  const api: AuthenticatedApi = {
+    get: <T extends object>(endpoint: string, options?: ApiOptions) =>
+      handleApiCall(() =>
+        apiAideMoi.get<T>(endpoint, { ...options, useAuth: true })
+      ),
+
+    post: <T extends object>(
+      endpoint: string,
+      body?: unknown,
+      options?: ApiOptions
+    ) =>
+      handleApiCall(() =>
+        apiAideMoi.post<T>(endpoint, body, { ...options, useAuth: true })
+      ),
+
+    put: <T extends object>(
+      endpoint: string,
+      body?: unknown,
+      options?: ApiOptions
+    ) =>
+      handleApiCall(() =>
+        apiAideMoi.put<T>(endpoint, body, { ...options, useAuth: true })
+      ),
+
+    delete: <T extends object>(endpoint: string, options?: ApiOptions) =>
+      handleApiCall(() =>
+        apiAideMoi.delete<T>(endpoint, { ...options, useAuth: true })
+      ),
+
+    patch: <T extends object>(
+      endpoint: string,
+      body?: unknown,
+      options?: ApiOptions
+    ) =>
+      handleApiCall(() =>
+        apiAideMoi.patch<T>(endpoint, body, { ...options, useAuth: true })
+      ),
   };
 
   const updateUser = (data: Partial<User>) => {
@@ -172,6 +269,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     isAuthenticated,
     isLoading,
     error,
+    api,
     login,
     register,
     logout,

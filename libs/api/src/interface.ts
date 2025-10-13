@@ -10,7 +10,6 @@ import {
   ProfileSuccessResponseSchema,
   RefreshTokenRequestSchema,
   LogoutSuccessResponseSchema,
-  TokenSchema,
   CategoryUpsertRequestSchema,
   CategoryUpsertSuccessResponseSchema,
   SubcategoryUpsertRequestSchema,
@@ -25,6 +24,15 @@ import {
   SubcategoryDetailRequestSchema,
   SubcategoryDetailSuccessResponseSchema,
   QuestionGetRequestSchema,
+  AnswerAddSuccessResponseSchema,
+  AnswersCreateRequestSchema,
+  AnswerGetSuccessResponseSchema,
+  AnswerGetRequestSchema,
+  JobCreateRequestSchema,
+  JobCreateSuccessResponseSchema,
+  MyJobsGetRequestSchema,
+  MyJobsGetSuccessResponseSchema,
+  IdParamsSchema,
 } from './schema';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -61,8 +69,6 @@ export type LogoutSuccessResponseType = Static<
 export interface LogoutHeaders {
   authorization: string;
 }
-
-export type TokenType = Static<typeof TokenSchema>;
 
 // export type LogoutRequest = Static<typeof LogoutRequestSchema>;
 export type CategoryUpsertRequest = Static<typeof CategoryUpsertRequestSchema>;
@@ -110,3 +116,28 @@ export type QuestionGetSuccessResponse = Static<
 export type SubcategoryGetRequest = Static<
   typeof SubcategoryDetailRequestSchema
 >;
+
+export type AnswersCreateRequest = Static<typeof AnswersCreateRequestSchema>;
+
+export type AnswerAddSuccessResponse = Static<
+  typeof AnswerAddSuccessResponseSchema
+>;
+export type AnswerGetSuccessResponse = Static<
+  typeof AnswerGetSuccessResponseSchema
+>;
+
+export type AnswerGetRequest = Static<typeof AnswerGetRequestSchema>;
+
+export type JobCreateRequest = Static<typeof JobCreateRequestSchema>;
+
+export type JobCreateSuccessResponse = Static<
+  typeof JobCreateSuccessResponseSchema
+>;
+
+export type MyJobsGetRequest = Static<typeof MyJobsGetRequestSchema>;
+
+export type MyJobsGetSuccessResponse = Static<
+  typeof MyJobsGetSuccessResponseSchema
+>;
+
+export type IdParamUrl = Static<typeof IdParamsSchema>;

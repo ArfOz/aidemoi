@@ -9,7 +9,7 @@ import { PostalCodes } from './postal-code';
 
 const montserrat = Montserrat({ subsets: ['latin'], weight: ['800'] });
 
-export default async function Navbar({ lang: currentLang }: { lang: string }) {
+export async function Navbar({ lang: currentLang }: { lang: string }) {
   const locale = (await getLocale()) || currentLang;
   const t = await getTranslations();
 

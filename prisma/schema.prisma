@@ -41,6 +41,7 @@ model Subcategory {
     category   Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
     i18n       SubcategoryI18n[]
     questions  Question[]
+    jobs       Job[] // New relationship
 
     @@unique([categoryId, slug], name: "uq_subcategory_cat_slug")
 }
@@ -65,6 +66,11 @@ model User {
     updatedAt DateTime @updatedAt
     tokens    Token[]
     username  String?  @unique
+    answers   Answer[]
+    // New relationships
+    jobs      Job[]    @relation("JobOwner") // Jobs created by the user
+    bids      Bid[] // Bids placed by the user
+    reviews   Review[] // Reviews received by the user
 }
 
 model Token {
@@ -108,12 +114,13 @@ model Question {
     subcategory  Subcategory           @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
     options      Option[]
     translations QuestionTranslation[]
+    answers      Answer[]
 }
 
 model QuestionTranslation {
     id          Int     @id @default(autoincrement())
     questionId  Int
-    locale      String  @db.VarChar(8) // "en" veya "fr"
+    locale      String  @db.VarChar(8)
     label       String
     description String?
 
@@ -129,15 +136,117 @@ model Option {
     question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
     translations OptionTranslation[]
+    answers      Answer[]
 }
 
 model OptionTranslation {
     id       Int    @id @default(autoincrement())
     optionId Int
-    locale   String @db.VarChar(8) // "en" veya "fr"
+    locale   String @db.VarChar(8)
     label    String
 
     option Option @relation(fields: [optionId], references: [id], onDelete: Cascade)
 
     @@unique([optionId, locale])
+}
+
+model Answer {
+    id            Int       @id @default(autoincrement())
+    userId        Int
+    questionId    Int
+    optionId      Int?
+    textValue     String?
+    numberValue   Float?
+    dateValue     DateTime?
+    inputLanguage String?   @db.VarChar(8)
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
+
+    // Job relationship
+    jobId Int? // Which job this answer belongs to (optional)
+
+    user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+    option   Option?  @relation(fields: [optionId], references: [id], onDelete: SetNull)
+    job      Job?     @relation("JobAnswers", fields: [jobId], references: [id], onDelete: SetNull)
+
+    @@unique([userId, questionId, optionId], name: "unique_user_question_option")
+    @@index([userId])
+    @@index([questionId])
+    @@index([jobId]) // New index
+}
+
+// New Job model
+model Job {
+    id            Int       @id @default(autoincrement())
+    title         String
+    description   String?   @db.Text
+    subcategoryId Int
+    userId        Int // User who created the job
+    status        JobStatus @default(OPEN)
+    location      String?
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
+
+    // Relationships
+    user        User        @relation("JobOwner", fields: [userId], references: [id], onDelete: Cascade)
+    subcategory Subcategory @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
+    answers     Answer[]    @relation("JobAnswers") // Directly linked to Answers
+    bids        Bid[] // Bids received for this job
+    reviews     Review[] // Reviews for this job
+
+    @@index([userId])
+    @@index([subcategoryId])
+    @@index([status])
+}
+
+// Job statuses
+enum JobStatus {
+    OPEN // Open - waiting for bids
+    IN_PROGRESS // In progress
+    COMPLETED // Completed
+    CANCELLED // Cancelled
+}
+
+// Bid model
+model Bid {
+    id        Int       @id @default(autoincrement())
+    jobId     Int
+    userId    Int // User who placed the bid
+    amount    Float? // Optional - some jobs might have fixed prices
+    message   String?   @db.Text
+    status    BidStatus @default(PENDING)
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+
+    job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([jobId, userId]) // Each user can only bid once per job
+    @@index([jobId])
+    @@index([userId])
+}
+
+// Bid statuses
+enum BidStatus {
+    PENDING // Pending
+    ACCEPTED // Accepted
+    REJECTED // Rejected
+}
+
+// Review model
+model Review {
+    id         Int      @id @default(autoincrement())
+    jobId      Int
+    reviewerId Int // User who gives the review
+    revieweeId Int // User who receives the review
+    rating     Int // Rating from 1-5
+    comment    String?  @db.Text
+    createdAt  DateTime @default(now())
+
+    job      Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+    reviewer User @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+
+    @@unique([jobId, reviewerId, revieweeId])
+    @@index([revieweeId])
 }

@@ -19,16 +19,20 @@ import {
   SubcategoryUpsertSuccessResponseSchema,
   SubcategoryGetRequest,
   SubcategoryDetailSuccessResponse,
+  SubcategoryDetailSuccessResponseSchema,
+  IdParamsSchema,
 } from '@api';
-import { CategoriesDBService } from '../services/DatabaseService/CategoriesDBService';
-import { SubCategoriesDBServices } from '../services/DatabaseService/SubCategoriesDBServices';
+import {
+  CategoriesDBService,
+  SubCategoriesDBService,
+} from '../services/DatabaseService';
 
 export async function categoriesRoutes(
   fastify: FastifyInstance
 ): Promise<void> {
   // Initialize services with the Prisma client from Fastify's decoration
   const categoriesDBService = new CategoriesDBService(fastify.prisma);
-  const subCategoriesDBService = new SubCategoriesDBServices(fastify.prisma);
+  const subcategoriesDBService = new SubCategoriesDBService(fastify.prisma);
 
   // Helper to generate URL-safe slug
   const slugify = (input: string): string =>
@@ -71,11 +75,11 @@ export async function categoriesRoutes(
     },
     async (request, reply) => {
       try {
-        // allow server to generate id when creating new category
+        // Allow server to generate id when creating new category
         let id = request.body.id as string | undefined;
         const { icon, sortOrder, i18n } = request.body;
 
-        // basic validation for i18n
+        // Basic validation for i18n
         if (!Array.isArray(i18n) || i18n.length === 0) {
           return reply.status(400).send({
             success: false,
@@ -87,17 +91,17 @@ export async function categoriesRoutes(
           });
         }
 
-        // normalize locales and names
+        // Normalize locales and names
         const normalizedI18n = i18n.map((e) => ({
           ...e,
           locale: String(e.locale || '')
             .toLowerCase()
             .trim(),
           name: String(e.name || '').trim(),
-          description: e.description ?? null,
+          description: e.description ?? undefined,
         }));
 
-        // ensure all names are present
+        // Ensure all names are present
         if (normalizedI18n.some((e) => !e.name)) {
           return reply.status(400).send({
             success: false,
@@ -110,8 +114,7 @@ export async function categoriesRoutes(
         }
 
         let created = false;
-
-        let newId;
+        let result;
 
         if (id) {
           // Update existing category
@@ -128,6 +131,16 @@ export async function categoriesRoutes(
               },
             });
           }
+
+          // Update category
+          result = await categoriesDBService.update(id, {
+            icon: icon ?? undefined,
+            sortOrder: sortOrder,
+            i18n: {
+              deleteMany: {},
+              create: normalizedI18n,
+            },
+          });
         } else {
           // Create new category: Generate ID (slug) from preferred name
           const preferred =
@@ -136,30 +149,19 @@ export async function categoriesRoutes(
             normalizedI18n[0];
 
           const baseSlug = slugify(preferred.name) || 'category';
-          newId = await ensureUniqueCategoryId(baseSlug);
-          // assign generated id into `id` so Prisma create receives the required `id`
-          id = newId;
+          id = await ensureUniqueCategoryId(baseSlug);
           created = true;
+
+          result = await categoriesDBService.create({
+            id,
+            name: preferred.name,
+            icon: icon ?? null,
+            sortOrder: sortOrder ?? 0,
+            i18n: {
+              create: normalizedI18n,
+            },
+          });
         }
-
-        const upsertData = {
-          icon: icon ?? null,
-          sortOrder: sortOrder,
-          // When creating, pass nested create shape Prisma expects
-          i18n: created
-            ? { create: normalizedI18n }
-            : { deleteMany: {}, create: normalizedI18n },
-        };
-
-        const result = created
-          ? await categoriesDBService.create({
-              id,
-              name:
-                normalizedI18n.find((e) => e.locale === 'en')?.name ??
-                normalizedI18n[0].name,
-              ...upsertData,
-            })
-          : await categoriesDBService.update(id, upsertData);
 
         const res: CategoryUpsertSuccessResponse = {
           success: true,
@@ -168,9 +170,7 @@ export async function categoriesRoutes(
             category: {
               id: result.id,
               created,
-              updatedLocales: created
-                ? normalizedI18n.map((item) => item.locale)
-                : normalizedI18n.map((item) => item.locale),
+              updatedLocales: normalizedI18n.map((item) => item.locale),
             },
           },
         };
@@ -211,16 +211,10 @@ export async function categoriesRoutes(
         // Get languages from query parameters
         const { languages: lang } = request.query;
 
-        // Fetch all categories with language filtering at database level
-        const categories = await categoriesDBService.findAll({
-          where:
-            lang && lang.length > 0
-              ? {
-                  i18n: { some: { locale: { in: lang } } },
-                }
-              : undefined,
-          languages: lang && lang.length > 0 ? lang : undefined,
-        });
+        // Fetch all categories with language filtering
+        const categories = await categoriesDBService.findAll(
+          lang && lang.length > 0 ? { languages: lang } : undefined
+        );
 
         return reply.status(200).send({
           success: true,
@@ -254,11 +248,7 @@ export async function categoriesRoutes(
     '/category/:id',
     {
       schema: {
-        params: {
-          type: 'object',
-          properties: { id: { type: 'string' } },
-          required: ['id'],
-        },
+        params: IdParamsSchema,
         querystring: CategoryGetRequestSchema,
         response: {
           200: CategoryDetailSuccessResponseSchema,
@@ -273,7 +263,7 @@ export async function categoriesRoutes(
         const { id } = request.params;
         const { languages: lang } = request.query;
 
-        // Fetch category by ID with language filtering at database level
+        // Fetch category by ID with language filtering
         const category = await categoriesDBService.findById({
           where: { id },
           languages: lang && lang.length > 0 ? lang : undefined,
@@ -313,64 +303,75 @@ export async function categoriesRoutes(
     }
   );
 
-  // List/Get Subcategories
+  // Get Subcategory by ID
   fastify.get<{
     Params: { id: string };
-    Body: SubcategoryGetRequest;
+    Querystring: SubcategoryGetRequest;
     Reply: SubcategoryDetailSuccessResponse | ApiErrorResponseType;
-  }>('/subcategory/:id', async (request, reply) => {
-    try {
-      // allow optional query params: categoryId and languages (array)
-      const q: any = request.query || {};
-      const categoryId: string | undefined = q.categoryId;
-      const languages: string[] | undefined = q.languages;
-
-      const where: any = {};
-      if (categoryId) where.categoryId = categoryId;
-      if (languages && Array.isArray(languages) && languages.length > 0) {
-        where.i18n = { some: { locale: { in: languages } } };
-      }
-
-      const subcategory = await subCategoriesDBService.findUnique({
-        where: {
-          id: Number(request.params.id),
+  }>(
+    '/subcategory/:id',
+    {
+      schema: {
+        params: IdParamsSchema,
+        response: {
+          200: SubcategoryDetailSuccessResponseSchema,
+          404: ApiErrorSchema,
+          500: ApiErrorSchema,
         },
-      });
+      },
+    },
+    async (request, reply) => {
+      try {
+        const { id } = request.params;
+        const query: any = request.query || {};
+        const languages: string[] | undefined = query.languages;
 
-      if (!subcategory) {
-        return reply.status(404).send({
-          success: false,
-          message: 'Subcategory not found',
-          error: {
-            message: `Subcategory with id "${request.params.id}" not found`,
-            code: 404,
+        const subcategories = await subcategoriesDBService.findAll({
+          where: {
+            slug: id,
+            ...(languages && languages.length > 0
+              ? { i18n: { some: { locale: { in: languages } } } }
+              : {}),
           },
         });
+
+        const subcategory = subcategories?.[0];
+
+        if (!subcategory) {
+          return reply.status(404).send({
+            success: false,
+            message: 'Subcategory not found',
+            error: {
+              message: `Subcategory with id "${id}" not found`,
+              code: 404,
+            },
+          });
+        }
+
+        return reply.status(200).send({
+          success: true,
+          message: 'Subcategory fetched',
+          data: {
+            subcategory:
+              subcategory as unknown as SubcategoryDetailSuccessResponse['data']['subcategory'],
+          },
+        });
+      } catch (err) {
+        fastify.log.error(err);
+        const devMsg =
+          process.env.NODE_ENV === 'development' && err instanceof Error
+            ? `Failed to fetch subcategory: ${err.message}`
+            : 'Failed to fetch subcategory';
+        return reply.status(500).send({
+          success: false,
+          message: 'Request failed',
+          error: { message: devMsg, code: 500 },
+        });
       }
-
-      return reply.status(200).send({
-        success: true,
-        message: 'Subcategory fetched',
-        data: {
-          subcategory:
-            subcategory as unknown as SubcategoryDetailSuccessResponse['data']['subcategory'],
-        },
-      });
-    } catch (err) {
-      fastify.log.error(err);
-      const devMsg =
-        process.env.NODE_ENV === 'development' && err instanceof Error
-          ? `Failed to fetch subcategories: ${err.message}`
-          : 'Failed to fetch subcategories';
-      return reply.status(500).send({
-        success: false,
-        message: 'Request failed',
-        error: { message: devMsg, code: 500 },
-      });
     }
-  });
+  );
 
-  // Upsert SubCategory
+  // Upsert Subcategory
   fastify.post<{
     Body: SubcategoryUpsertRequest;
     Reply: SubcategoryUpsertSuccessResponse | ApiErrorResponseType;
@@ -392,7 +393,7 @@ export async function categoriesRoutes(
         let slug = request.body.slug as string | undefined;
         const { i18n } = request.body;
 
-        // If slug provided, normalise it; otherwise leave undefined to let service generate one.
+        // If slug provided, normalize it; otherwise leave undefined to let service generate one
         if (typeof slug === 'string') {
           slug = slugify(String(slug).trim());
           if (!slug) {
@@ -425,7 +426,7 @@ export async function categoriesRoutes(
             .toLowerCase()
             .trim(),
           name: String(e.name || '').trim(),
-          description: e.description ?? null,
+          description: e.description ?? undefined,
         }));
 
         // Ensure all names are present
@@ -453,66 +454,41 @@ export async function categoriesRoutes(
         }
 
         let created = false;
-        let updatedLocales: string[] = [];
+        let result;
 
         // If slug provided, check existence; if no slug provided, proceed to create
         let subcategory = null;
         if (slug) {
-          subcategory = await subCategoriesDBService.findBySlugAndCategory(
-            categoryId,
-            slug
-          );
+          const subcategories = await subcategoriesDBService.findAll({
+            where: { categoryId, slug },
+          });
+          subcategory = subcategories?.[0] || null;
         }
 
         if (!subcategory) {
           // Create new subcategory
-          try {
-            const result = await subCategoriesDBService.create({
-              categoryId,
-              slug: slug as string, // service accepts optional slug
-              icon: icon ?? null,
-              sortOrder: sortOrder ?? 0,
-              i18n: normalizedI18n,
-            });
-            created = true;
-            updatedLocales = normalizedI18n.map((item) => item.locale);
-            // capture generated slug if service returned one
-            slug = result.slug;
-          } catch {
-            // Fallback if createSubcategory doesn't exist
-            return reply.status(500).send({
-              success: false,
-              message: 'Service error',
-              error: {
-                message: 'Subcategory service method not implemented',
-                code: 500,
-              },
-            });
-          }
+          result = await subcategoriesDBService.create({
+            categoryId,
+            slug: slug || undefined,
+            icon: icon ?? undefined,
+            sortOrder: sortOrder ?? 0,
+            i18n: normalizedI18n,
+          });
+          created = true;
+          slug = result.slug;
         } else {
           // Update existing subcategory
-          try {
-            const updateResult = await subCategoriesDBService.update(
-              categoryId,
-              slug as string,
-              {
-                icon: icon ?? null,
-                sortOrder: sortOrder,
-                i18n: normalizedI18n,
-              }
-            );
-            updatedLocales = updateResult?.updatedLocales ?? [];
-          } catch {
-            // Fallback if updateSubcategory doesn't exist
-            return reply.status(500).send({
-              success: false,
-              message: 'Service error',
-              error: {
-                message: 'Subcategory update service method not implemented',
-                code: 500,
+          result = await subcategoriesDBService.update(
+            { id: subcategory.id },
+            {
+              icon: icon ?? undefined,
+              sortOrder: sortOrder,
+              i18n: {
+                deleteMany: {},
+                create: normalizedI18n,
               },
-            });
-          }
+            }
+          );
         }
 
         const res: SubcategoryUpsertSuccessResponse = {
@@ -523,7 +499,7 @@ export async function categoriesRoutes(
               categoryId,
               slug: slug as string,
               created,
-              updatedLocales,
+              updatedLocales: normalizedI18n.map((item) => item.locale),
             },
           },
         };
