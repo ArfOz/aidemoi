@@ -9,7 +9,7 @@ export default async function CategoryPage({
   params: { locale: string; category: string };
 }) {
   const locale = await getLocale();
-  const { category } = params;
+  const { category } = await params;
   let active: CategoryDetailSuccessResponse['data']['category'] | undefined;
   try {
     const json = await apiAideMoi.get<CategoryDetailSuccessResponse>(
