@@ -2,8 +2,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { notFound } from 'next/navigation';
 import { routing } from '../../i18n/routing';
 import './styles/globals.css';
-import { AuthProvider } from '../../components/context';
-import Navbar from '../../components/Navbar';
+import { AuthProvider, Navbar } from '@components';
 
 export default async function LocaleLayout({
   children,
@@ -12,7 +11,7 @@ export default async function LocaleLayout({
   children: React.ReactNode;
   params: { locale: string };
 }) {
-  const { locale } = await params;
+  const { locale } = await params; // fixed destructure
   if (!routing.locales.includes(locale as (typeof routing.locales)[number])) {
     notFound();
   }

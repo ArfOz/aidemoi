@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useEffect } from 'react';
-import { cn } from '../../app/lib/utils';
+
 import { Button } from './Button';
 import { FaTimes } from 'react-icons/fa';
 
@@ -53,6 +55,10 @@ export function Modal({
   }, [isOpen]);
 
   if (!isOpen) return null;
+
+  function cn(...classes: (string | undefined | null | false)[]): string {
+    return classes.filter(Boolean).join(' ');
+  }
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">

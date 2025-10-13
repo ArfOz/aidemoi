@@ -1,9 +1,15 @@
+'use client';
+
 import React, { forwardRef } from 'react';
 import Link from 'next/link';
-import { cn } from '../../app/lib/utils';
 
-type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline';
-type ButtonSize = 'sm' | 'md' | 'lg';
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'danger'
+  | 'ghost'
+  | 'outline';
+export type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface BaseButtonProps {
   children: React.ReactNode;
@@ -18,7 +24,7 @@ interface BaseButtonProps {
 
 interface ButtonAsButtonProps extends BaseButtonProps {
   type?: 'button' | 'submit' | 'reset';
-  onClick?: () => void;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
   href?: never;
 }
 
@@ -28,22 +34,22 @@ interface ButtonAsLinkProps extends BaseButtonProps {
   onClick?: never;
 }
 
-type ButtonProps = ButtonAsButtonProps | ButtonAsLinkProps;
+export type ButtonProps = ButtonAsButtonProps | ButtonAsLinkProps;
 
-const buttonVariants = {
+const buttonVariants: Record<ButtonVariant, string> = {
   primary: 'bg-purple-600 text-white hover:bg-purple-700 focus:ring-purple-500',
   secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500',
   danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
   ghost: 'text-purple-600 hover:bg-purple-50 focus:ring-purple-500',
   outline:
     'border border-purple-600 text-purple-600 hover:bg-purple-50 focus:ring-purple-500',
-} as const;
+};
 
-const buttonSizes = {
+const buttonSizes: Record<ButtonSize, string> = {
   sm: 'px-3 py-1.5 text-sm',
   md: 'px-4 py-2 text-base',
   lg: 'px-6 py-3 text-lg',
-} as const;
+};
 
 export const Button = forwardRef<
   HTMLButtonElement | HTMLAnchorElement,
@@ -68,14 +74,19 @@ export const Button = forwardRef<
 
     const classes = cn(
       baseClasses,
-      buttonVariants[variant as keyof typeof buttonVariants],
-      buttonSizes[size as keyof typeof buttonSizes],
-      (loading || disabled) && 'pointer-events-none',
+      buttonVariants[variant],
+      buttonSizes[size],
+      (loading || disabled) && 'pointer-events-none aria-disabled:opacity-50',
       className
     );
 
     const iconElement = loading ? (
-      <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+      <svg
+        className="animate-spin h-4 w-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
         <circle
           className="opacity-25"
           cx="12"
@@ -102,23 +113,31 @@ export const Button = forwardRef<
       </>
     );
 
+    // Link case
     if ('href' in props && props.href) {
+      if (disabled || loading) {
+        // Render a non-interactive element when disabled/loading
+        return (
+          <span className={classes} aria-disabled="true">
+            {content}
+          </span>
+        );
+      }
       return (
-        <Link
-          ref={ref as React.Ref<HTMLAnchorElement>}
-          href={props.href}
-          className={classes}
-        >
+        <Link href={props.href} className={classes} aria-disabled={undefined}>
           {content}
         </Link>
       );
     }
 
+    // Button case
+    const buttonProps = props as ButtonAsButtonProps;
+
     return (
       <button
         ref={ref as React.Ref<HTMLButtonElement>}
-        type={props.type || 'button'}
-        onClick={props.onClick}
+        type={buttonProps.type || 'button'}
+        onClick={buttonProps.onClick}
         disabled={disabled || loading}
         className={classes}
       >
@@ -129,3 +148,9 @@ export const Button = forwardRef<
 );
 
 Button.displayName = 'Button';
+
+export default Button;
+
+function cn(...classes: (string | boolean | undefined | null)[]): string {
+  return classes.filter(Boolean).join(' ');
+}

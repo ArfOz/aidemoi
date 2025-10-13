@@ -2,17 +2,15 @@ import { CategoryDetailSuccessResponse } from '@api';
 import Link from 'next/link';
 import React from 'react';
 
-export const SubCategoryCards = ({
-  subs,
-  locale,
-  params,
-  active,
-}: {
+type SubCategoryCardsProps = {
   subs: CategoryDetailSuccessResponse['data']['category']['subcategories'];
   locale: string;
   params: { locale: string; category: string };
   active: CategoryDetailSuccessResponse['data']['category'] | undefined;
-}) => {
+};
+
+export function SubCategoryCards(props: SubCategoryCardsProps) {
+  const { subs, locale, params, active } = props;
   if (!active) return null;
 
   console.log('active category:', active);
@@ -36,7 +34,7 @@ export const SubCategoryCards = ({
           return (
             <Link
               key={s.slug}
-              href={`/${params.locale}/${active.id}/${
+              href={`/${locale}/${active.id}/${
                 s.slug
               }?subcatId=${encodeURIComponent(s.id)}`}
               aria-label={`${sName} subcategory`}
@@ -72,4 +70,4 @@ export const SubCategoryCards = ({
       )}
     </section>
   );
-};
+}

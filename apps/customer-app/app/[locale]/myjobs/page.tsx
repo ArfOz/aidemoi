@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { MyJobsGetSuccessResponse } from '@api';
-import { useAuth } from '../components/context/AuthContext';
+import { useAuth } from '@components';
 import {
   JobsError,
   PaginationButton,
