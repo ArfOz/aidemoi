@@ -220,6 +220,10 @@ export default function Page() {
               questions[currentQuestionIndex]
             )}
             goToNextQuestion={goToNextQuestion}
+            isLast={currentQuestionIndex === questions.length - 1}
+            onSubmit={() => {
+              console.log('Answers:', answers);
+            }}
           />
         </div>
       ) : (
