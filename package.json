@@ -38,6 +38,7 @@
     "fastify-plugin": "~5.0.1",
     "fastify-type-provider-zod": "^5.0.2",
     "jsonwebtoken": "^9.0.2",
+    "jwt-decode": "^4.0.0",
     "next": "~15.2.4",
     "next-intl": "^3.22.0",
     "pg": "^8.16.3",

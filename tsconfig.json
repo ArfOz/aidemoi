@@ -7,5 +7,25 @@
   },
   "extends": "./tsconfig.base.json",
   "compileOnSave": false,
-  "files": []
+  "files": [],
+  "references": [
+    {
+      "path": "./apps/customer-app-e2e"
+    },
+    {
+      "path": "./apps/customer-app"
+    },
+    {
+      "path": "./apps/company-app"
+    },
+    {
+      "path": "./apps/backend"
+    },
+    {
+      "path": "./libs/api"
+    },
+    {
+      "path": "./libs"
+    }
+  ]
 }

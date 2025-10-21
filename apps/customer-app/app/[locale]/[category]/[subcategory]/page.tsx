@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import {
+  AnswerAddSuccessResponse,
   apiAideMoi,
   CategoryDetailSuccessResponse,
   QuestionGetSuccessResponse,
@@ -168,6 +169,41 @@ export default function Page() {
     fetchData();
   }, [locale, category, subcategory]);
 
+  const SendAnswers = async (answersState: AnswersState) => {
+    // Transform your answersState to the required array format
+    // You may need to adjust this mapping based on your actual state structure
+    const payload = Object.entries(answersState.options).flatMap(
+      ([questionId, optionIds]) =>
+        (optionIds as string[]).map((optionId) => ({
+          questionId: Number(questionId),
+          optionId: Number(optionId),
+          inputLanguage: locale || 'en',
+        }))
+    );
+
+    try {
+      const res = await apiAideMoi.post<AnswerAddSuccessResponse>(
+        `/answers/answers`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ answers: payload }),
+        }
+      );
+
+      if (!res.success) {
+        throw new Error('Failed to submit answers');
+      }
+
+      // Optionally handle success (show message, redirect, etc.)
+      alert('Answers submitted successfully!');
+    } catch (error) {
+      alert('Error submitting answers');
+      console.error(error);
+    }
+  };
+
   // --- Early returns only in render section ---
   if (!locale || !category || !subcategory)
     return <div>Invalid URL parameters</div>;
@@ -222,7 +258,7 @@ export default function Page() {
             goToNextQuestion={goToNextQuestion}
             isLast={currentQuestionIndex === questions.length - 1}
             onSubmit={() => {
-              console.log('Answers:', answers);
+              SendAnswers(answers);
             }}
           />
         </div>
