@@ -5,6 +5,7 @@ import {
   AnswerAddSuccessResponse,
   apiAideMoi,
   CategoryDetailSuccessResponse,
+  JobCreateSuccessResponse,
   QuestionGetSuccessResponse,
 } from '@api';
 import {
@@ -45,50 +46,77 @@ export default function Page() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  // job meta inputs to build payload like the example
+  const [jobTitle, setJobTitle] = useState<string>('');
+  const [jobDescription, setJobDescription] = useState<string>('');
+
   // --- Handlers ---
   const handleOptionClick = useCallback(
     (questionId: string, optionValue: string, isMulti: boolean): void => {
+      console.log('handleOptionClick called:', {
+        questionId,
+        optionValue,
+        isMulti,
+      }); // Debug log
       setAnswers((prev) => {
         const current = prev.options[questionId] || [];
-        return {
+        const updatedOptions = isMulti
+          ? current.includes(optionValue)
+            ? current.filter((v) => v !== optionValue)
+            : [...current, optionValue]
+          : current.includes(optionValue)
+          ? []
+          : [optionValue];
+        const newAnswers = {
           ...prev,
           options: {
             ...prev.options,
-            [questionId]: isMulti
-              ? current.includes(optionValue)
-                ? current.filter((v) => v !== optionValue)
-                : [...current, optionValue]
-              : current.includes(optionValue)
-              ? []
-              : [optionValue],
+            [questionId]: updatedOptions,
           },
         };
+        console.log('Updated answers.options:', newAnswers.options); // Debug log
+        return newAnswers;
       });
     },
     []
   );
 
   const handleDateChange = useCallback((questionId: string, value: string) => {
-    setAnswers((prev) => ({
-      ...prev,
-      date: { ...prev.date, [questionId]: value },
-    }));
+    console.log('handleDateChange called:', { questionId, value }); // Debug log
+    setAnswers((prev) => {
+      const newAnswers = {
+        ...prev,
+        date: { ...prev.date, [questionId]: value },
+      };
+      console.log('Updated answers.date:', newAnswers.date); // Debug log
+      return newAnswers;
+    });
   }, []);
 
   const handleTextChange = useCallback((questionId: string, value: string) => {
-    setAnswers((prev) => ({
-      ...prev,
-      text: { ...prev.text, [questionId]: value },
-    }));
+    console.log('handleTextChange called:', { questionId, value }); // Debug log
+    setAnswers((prev) => {
+      const newAnswers = {
+        ...prev,
+        text: { ...prev.text, [questionId]: value },
+      };
+      console.log('Updated answers.text:', newAnswers.text); // Debug log
+      return newAnswers;
+    });
   }, []);
 
   const handleNumberChange = useCallback(
     (questionId: string, value: string) => {
+      console.log('handleNumberChange called:', { questionId, value }); // Debug log
       if (value === '' || /^\d*\.?\d*$/.test(value)) {
-        setAnswers((prev) => ({
-          ...prev,
-          number: { ...prev.number, [questionId]: value },
-        }));
+        setAnswers((prev) => {
+          const newAnswers = {
+            ...prev,
+            number: { ...prev.number, [questionId]: value },
+          };
+          console.log('Updated answers.number:', newAnswers.number); // Debug log
+          return newAnswers;
+        });
       }
     },
     []
@@ -170,37 +198,124 @@ export default function Page() {
   }, [locale, category, subcategory]);
 
   const SendAnswers = async (answersState: AnswersState) => {
-    // Transform your answersState to the required array format
-    // You may need to adjust this mapping based on your actual state structure
-    const payload = Object.entries(answersState.options).flatMap(
-      ([questionId, optionIds]) =>
-        (optionIds as string[]).map((optionId) => ({
-          questionId: Number(questionId),
-          optionId: Number(optionId),
-          inputLanguage: locale || 'en',
-        }))
-    );
+    console.log('Answers state before submit:', answersState); // Debug log
+    // Collect all questionIds from all answer types
+    const questionIds = new Set<string>([
+      ...Object.keys(answersState.options),
+      ...Object.keys(answersState.date),
+      ...Object.keys(answersState.text),
+      ...Object.keys(answersState.number),
+    ]);
 
-    try {
-      const res = await apiAideMoi.post<AnswerAddSuccessResponse>(
-        `/answers/answers`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ answers: payload }),
-        }
-      );
+    // Build payload: one entry per selected option, plus other answer types
+    const payload: Array<{
+      questionId: number;
+      optionId?: number;
+      value?: string | number;
+      inputLanguage: string;
+    }> = [];
 
-      if (!res.success) {
-        throw new Error('Failed to submit answers');
+    // Map option values to optionId for each question
+    questionIds.forEach((qid) => {
+      const questionIdNum = Number(qid);
+      const question = questions.find((q) => q.id === questionIdNum);
+
+      // Handle options (single/multi/select)
+      const optionValuesRaw = answersState.options[qid] as string[] | undefined;
+      if (optionValuesRaw && question && Array.isArray(question.options)) {
+        optionValuesRaw.forEach((optionValue) => {
+          const foundOption = question.options.find(
+            (opt: any) => opt.value === optionValue
+          );
+          if (foundOption) {
+            payload.push({
+              questionId: questionIdNum,
+              optionId: foundOption.id,
+              inputLanguage: locale || 'en',
+            });
+          }
+        });
       }
 
-      // Optionally handle success (show message, redirect, etc.)
+      // Handle date, text, number answers (if needed by backend)
+      const dateValue = answersState.date[qid];
+      const textValue = answersState.text[qid];
+      const numberValue = answersState.number[qid];
+
+      let value: string | number | undefined;
+      if (numberValue && !isNaN(Number(numberValue)))
+        value = Number(numberValue);
+      else if (dateValue) value = dateValue;
+      else if (textValue) value = textValue;
+
+      // Only push if there is a value and no optionId for this question
+      if (
+        value !== undefined &&
+        (!optionValuesRaw || optionValuesRaw.length === 0)
+      ) {
+        payload.push({
+          questionId: questionIdNum,
+          value,
+          inputLanguage: locale || 'en',
+        });
+      }
+    });
+
+    console.log('Payload to submit:', payload);
+    // Build full job payload (matches your example)
+    const fullJobPayload = {
+      title:
+        jobTitle || `Job for subcategory ${activeSubcat?.id || subcategory}`,
+      description: jobDescription || '',
+      subcategoryId: activeSubcat?.id ?? Number(subcategory),
+      answers: payload,
+    };
+    console.log('Request body:', JSON.stringify(fullJobPayload));
+
+    try {
+      // Try the preferred endpoint first, if 404 retry the legacy endpoint
+      let res: JobCreateSuccessResponse | undefined;
+      try {
+        res = await apiAideMoi.post<JobCreateSuccessResponse>(
+          `/jobs/jobs`,
+          fullJobPayload,
+          {
+            useAuth: true,
+          }
+        );
+      } catch (err: any) {
+        const status = err?.response?.status ?? err?.status ?? err?.statusCode;
+        console.warn('First attempt to POST /jobs failed:', { status, err });
+        if (status === 404) {
+          console.info('Falling back to /jobs/answers endpoint');
+          res = await apiAideMoi.post<JobCreateSuccessResponse>(
+            `/jobs/answers`,
+            fullJobPayload
+          );
+        } else {
+          throw err;
+        }
+      }
+
+      if (!res || !res.success) {
+        throw new Error(
+          'Failed to create job — server returned unsuccessful response'
+        );
+      }
+
       alert('Answers submitted successfully!');
     } catch (error) {
-      alert('Error submitting answers');
-      console.error(error);
+      // Give a clearer message when 404 occurs or other known issues
+      const status =
+        (error as any)?.response?.status ??
+        (error as any)?.status ??
+        (error as any)?.statusCode;
+      if (status === 404) {
+        alert('API endpoint not found (404). Please check backend routes.');
+      } else {
+        alert('Error submitting answers. See console for details.');
+      }
+      console.error('SendAnswers error:', error);
     }
   };
 
@@ -211,9 +326,6 @@ export default function Page() {
   if (!activeSubcat)
     return <div style={{ padding: 12 }}>Subcategory not found.</div>;
 
-  // Add these interfaces at the top of the file, after the existing imports
-
-  // Then the selected code becomes:
   const subcatI18n: I18nTranslation | undefined =
     (activeSubcat as SubcategoryWithI18n).i18n?.find(
       (x: I18nTranslation) => x.locale === locale
@@ -227,6 +339,22 @@ export default function Page() {
   // --- Render ---
   return (
     <div style={{ padding: 12, fontFamily: 'sans-serif' }}>
+      {/* Job metadata inputs to match the JSON example */}
+      <div style={{ marginBottom: 12 }}>
+        <input
+          value={jobTitle}
+          onChange={(e) => setJobTitle(e.target.value)}
+          placeholder="Title (e.g. Home Cleaning Service Required)"
+          style={{ width: '100%', padding: 8, marginBottom: 8 }}
+        />
+        <textarea
+          value={jobDescription}
+          onChange={(e) => setJobDescription(e.target.value)}
+          placeholder="Description (e.g. Weekly cleaning service for a 120m² apartment...)"
+          style={{ width: '100%', padding: 8, minHeight: 80 }}
+        />
+      </div>
+
       <p>Subcategory: {subcatName}</p>
       <p>ID: {activeSubcat.id}</p>
 

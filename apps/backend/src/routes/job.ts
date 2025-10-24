@@ -278,10 +278,20 @@ export async function jobRoutes(
           });
         }
 
-        // Validate answers if provided
-        const createdAnswers = [];
+        // --- No existing job: proceed to create the job and its answers ---
+        // Create the job first, then create answers attached to that job.
+        const jobData = {
+          title: title.trim(),
+          description: description?.trim() || null,
+          user: { connect: { id: Number(userId) } },
+          subcategory: { connect: { id: subcategoryId } },
+        };
+
+        const createdJob = await jobDBService.create(jobData);
+
+        // If answers provided, create them attached to createdJob
+        const createdAnswers: number[] = [];
         if (answers && answers.length > 0) {
-          // Create answers first
           for (const answerData of answers) {
             const {
               questionId,
@@ -327,10 +337,25 @@ export async function jobRoutes(
                 }
               }
 
-              // Create the answer
+              // Check for existing answer
+              const existingAnswer = await fastify.prisma.answer.findFirst({
+                where: {
+                  userId: Number(userId),
+                  questionId,
+                  optionId: optionId ?? null,
+                },
+              });
+
+              if (existingAnswer) {
+                createdAnswers.push(existingAnswer.id);
+                continue; // Skip creating a duplicate answer
+              }
+
+              // Create the answer attached to the job
               const answerCreateData: any = {
                 user: { connect: { id: Number(userId) } },
                 question: { connect: { id: questionId } },
+                job: { connect: { id: createdJob.id } },
                 textValue,
                 numberValue,
                 dateValue: dateValue ? new Date(dateValue) : undefined,
@@ -345,6 +370,25 @@ export async function jobRoutes(
               createdAnswers.push(answer.id);
             } catch (answerError) {
               fastify.log.error(answerError);
+              // Rollback: delete created answers and the job to avoid partial state
+              try {
+                if (createdAnswers.length > 0) {
+                  await fastify.prisma.answer.deleteMany({
+                    where: {
+                      id: { in: createdAnswers },
+                      userId: Number(userId),
+                    },
+                  });
+                }
+                await jobDBService.delete(createdJob.id);
+              } catch (cleanupErr) {
+                fastify.log.error(
+                  'Cleanup after answer creation failed',
+                  undefined,
+                  cleanupErr
+                );
+              }
+
               return reply.status(400).send({
                 success: false,
                 error: {
@@ -358,29 +402,6 @@ export async function jobRoutes(
           }
         }
 
-        // Create the job
-        const jobData = {
-          title: title.trim(),
-          description: description?.trim() || null,
-          user: { connect: { id: Number(userId) } },
-          subcategory: { connect: { id: subcategoryId } },
-        };
-
-        const createdJob = await jobDBService.create(jobData);
-
-        // Link answers to the job if any were created
-        if (createdAnswers.length > 0) {
-          await fastify.prisma.answer.updateMany({
-            where: {
-              id: { in: createdAnswers },
-              userId: userId,
-            },
-            data: {
-              jobId: createdJob.id,
-            },
-          });
-        }
-
         return reply.status(201).send({
           success: true,
           message: 'Job created successfully',
@@ -391,6 +412,17 @@ export async function jobRoutes(
         });
       } catch (error) {
         fastify.log.error(error);
+        // Prisma unique constraint (race or DB-level uniqueness) -> treat as client error
+        if ((error as any)?.code === 'P2002') {
+          return reply.status(400).send({
+            success: false,
+            error: {
+              message:
+                'A job for this subcategory already exists for this user.',
+              code: 400,
+            },
+          });
+        }
         return reply.status(500).send({
           success: false,
           error: { message: 'Failed to create job', code: 500 },
