@@ -430,4 +430,50 @@ export async function jobRoutes(
       }
     }
   );
+
+  //delete job
+  fastify.delete<{
+    Params: IdParamUrl;
+    Headers: { authorization: string };
+  }>(`/jobs/:id`, async (request, reply) => {
+    try {
+      const userId =
+        (request as any).user?.userId ??
+        (request as any).user?.id ??
+        (request as any).userId;
+      if (!userId) {
+        return reply.status(401).send({
+          success: false,
+          error: { message: 'Unauthorized', code: 401 },
+        });
+      }
+      const jobId = parseInt(request.params.id);
+      if (isNaN(jobId)) {
+        return reply.status(400).send({
+          success: false,
+          error: { message: 'Invalid job ID', code: 400 },
+        });
+      }
+      const job = await jobDBService.findUnique({
+        where: { id: jobId, userId: Number(userId) },
+      });
+      if (!job || job.userId !== Number(userId)) {
+        return reply.status(404).send({
+          success: false,
+          error: { message: 'Job not found', code: 404 },
+        });
+      }
+      await jobDBService.delete(jobId);
+      return reply.status(200).send({
+        success: true,
+        message: 'Job deleted successfully',
+      });
+    } catch (error) {
+      fastify.log.error(error);
+      return reply.status(500).send({
+        success: false,
+        error: { message: 'Failed to delete job', code: 500 },
+      });
+    }
+  });
 }
