@@ -198,6 +198,17 @@ export default function Page() {
   }, [locale, category, subcategory]);
 
   const SendAnswers = async (answersState: AnswersState) => {
+    // require title and description be filled
+    if (
+      !jobTitle ||
+      !jobTitle.trim() ||
+      !jobDescription ||
+      !jobDescription.trim()
+    ) {
+      alert('Please provide both a title and a description for the job.');
+      return;
+    }
+
     console.log('Answers state before submit:', answersState); // Debug log
     // Collect all questionIds from all answer types
     const questionIds = new Set<string>([
@@ -262,38 +273,28 @@ export default function Page() {
     });
 
     console.log('Payload to submit:', payload);
-    // Build full job payload (matches your example)
+    // Build full job payload (use provided title/description)
     const fullJobPayload = {
-      title:
-        jobTitle || `Job for subcategory ${activeSubcat?.id || subcategory}`,
-      description: jobDescription || '',
+      title: jobTitle.trim(),
+      description: jobDescription.trim(),
       subcategoryId: activeSubcat?.id ?? Number(subcategory),
       answers: payload,
     };
     console.log('Request body:', JSON.stringify(fullJobPayload));
 
     try {
-      // Try the preferred endpoint first, if 404 retry the legacy endpoint
       let res: JobCreateSuccessResponse | undefined;
       try {
         res = await apiAideMoi.post<JobCreateSuccessResponse>(
           `/jobs/jobs`,
           fullJobPayload,
-          {
-            useAuth: true,
-          }
+          { useAuth: true } // pass useAuth in options
         );
       } catch (err: any) {
-        const status = err?.response?.status ?? err?.status ?? err?.statusCode;
-        console.warn('First attempt to POST /jobs failed:', { status, err });
-        if (status === 404) {
-          console.info('Falling back to /jobs/answers endpoint');
-          res = await apiAideMoi.post<JobCreateSuccessResponse>(
-            `/jobs/answers`,
-            fullJobPayload
+        if (err?.response?.status === 404) {
+          console.warn(
+            '/jobs/jobs endpoint not found, retrying with /jobs/create'
           );
-        } else {
-          throw err;
         }
       }
 
