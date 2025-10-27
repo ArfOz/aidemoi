@@ -689,3 +689,11 @@ export const AuthHeadersSchema = Type.Object({
 export const IdParamsSchema = Type.Object({
   id: Type.String(),
 });
+
+export const MyJobDeleteSuccessResponseSchema = Type.Object({
+  success: Type.Literal(true),
+  message: Type.String(),
+  data: Type.Object({
+    jobDeleted: Type.Boolean(),
+  }),
+});

@@ -22,6 +22,7 @@ import {
   JobCreateSuccessResponseSchema,
   JobDetailSuccessResponseSchema,
   JobGetIdRequestSchema,
+  MyJobDeleteSuccessResponseSchema,
   MyJobsGetRequest,
   MyJobsGetRequestSchema,
   MyJobsGetSuccessResponseSchema,
@@ -435,45 +436,67 @@ export async function jobRoutes(
   fastify.delete<{
     Params: IdParamUrl;
     Headers: { authorization: string };
-  }>(`/jobs/:id`, async (request, reply) => {
-    try {
-      const userId =
-        (request as any).user?.userId ??
-        (request as any).user?.id ??
-        (request as any).userId;
-      if (!userId) {
-        return reply.status(401).send({
+  }>(
+    `/jobs/:id`,
+    {
+      preHandler: authenticateToken,
+      schema: {
+        headers: AuthHeadersSchema,
+        querystring: MyJobsGetRequestSchema,
+        response: {
+          200: MyJobDeleteSuccessResponseSchema,
+          400: ApiErrorSchema,
+          401: ApiErrorSchema,
+          500: ApiErrorSchema,
+        },
+      },
+    },
+    async (request, reply) => {
+      try {
+        const userId =
+          (request as any).user?.userId ??
+          (request as any).user?.id ??
+          (request as any).userId;
+        console.log(
+          'Deleting job for userId:',
+          userId,
+          'jobId:',
+          request.params.id
+        );
+        if (!userId) {
+          return reply.status(401).send({
+            success: false,
+            error: { message: 'Unauthorized', code: 401 },
+          });
+        }
+        const jobId = parseInt(request.params.id);
+        if (isNaN(jobId)) {
+          return reply.status(400).send({
+            success: false,
+            error: { message: 'Invalid job ID', code: 400 },
+          });
+        }
+        const job = await jobDBService.findUnique({
+          where: { id: jobId, userId: Number(userId) },
+        });
+        if (!job || job.userId !== Number(userId)) {
+          return reply.status(404).send({
+            success: false,
+            error: { message: 'Job not found', code: 404 },
+          });
+        }
+        await jobDBService.delete(jobId);
+        return reply.status(200).send({
+          success: true,
+          message: 'Job deleted successfully',
+        });
+      } catch (error) {
+        fastify.log.error(error);
+        return reply.status(500).send({
           success: false,
-          error: { message: 'Unauthorized', code: 401 },
+          error: { message: 'Failed to delete job', code: 500 },
         });
       }
-      const jobId = parseInt(request.params.id);
-      if (isNaN(jobId)) {
-        return reply.status(400).send({
-          success: false,
-          error: { message: 'Invalid job ID', code: 400 },
-        });
-      }
-      const job = await jobDBService.findUnique({
-        where: { id: jobId, userId: Number(userId) },
-      });
-      if (!job || job.userId !== Number(userId)) {
-        return reply.status(404).send({
-          success: false,
-          error: { message: 'Job not found', code: 404 },
-        });
-      }
-      await jobDBService.delete(jobId);
-      return reply.status(200).send({
-        success: true,
-        message: 'Job deleted successfully',
-      });
-    } catch (error) {
-      fastify.log.error(error);
-      return reply.status(500).send({
-        success: false,
-        error: { message: 'Failed to delete job', code: 500 },
-      });
     }
-  });
+  );
 }
