@@ -22,6 +22,7 @@ import {
   JobCreateSuccessResponseSchema,
   JobDetailSuccessResponseSchema,
   JobGetIdRequestSchema,
+  MyJobDeleteSuccessResponse,
   MyJobDeleteSuccessResponseSchema,
   MyJobsGetRequest,
   MyJobsGetRequestSchema,
@@ -33,6 +34,7 @@ import {
   JobsDBService,
   SubCategoriesDBService, // Fixed: Changed from SubCategoriesDBService
 } from '../services/DatabaseService';
+import { tr } from 'zod/v4/locales';
 
 export async function jobRoutes(
   fastify: FastifyInstance,
@@ -436,13 +438,14 @@ export async function jobRoutes(
   fastify.delete<{
     Params: IdParamUrl;
     Headers: { authorization: string };
+    Body: JobCreateRequest;
+    Reply: MyJobDeleteSuccessResponse | ApiErrorResponseType;
   }>(
     `/jobs/:id`,
     {
       preHandler: authenticateToken,
       schema: {
         headers: AuthHeadersSchema,
-        querystring: MyJobsGetRequestSchema,
         response: {
           200: MyJobDeleteSuccessResponseSchema,
           400: ApiErrorSchema,
@@ -489,6 +492,7 @@ export async function jobRoutes(
         return reply.status(200).send({
           success: true,
           message: 'Job deleted successfully',
+          data: { jobDeleted: true },
         });
       } catch (error) {
         fastify.log.error(error);

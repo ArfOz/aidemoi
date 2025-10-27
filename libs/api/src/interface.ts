@@ -33,6 +33,7 @@ import {
   MyJobsGetRequestSchema,
   MyJobsGetSuccessResponseSchema,
   IdParamsSchema,
+  MyJobDeleteSuccessResponseSchema,
 } from './schema';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -141,3 +142,7 @@ export type MyJobsGetSuccessResponse = Static<
 >;
 
 export type IdParamUrl = Static<typeof IdParamsSchema>;
+
+export type MyJobDeleteSuccessResponse = Static<
+  typeof MyJobDeleteSuccessResponseSchema
+>;
