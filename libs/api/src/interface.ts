@@ -13,7 +13,7 @@ import {
   CategoryUpsertRequestSchema,
   CategoryUpsertSuccessResponseSchema,
   SubcategoryUpsertRequestSchema,
-  SubcategoryUpsertSuccessResponseSchema,
+  // SubcategoryUpsertSuccessResponseSchema,
   CategoriesListSuccessResponseSchema,
   CategoryGetRequestSchema,
   CategoryDetailSuccessResponseSchema,
@@ -84,9 +84,9 @@ export type SubcategoryUpsertRequest = Static<
   typeof SubcategoryUpsertRequestSchema
 >;
 
-export type SubcategoryUpsertSuccessResponse = Static<
-  typeof SubcategoryUpsertSuccessResponseSchema
->;
+// export type SubcategoryUpsertSuccessResponse = Static<
+//   typeof SubcategoryUpsertSuccessResponseSchema
+// >;
 
 export type CategoriesListSuccessResponse = Static<
   typeof CategoriesListSuccessResponseSchema

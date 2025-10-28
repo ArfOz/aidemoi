@@ -138,17 +138,18 @@ export const CategoryUpsertRequestSchema = Type.Object({
   id: Type.Optional(Type.String()), // for updates
 });
 
-export const CategoryUpsertSuccessResponseSchema = Type.Object({
-  success: Type.Literal(true),
-  message: Type.String(),
-  data: Type.Object({
-    category: Type.Object({
-      id: Type.String(),
-      created: Type.Boolean(),
-      updatedLocales: Type.Array(Type.String()),
+export const CategoryUpsertSuccessResponseSchema = Type.Intersect([
+  ApiResponseSchema,
+  Type.Object({
+    data: Type.Object({
+      category: Type.Object({
+        id: Type.String(),
+        created: Type.Boolean(),
+        updatedLocales: Type.Array(Type.String()),
+      }),
     }),
   }),
-});
+]);
 
 export const CategoriesListRequestSchema = Type.Object({
   includeSubcategories: Type.Optional(Type.Boolean({ default: false })),
@@ -171,18 +172,21 @@ export const SubcategoryUpsertRequestSchema = Type.Object({
   i18n: Type.Array(SubcategoryI18nSchema, { minItems: 1 }),
 });
 
-export const SubcategoryUpsertSuccessResponseSchema = Type.Object({
-  success: Type.Literal(true),
-  message: Type.String(),
-  data: Type.Object({
-    subcategory: Type.Object({
-      categoryId: Type.String(),
-      slug: Type.String(),
-      created: Type.Boolean(),
-      updatedLocales: Type.Array(Type.String()),
+export const SubcategoryUpsertSuccessResponseSchema = Type.Intersect([
+  ApiResponseSchema,
+  Type.Object({
+    success: Type.Literal(true),
+    message: Type.String(),
+    data: Type.Object({
+      subcategory: Type.Object({
+        categoryId: Type.String(),
+        slug: Type.String(),
+        created: Type.Boolean(),
+        updatedLocales: Type.Array(Type.String()),
+      }),
     }),
   }),
-});
+]);
 
 export const SubcategoryOutSchema = Type.Object({
   id: Type.Integer(),
@@ -223,13 +227,14 @@ export const CategoryListSchema = Type.Object({
   updatedAt: Type.String({ format: 'date-time' }), // ✅ Fastify uyumlu
 });
 
-export const CategoriesListSuccessResponseSchema = Type.Object({
-  success: Type.Literal(true),
-  message: Type.String(),
-  data: Type.Object({
-    categories: Type.Array(CategoryListSchema),
+export const CategoriesListSuccessResponseSchema = Type.Intersect([
+  ApiResponseSchema,
+  Type.Object({
+    data: Type.Object({
+      categories: Type.Array(CategoryListSchema),
+    }),
   }),
-});
+]);
 
 export const CategoryGetRequestSchema = Type.Object({
   includeSubcategories: Type.Optional(Type.Boolean({ default: false })),
@@ -238,13 +243,14 @@ export const CategoryGetRequestSchema = Type.Object({
   ),
 });
 
-export const CategoryDetailSuccessResponseSchema = Type.Object({
-  success: Type.Literal(true),
-  message: Type.String(),
-  data: Type.Object({
-    category: CategoryDetailSchema,
+export const CategoryDetailSuccessResponseSchema = Type.Intersect([
+  ApiResponseSchema,
+  Type.Object({
+    data: Type.Object({
+      category: CategoryDetailSchema,
+    }),
   }),
-});
+]);
 
 export const SubcategoryDetailRequestSchema = Type.Object({
   includeSubcategories: Type.Optional(Type.Boolean({ default: false })),
@@ -253,22 +259,24 @@ export const SubcategoryDetailRequestSchema = Type.Object({
   ),
 });
 
-export const SubcategoryDetailSuccessResponseSchema = Type.Object({
-  success: Type.Literal(true),
-  message: Type.String(),
-  data: Type.Object({
-    subcategory: SubcategoryOutSchema,
+export const SubcategoryDetailSuccessResponseSchema = Type.Intersect([
+  ApiResponseSchema,
+  Type.Object({
+    data: Type.Object({
+      subcategory: SubcategoryOutSchema,
+    }),
   }),
-});
+]);
 
-export const QuestionAddSuccessResponseSchema = Type.Object({
-  success: Type.Literal(true),
-  message: Type.String(),
-  data: Type.Object({
-    questionId: Type.Integer(),
-    submittedAt: Type.String({ format: 'date-time' }),
+export const QuestionAddSuccessResponseSchema = Type.Intersect([
+  ApiResponseSchema,
+  Type.Object({
+    data: Type.Object({
+      questionId: Type.Integer(),
+      submittedAt: Type.String({ format: 'date-time' }),
+    }),
   }),
-});
+]);
 
 // add Question i18n schema
 export const QuestionI18nSchema = Type.Object({
