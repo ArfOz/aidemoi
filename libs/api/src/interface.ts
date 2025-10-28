@@ -1,6 +1,6 @@
 import { Static } from '@sinclair/typebox';
 import {
-  ApiResponseSchema,
+  ApiResponseSuccessSchema,
   ApiErrorSchema,
   LoginRequestSchema,
   LoginSuccessResponseSchema,
@@ -38,7 +38,7 @@ import {
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
-export type ApiResponseType = Static<typeof ApiResponseSchema>;
+export type ApiResponseType = Static<typeof ApiResponseSuccessSchema>;
 
 export type LoginSuccessResponseType = Static<
   typeof LoginSuccessResponseSchema
