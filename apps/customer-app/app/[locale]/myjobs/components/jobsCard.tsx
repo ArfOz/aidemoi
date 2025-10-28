@@ -62,7 +62,7 @@ export const JobsCard = ({
       if (!res.success) {
         const text = await res.data;
 
-        throw new Error(`Delete failed: ${res.status} ${text}`);
+        throw new Error(`Delete failed: ${res.error?.code} ${text}`);
       }
       setLocalJobs((prev) => prev.filter((j) => j.id !== id));
     } catch (err) {
