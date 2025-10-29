@@ -1,7 +1,7 @@
 import { Static } from '@sinclair/typebox';
 import {
   ApiResponseSuccessSchema,
-  ApiErrorSchema,
+  ApiResponseErrorSchema,
   LoginRequestSchema,
   LoginSuccessResponseSchema,
   RegisterRequestSchema,
@@ -45,7 +45,7 @@ export type LoginSuccessResponseType = Static<
 >;
 export type LoginRequestType = Static<typeof LoginRequestSchema>;
 
-export type ApiErrorResponseType = Static<typeof ApiErrorSchema>;
+export type ApiErrorResponseType = Static<typeof ApiResponseErrorSchema>;
 
 export type LoginResponseType = LoginSuccessResponseType | ApiErrorResponseType;
 
