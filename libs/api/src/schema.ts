@@ -45,19 +45,11 @@ export const LogoutRequestSchema = Type.Object({
 export const ApiResponseSuccessSchema = Type.Object({
   success: Type.Literal(true),
   message: Type.String(),
-  error: Type.Optional(
-    Type.Object({
-      code: Type.Number(),
-      message: Type.String(),
-    })
-  ),
 });
 
-export const ApiErrorSchema = Type.Object({
+export const ApiResponseErrorSchema = Type.Object({
   success: Type.Literal(false),
-  data: Type.Optional(Type.Any()),
-  error: Type.Optional(ErrorSchema),
-  message: Type.Optional(Type.String()),
+  error: ErrorSchema,
 });
 
 export const LoginSuccessResponseSchema = Type.Intersect([
