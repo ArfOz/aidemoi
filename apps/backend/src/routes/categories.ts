@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import {
   ApiErrorResponseType,
-  ApiErrorSchema,
+  ApiResponseErrorSchema,
   CategoryDetailSuccessResponseSchema,
   CategoryDetailSuccessResponse,
   CategoryGetRequest,
@@ -201,8 +201,8 @@ export async function categoriesRoutes(
         querystring: CategoryGetRequestSchema,
         response: {
           200: CategoriesListSuccessResponseSchema,
-          400: ApiErrorSchema,
-          500: ApiErrorSchema,
+          400: ApiResponseErrorSchema,
+          500: ApiResponseErrorSchema,
         },
       },
     },
@@ -232,7 +232,6 @@ export async function categoriesRoutes(
             : 'Failed to fetch categories';
         return reply.status(500).send({
           success: false,
-          message: 'Request failed',
           error: { message: devMsg, code: 500 },
         });
       }
@@ -252,8 +251,8 @@ export async function categoriesRoutes(
         querystring: CategoryGetRequestSchema,
         response: {
           200: CategoryDetailSuccessResponseSchema,
-          404: ApiErrorSchema,
-          500: ApiErrorSchema,
+          404: ApiResponseErrorSchema,
+          500: ApiResponseErrorSchema,
         },
       },
     },
@@ -272,7 +271,6 @@ export async function categoriesRoutes(
         if (!category) {
           return reply.status(404).send({
             success: false,
-            message: 'Category not found',
             error: {
               message: `Category "${id}" not found`,
               code: 404,
@@ -296,7 +294,6 @@ export async function categoriesRoutes(
             : 'Failed to fetch category';
         return reply.status(500).send({
           success: false,
-          message: 'Request failed',
           error: { message: devMsg, code: 500 },
         });
       }
@@ -315,8 +312,8 @@ export async function categoriesRoutes(
         params: IdParamsSchema,
         response: {
           200: SubcategoryDetailSuccessResponseSchema,
-          404: ApiErrorSchema,
-          500: ApiErrorSchema,
+          404: ApiResponseErrorSchema,
+          500: ApiResponseErrorSchema,
         },
       },
     },
@@ -340,7 +337,6 @@ export async function categoriesRoutes(
         if (!subcategory) {
           return reply.status(404).send({
             success: false,
-            message: 'Subcategory not found',
             error: {
               message: `Subcategory with id "${id}" not found`,
               code: 404,
@@ -364,7 +360,6 @@ export async function categoriesRoutes(
             : 'Failed to fetch subcategory';
         return reply.status(500).send({
           success: false,
-          message: 'Request failed',
           error: { message: devMsg, code: 500 },
         });
       }

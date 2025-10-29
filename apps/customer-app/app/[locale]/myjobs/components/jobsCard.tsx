@@ -60,7 +60,7 @@ export const JobsCard = ({
         { useAuth: true }
       );
       if (!res.success) {
-        const text = await res.data;
+        const text = await res.error;
 
         throw new Error(`Delete failed: ${res.error?.code} ${text}`);
       }

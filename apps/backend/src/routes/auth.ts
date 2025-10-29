@@ -6,7 +6,7 @@ import { authenticateToken } from '../middleware/auth';
 
 import {
   ApiErrorResponseType,
-  ApiErrorSchema,
+  ApiResponseErrorSchema,
   LoginRequestType,
   LoginRequestSchema,
   LoginSuccessResponseSchema,
@@ -47,8 +47,8 @@ export async function authRoutes(
         body: LoginRequestSchema,
         response: {
           200: LoginSuccessResponseSchema,
-          401: ApiErrorSchema,
-          500: ApiErrorSchema,
+          401: ApiResponseErrorSchema,
+          500: ApiResponseErrorSchema,
         },
       },
     },
@@ -138,8 +138,8 @@ export async function authRoutes(
         body: RegisterRequestSchema,
         response: {
           201: RegisterSuccessResponseSchema,
-          400: ApiErrorSchema,
-          409: ApiErrorSchema,
+          400: ApiResponseErrorSchema,
+          409: ApiResponseErrorSchema,
         },
       },
     },
@@ -159,7 +159,6 @@ export async function authRoutes(
               message: 'User with this email already exists',
               code: 409,
             },
-            message: 'User with this email already exists',
           });
         }
 
@@ -173,7 +172,6 @@ export async function authRoutes(
               message: 'Username is already taken',
               code: 409,
             },
-            message: 'Username is already taken',
           });
         }
 
@@ -205,7 +203,6 @@ export async function authRoutes(
             message: 'Registration failed',
             code: 500,
           },
-          message: 'Registration failed',
         });
       }
     }
@@ -223,9 +220,9 @@ export async function authRoutes(
         headers: AuthHeadersSchema,
         response: {
           200: ProfileSuccessResponseSchema,
-          401: ApiErrorSchema,
-          404: ApiErrorSchema,
-          500: ApiErrorSchema,
+          401: ApiResponseErrorSchema,
+          404: ApiResponseErrorSchema,
+          500: ApiResponseErrorSchema,
         },
       },
     },
@@ -283,8 +280,8 @@ export async function authRoutes(
         body: RefreshTokenRequestSchema,
         response: {
           200: RefreshTokenSuccessResponseSchema,
-          401: ApiErrorSchema,
-          500: ApiErrorSchema,
+          401: ApiResponseErrorSchema,
+          500: ApiResponseErrorSchema,
         },
       },
     },
@@ -377,8 +374,8 @@ export async function authRoutes(
         headers: AuthHeadersSchema,
         response: {
           200: LogoutSuccessResponseSchema,
-          401: ApiErrorSchema,
-          500: ApiErrorSchema,
+          401: ApiResponseErrorSchema,
+          500: ApiResponseErrorSchema,
         },
       },
     },

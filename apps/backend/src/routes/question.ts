@@ -6,7 +6,7 @@ import {
 } from '../services/DatabaseService';
 import {
   ApiErrorResponseType,
-  ApiErrorSchema,
+  ApiResponseErrorSchema,
   QuestionAddSuccessResponse,
   QuestionGetRequest,
   QuestionGetRequestSchema,
@@ -126,8 +126,8 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
         body: QuestionUpsertRequestSchema,
         response: {
           200: QuestionAddSuccessResponseSchema,
-          400: ApiErrorSchema,
-          500: ApiErrorSchema,
+          400: ApiResponseErrorSchema,
+          500: ApiResponseErrorSchema,
         },
       },
     },
@@ -240,7 +240,7 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
         querystring: QuestionGetRequestSchema,
         response: {
           200: QuestionGetSuccessResponseSchema,
-          500: ApiErrorSchema,
+          500: ApiResponseErrorSchema,
         },
       },
     },
@@ -297,9 +297,9 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
         body: QuestionUpdateRequestSchema,
         response: {
           200: QuestionUpdateSuccessResponseSchema,
-          400: ApiErrorSchema,
-          404: ApiErrorSchema,
-          500: ApiErrorSchema,
+          400: ApiResponseErrorSchema,
+          404: ApiResponseErrorSchema,
+          500: ApiResponseErrorSchema,
         },
       },
     },
@@ -451,7 +451,7 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
         },
         response: {
           200: QuestionGetSuccessResponseSchema,
-          500: ApiErrorSchema,
+          500: ApiResponseErrorSchema,
         },
       },
     },
@@ -498,7 +498,6 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
             : 'Failed to fetch questions';
         return reply.status(500).send({
           success: false,
-          message: 'Request failed',
           error: { message: devMsg, code: 500 },
         });
       }
