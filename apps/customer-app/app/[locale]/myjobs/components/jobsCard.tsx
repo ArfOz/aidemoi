@@ -3,7 +3,7 @@ import {
   MyJobDeleteSuccessResponse,
   MyJobsGetSuccessResponse,
 } from '@api';
-import { useAuth } from 'lib/useAuth';
+import { ApiResponse } from '@api/types.api';
 import React, { useEffect, useState } from 'react';
 
 const getStatusColor = (status: string) => {
@@ -55,12 +55,11 @@ export const JobsCard = ({
 
     try {
       setDeletingIds((s) => [...s, id]);
-      const res = await apiAideMoi.delete<MyJobDeleteSuccessResponse>(
-        `/jobs/my-jobs/${id}`,
-        { useAuth: true }
-      );
+      const res = await apiAideMoi.delete<
+        ApiResponse<MyJobDeleteSuccessResponse>
+      >(`/jobs/my-jobs/${id}`, { useAuth: true });
       if (!res.success) {
-        const text = await res.error;
+        const text = await res;
 
         throw new Error(`Delete failed: ${res.error?.code} ${text}`);
       }
