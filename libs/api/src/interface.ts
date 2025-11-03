@@ -1,4 +1,4 @@
-import { Static } from '@sinclair/typebox';
+import { Static, TObject } from '@sinclair/typebox';
 import {
   ApiResponseSuccessSchema,
   ApiResponseErrorSchema,
@@ -16,7 +16,6 @@ import {
   // SubcategoryUpsertSuccessResponseSchema,
   CategoriesListSuccessResponseSchema,
   CategoryGetRequestSchema,
-  CategoryDetailSuccessResponseSchema,
   CategoriesListRequestSchema,
   QuestionAddSuccessResponseSchema,
   QuestionUpsertRequestSchema,
@@ -38,14 +37,20 @@ import {
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
-export type ApiResponseType = Static<typeof ApiResponseSuccessSchema>;
+export type ApiErrorResponseType = Static<typeof ApiResponseErrorSchema>;
+
+export type ApiSuccessResponseType<T extends TObject> = Static<
+  ReturnType<typeof ApiResponseSuccessSchema<T>>
+>;
+
+export type ApiResponseType<T extends TObject> =
+  | ApiSuccessResponseType<T>
+  | ApiErrorResponseType;
 
 export type LoginSuccessResponseType = Static<
   typeof LoginSuccessResponseSchema
 >;
 export type LoginRequestType = Static<typeof LoginRequestSchema>;
-
-export type ApiErrorResponseType = Static<typeof ApiResponseErrorSchema>;
 
 export type LoginResponseType = LoginSuccessResponseType | ApiErrorResponseType;
 
@@ -95,10 +100,6 @@ export type CategoriesListSuccessResponse = Static<
 export type CategoryGetRequest = Static<typeof CategoryGetRequestSchema>;
 
 export type QuestionGetRequest = Static<typeof QuestionGetRequestSchema>;
-
-export type CategoryDetailSuccessResponse = Static<
-  typeof CategoryDetailSuccessResponseSchema
->;
 
 export type SubcategoryDetailSuccessResponse = Static<
   typeof SubcategoryDetailSuccessResponseSchema

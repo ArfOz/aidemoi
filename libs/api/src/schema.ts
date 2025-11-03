@@ -1,10 +1,22 @@
-import { Type, Static } from '@sinclair/typebox';
+import { Type, Static, TSchema } from '@sinclair/typebox';
 
 export const ErrorSchema = Type.Object({
   code: Type.Number(),
   message: Type.String(),
   // field: Type.Optional(Type.String()),
   // details: Type.Optional(Type.Any()),
+});
+
+export const ApiResponseSuccessSchema = <T extends TSchema>(dataSchema: T) =>
+  Type.Object({
+    success: Type.Literal(true),
+    message: Type.String(),
+    data: dataSchema,
+  });
+
+export const ApiResponseErrorSchema = Type.Object({
+  success: Type.Literal(false),
+  error: ErrorSchema,
 });
 
 export const LoginRequestSchema = Type.Object({
@@ -42,30 +54,12 @@ export const LogoutRequestSchema = Type.Object({
   refreshToken: Type.String(),
 });
 
-export const ApiResponseSuccessSchema = Type.Object({
-  success: Type.Literal(true),
-  message: Type.String(),
+export const LoginSuccessResponseSchema = Type.Object({
+  tokens: TokenSchema,
+  user: UserSchema,
 });
-
-export const ApiResponseErrorSchema = Type.Object({
-  success: Type.Literal(false),
-  error: ErrorSchema,
-});
-
-export const LoginSuccessResponseSchema = Type.Intersect([
-  ApiResponseSuccessSchema,
-  Type.Object({
-    data: Type.Object({
-      tokens: TokenSchema,
-      user: UserSchema,
-    }),
-  }),
-]);
-
-// export type ApiResponseType = Static<typeof ApiResponseSchema>;
 
 export const LogoutSuccessResponseSchema = Type.Intersect([
-  ApiResponseSuccessSchema,
   Type.Object({
     data: Type.Object({
       loggedOut: Type.Boolean(),
@@ -74,7 +68,6 @@ export const LogoutSuccessResponseSchema = Type.Intersect([
 ]);
 
 export const RefreshTokenSuccessResponseSchema = Type.Intersect([
-  ApiResponseSuccessSchema,
   Type.Object({
     data: Type.Object({
       tokens: Type.Object({
@@ -90,7 +83,6 @@ export const RefreshTokenSuccessResponseSchema = Type.Intersect([
 ]);
 
 export const ProfileSuccessResponseSchema = Type.Intersect([
-  ApiResponseSuccessSchema,
   Type.Object({
     data: Type.Object({
       user: Type.Object({
@@ -104,7 +96,6 @@ export const ProfileSuccessResponseSchema = Type.Intersect([
 ]);
 
 export const RegisterSuccessResponseSchema = Type.Intersect([
-  ApiResponseSuccessSchema,
   Type.Object({
     data: Type.Object({
       user: Type.Object({
@@ -132,7 +123,6 @@ export const CategoryUpsertRequestSchema = Type.Object({
 });
 
 export const CategoryUpsertSuccessResponseSchema = Type.Intersect([
-  ApiResponseSuccessSchema,
   Type.Object({
     data: Type.Object({
       category: Type.Object({
@@ -166,7 +156,6 @@ export const SubcategoryUpsertRequestSchema = Type.Object({
 });
 
 export const SubcategoryUpsertSuccessResponseSchema = Type.Intersect([
-  ApiResponseSuccessSchema,
   Type.Object({
     success: Type.Literal(true),
     message: Type.String(),
@@ -221,7 +210,6 @@ export const CategoryListSchema = Type.Object({
 });
 
 export const CategoriesListSuccessResponseSchema = Type.Intersect([
-  ApiResponseSuccessSchema,
   Type.Object({
     data: Type.Object({
       categories: Type.Array(CategoryListSchema),
@@ -236,15 +224,6 @@ export const CategoryGetRequestSchema = Type.Object({
   ),
 });
 
-export const CategoryDetailSuccessResponseSchema = Type.Intersect([
-  ApiResponseSuccessSchema,
-  Type.Object({
-    data: Type.Object({
-      category: CategoryDetailSchema,
-    }),
-  }),
-]);
-
 export const SubcategoryDetailRequestSchema = Type.Object({
   includeSubcategories: Type.Optional(Type.Boolean({ default: false })),
   languages: Type.Optional(
@@ -253,7 +232,6 @@ export const SubcategoryDetailRequestSchema = Type.Object({
 });
 
 export const SubcategoryDetailSuccessResponseSchema = Type.Intersect([
-  ApiResponseSuccessSchema,
   Type.Object({
     data: Type.Object({
       subcategory: SubcategoryOutSchema,
@@ -262,7 +240,6 @@ export const SubcategoryDetailSuccessResponseSchema = Type.Intersect([
 ]);
 
 export const QuestionAddSuccessResponseSchema = Type.Intersect([
-  ApiResponseSuccessSchema,
   Type.Object({
     data: Type.Object({
       questionId: Type.Integer(),
@@ -312,7 +289,6 @@ export const QuestionGetRequestSchema = Type.Object({
 });
 
 export const QuestionGetSuccessResponseSchema = Type.Intersect([
-  ApiResponseSuccessSchema,
   Type.Object({
     data: Type.Object({
       // allow any shape for question to avoid serializer schema mismatch
@@ -360,7 +336,6 @@ export const QuestionUpdateRequestSchema = Type.Object({
 });
 
 export const QuestionUpdateSuccessResponseSchema = Type.Intersect([
-  ApiResponseSuccessSchema,
   Type.Object({
     data: Type.Object({
       questionId: Type.Integer(),
@@ -383,7 +358,6 @@ export const AnswersCreateRequestSchema = Type.Object({
 });
 
 export const AnswerAddSuccessResponseSchema = Type.Intersect([
-  ApiResponseSuccessSchema,
   Type.Object({
     data: Type.Object({
       answersCreated: Type.Number(),
@@ -399,7 +373,6 @@ export const AnswerAddSuccessResponseSchema = Type.Intersect([
 ]);
 
 export const AnswerGetSuccessResponseSchema = Type.Intersect([
-  ApiResponseSuccessSchema,
   Type.Object({
     data: Type.Object({
       answers: Type.Array(
@@ -450,7 +423,6 @@ export const JobCreateRequestSchema = Type.Object({
 });
 
 export const JobCreateSuccessResponseSchema = Type.Intersect([
-  ApiResponseSuccessSchema,
   Type.Object({
     data: Type.Object({
       jobId: Type.Number(),
@@ -571,7 +543,6 @@ export const MyJobsGetRequestSchema = Type.Object({
 
 // My Jobs Success Response Schema
 export const MyJobsGetSuccessResponseSchema = Type.Intersect([
-  ApiResponseSuccessSchema,
   Type.Object({
     data: Type.Object({
       jobs: Type.Array(JobSchema),
@@ -673,7 +644,6 @@ export const JobDetailSchema = Type.Object({
 
 // Job Detail Success Response Schema
 export const JobDetailSuccessResponseSchema = Type.Intersect([
-  ApiResponseSuccessSchema,
   Type.Object({
     data: JobDetailSchema,
   }),
@@ -699,7 +669,6 @@ export const IdParamsSchema = Type.Object({
 });
 
 export const MyJobDeleteSuccessResponseSchema = Type.Intersect([
-  ApiResponseSuccessSchema,
   Type.Object({
     data: Type.Object({
       jobDeleted: Type.Boolean(),

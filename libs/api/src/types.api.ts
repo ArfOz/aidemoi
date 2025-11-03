@@ -1,16 +1,15 @@
-import type {
-  Static,
-  TIntersect,
-  TObject,
-  TLiteral,
-  TString,
-  TBoolean,
-} from '@sinclair/typebox';
-import { ApiResponseErrorSchema, ApiResponseSuccessSchema } from './schema';
-// Generic API response types for frontend usage
+// import { Static, TObject } from '@sinclair/typebox';
+// import { ApiResponseSuccessSchema, ApiResponseErrorSchema } from './schema';
 
-export type ApiErrorResponse = Static<typeof ApiResponseErrorSchema>;
-export type ApiSuccessResponse<T> = Static<typeof ApiResponseSuccessSchema> & {
-  data: T;
-};
-export type ApiResponse<T> = ApiSuccessResponse<T> | ApiErrorResponse;
+// // ✅ Error tipi doğrudan şemadan türetilebilir
+// export type ApiErrorResponseType = Static<typeof ApiResponseErrorSchema>;
+
+// // ✅ Success tipi fonksiyon olduğu için ReturnType kullanıyoruz
+// export type ApiSuccessResponseType<T extends TObject> = Static<
+//   ReturnType<typeof ApiResponseSuccessSchema<T>>
+// >;
+
+// // ✅ Union response tipi (her endpoint için)
+// export type ApiResponseType<T extends TObject> =
+//   | ApiSuccessResponseType<T>
+//   | ApiErrorResponseType;
