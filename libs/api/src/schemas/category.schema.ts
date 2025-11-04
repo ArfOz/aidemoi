@@ -72,3 +72,13 @@ export const CategoryUpsertRequestSchema = Type.Object({
   i18n: Type.Array(CategoryI18nSchema, { minItems: 1 }),
   id: Type.Optional(Type.String()), // for updates
 });
+
+//Subcategory  types and schemas
+
+export const SubcategoryDetailResponseSchema = Type.Object({
+  subcategory: SubcategoryOutSchema,
+});
+
+export const SubcategoryDetailSuccessResponseSchema = ApiResponseSuccessSchema(
+  SubcategoryDetailResponseSchema
+);

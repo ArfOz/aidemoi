@@ -125,20 +125,14 @@ export const SubcategoryUpsertRequestSchema = Type.Object({
   i18n: Type.Array(SubcategoryI18nSchema, { minItems: 1 }),
 });
 
-export const SubcategoryUpsertSuccessResponseSchema = Type.Intersect([
-  Type.Object({
-    success: Type.Literal(true),
-    message: Type.String(),
-    data: Type.Object({
-      subcategory: Type.Object({
-        categoryId: Type.String(),
-        slug: Type.String(),
-        created: Type.Boolean(),
-        updatedLocales: Type.Array(Type.String()),
-      }),
-    }),
+export const SubcategoryUpsertSuccessResponseSchema = Type.Object({
+  subcategory: Type.Object({
+    categoryId: Type.String(),
+    slug: Type.String(),
+    created: Type.Boolean(),
+    updatedLocales: Type.Array(Type.String()),
   }),
-]);
+});
 
 export const CategoryGetRequestSchema = Type.Object({
   includeSubcategories: Type.Optional(Type.Boolean({ default: false })),
@@ -153,10 +147,6 @@ export const SubcategoryDetailRequestSchema = Type.Object({
     Type.Array(Type.String({ minLength: 2, maxLength: 8 }))
   ),
 });
-
-// export const SubcategoryDetailSuccessResponseSchema = Type.Object({
-//   subcategory: SubcategoryOutSchema,
-// });
 
 export const QuestionAddSuccessResponseSchema = Type.Object({
   questionId: Type.Integer(),
