@@ -2,8 +2,6 @@ import { FastifyInstance } from 'fastify';
 import {
   ApiErrorResponseType,
   ApiResponseErrorSchema,
-  CategoryDetailSuccessResponseSchema,
-  CategoryDetailSuccessResponse,
   CategoryGetRequest,
   CategoryGetRequestSchema,
   CategoryUpsertRequest,
@@ -18,9 +16,13 @@ import {
   SubcategoryUpsertRequestSchema,
   // SubcategoryUpsertSuccessResponseSchema,
   SubcategoryGetRequest,
-  SubcategoryDetailSuccessResponse,
-  SubcategoryDetailSuccessResponseSchema,
   IdParamsSchema,
+  ApiResponseType,
+  CategoryDetailSuccessResponseSchema,
+  ApiResponseSuccessSchema,
+  CategoriesListResponseSchema,
+  CategoryDetailResponseSchema,
+  CategoryDetailSuccessResponse,
 } from '@api';
 import {
   CategoriesDBService,
@@ -30,6 +32,23 @@ import {
 export async function categoriesRoutes(
   fastify: FastifyInstance
 ): Promise<void> {
+  // Ensure all uncaught errors serialize to the expected error schema
+  fastify.setErrorHandler(async (error, request, reply) => {
+    fastify.log.error(error);
+    const statusCode = (error && (error as any).statusCode) || 500;
+    const message =
+      process.env.NODE_ENV === 'development' && error instanceof Error
+        ? error.message
+        : statusCode >= 500
+        ? 'Internal Server Error'
+        : String((error as any).message || 'Error');
+
+    return reply.status(statusCode).send({
+      success: false,
+      error: { message, code: statusCode },
+    });
+  });
+
   // Initialize services with the Prisma client from Fastify's decoration
   const categoriesDBService = new CategoriesDBService(fastify.prisma);
   const subcategoriesDBService = new SubCategoriesDBService(fastify.prisma);
@@ -193,7 +212,7 @@ export async function categoriesRoutes(
   // List Categories
   fastify.get<{
     Querystring: CategoriesListRequest;
-    Reply: CategoriesListSuccessResponse | ApiErrorResponseType;
+    Reply: ApiResponseType<typeof CategoriesListResponseSchema>;
   }>(
     '/categories',
     {
@@ -216,6 +235,7 @@ export async function categoriesRoutes(
           lang && lang.length > 0 ? { languages: lang } : undefined
         );
 
+        // return exact shape required by CategoriesListSuccessResponseSchema
         return reply.status(200).send({
           success: true,
           message: 'Categories fetched',
@@ -242,7 +262,7 @@ export async function categoriesRoutes(
   fastify.get<{
     Params: { id: string };
     Querystring: CategoryGetRequest;
-    Reply: CategoryDetailSuccessResponse | ApiErrorResponseType;
+    Reply: ApiResponseType<typeof CategoryDetailResponseSchema>;
   }>(
     '/category/:id',
     {
@@ -262,13 +282,16 @@ export async function categoriesRoutes(
         const { id } = request.params;
         const { languages: lang } = request.query;
 
+        console.log('Fetching category', id, 'with languages', lang);
         // Fetch category by ID with language filtering
-        const category = await categoriesDBService.findById({
+        const details = await categoriesDBService.findById({
           where: { id },
           languages: lang && lang.length > 0 ? lang : undefined,
         });
 
-        if (!category) {
+        console.log('Fetched category details:', details);
+
+        if (!details) {
           return reply.status(404).send({
             success: false,
             error: {
@@ -278,12 +301,13 @@ export async function categoriesRoutes(
           });
         }
 
+        // Return shape matching schema: { success: true, message, data: { category } }
         return reply.status(200).send({
           success: true,
           message: 'Category fetched',
           data: {
-            category:
-              category as unknown as CategoryDetailSuccessResponse['data']['category'],
+            details:
+              details as unknown as CategoryDetailSuccessResponse['data']['details'],
           },
         });
       } catch (err) {
@@ -300,71 +324,70 @@ export async function categoriesRoutes(
     }
   );
 
-  // Get Subcategory by ID
-  fastify.get<{
-    Params: { id: string };
-    Querystring: SubcategoryGetRequest;
-    Reply: SubcategoryDetailSuccessResponse | ApiErrorResponseType;
-  }>(
-    '/subcategory/:id',
-    {
-      schema: {
-        params: IdParamsSchema,
-        response: {
-          200: SubcategoryDetailSuccessResponseSchema,
-          404: ApiResponseErrorSchema,
-          500: ApiResponseErrorSchema,
-        },
-      },
-    },
-    async (request, reply) => {
-      try {
-        const { id } = request.params;
-        const query: any = request.query || {};
-        const languages: string[] | undefined = query.languages;
+  // // Get Subcategory by ID
+  // fastify.get<{
+  //   Params: { id: string };
+  //   Querystring: SubcategoryGetRequest;
+  //   Reply: ApiResponseType<typeof SubcategoryDetailSuccessResponseSchema>;
+  // }>(
+  //   '/subcategory/:id',
+  //   {
+  //     schema: {
+  //       params: IdParamsSchema,
+  //       response: {
+  //         200: SubcategoryDetailSuccessResponseSchema,
+  //         404: ApiResponseErrorSchema,
+  //         500: ApiResponseErrorSchema,
+  //       },
+  //     },
+  //   },
+  //   async (request, reply) => {
+  //     try {
+  //       const { id } = request.params;
+  //       const query: any = request.query || {};
+  //       const languages: string[] | undefined = query.languages;
 
-        const subcategories = await subcategoriesDBService.findAll({
-          where: {
-            slug: id,
-            ...(languages && languages.length > 0
-              ? { i18n: { some: { locale: { in: languages } } } }
-              : {}),
-          },
-        });
+  //       const subcategories = await subcategoriesDBService.findAll({
+  //         where: {
+  //           slug: id,
+  //           ...(languages && languages.length > 0
+  //             ? { i18n: { some: { locale: { in: languages } } } }
+  //             : {}),
+  //         },
+  //       });
 
-        const subcategory = subcategories?.[0];
+  //       const subcategory = subcategories?.[0];
 
-        if (!subcategory) {
-          return reply.status(404).send({
-            success: false,
-            error: {
-              message: `Subcategory with id "${id}" not found`,
-              code: 404,
-            },
-          });
-        }
+  //       if (!subcategory) {
+  //         return reply.status(404).send({
+  //           success: false,
+  //           error: {
+  //             message: `Subcategory with id "${id}" not found`,
+  //             code: 404,
+  //           },
+  //         });
+  //       }
 
-        return reply.status(200).send({
-          success: true,
-          message: 'Subcategory fetched',
-          data: {
-            subcategory:
-              subcategory as unknown as SubcategoryDetailSuccessResponse['data']['subcategory'],
-          },
-        });
-      } catch (err) {
-        fastify.log.error(err);
-        const devMsg =
-          process.env.NODE_ENV === 'development' && err instanceof Error
-            ? `Failed to fetch subcategory: ${err.message}`
-            : 'Failed to fetch subcategory';
-        return reply.status(500).send({
-          success: false,
-          error: { message: devMsg, code: 500 },
-        });
-      }
-    }
-  );
+  //       // Schema expects: { data: { subcategory: ... } }
+  //       return reply.status(200).send({
+  //         data: {
+  //           subcategory:
+  //             subcategory as unknown as (typeof SubcategoryDetailSuccessResponseSchema)['subcategory'],
+  //         },
+  //       });
+  //     } catch (err) {
+  //       fastify.log.error(err);
+  //       const devMsg =
+  //         process.env.NODE_ENV === 'development' && err instanceof Error
+  //           ? `Failed to fetch subcategory: ${err.message}`
+  //           : 'Failed to fetch subcategory';
+  //       return reply.status(500).send({
+  //         success: false,
+  //         error: { message: devMsg, code: 500 },
+  //       });
+  //     }
+  //   }
+  // );
 
   // // Upsert Subcategory
   // fastify.post<{

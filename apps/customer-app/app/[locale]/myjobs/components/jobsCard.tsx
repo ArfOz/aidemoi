@@ -59,9 +59,9 @@ export const JobsCard = ({
         ApiResponse<MyJobDeleteSuccessResponse>
       >(`/jobs/my-jobs/${id}`, { useAuth: true });
       if (!res.success) {
-        const text = await res;
-
-        throw new Error(`Delete failed: ${res.error?.code} ${text}`);
+        throw new Error(
+          `Delete failed: ${res.error?.code} ${res.error?.message}`
+        );
       }
       setLocalJobs((prev) => prev.filter((j) => j.id !== id));
     } catch (err) {

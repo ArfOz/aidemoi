@@ -26,6 +26,9 @@ import {
   LogoutSuccessResponseType,
   LogoutHeaders,
   AuthHeadersSchema,
+  ApiResponseSuccessSchema,
+  ApiResponseType,
+  ApiSuccessResponseType,
 } from '@api';
 import { TokenDBService } from '../services/DatabaseService/TokenDBService';
 
@@ -39,14 +42,14 @@ export async function authRoutes(
 
   fastify.post<{
     Body: LoginRequestType;
-    Reply: LoginSuccessResponseType | ApiErrorResponseType;
+    Reply: ApiResponseType<typeof LoginSuccessResponseSchema>;
   }>(
     '/login',
     {
       schema: {
         body: LoginRequestSchema,
         response: {
-          200: LoginSuccessResponseSchema,
+          200: ApiResponseSuccessSchema(LoginSuccessResponseSchema),
           401: ApiResponseErrorSchema,
           500: ApiResponseErrorSchema,
         },
@@ -95,8 +98,8 @@ export async function authRoutes(
           expiresAtRefresh: refreshTokenExpiresAt,
         });
 
-        const response: LoginSuccessResponseType = {
-          success: true,
+        const response = {
+          success: true as const,
           message: 'Login successful',
           data: {
             tokens: {
@@ -130,14 +133,14 @@ export async function authRoutes(
   // Register endpoint
   fastify.post<{
     Body: RegisterRequestType;
-    Reply: RegisterSuccessResponseType | ApiErrorResponseType;
+    Reply: ApiResponseType<typeof RegisterSuccessResponseSchema>;
   }>(
     '/register',
     {
       schema: {
         body: RegisterRequestSchema,
         response: {
-          201: RegisterSuccessResponseSchema,
+          201: ApiResponseSuccessSchema(RegisterSuccessResponseSchema),
           400: ApiResponseErrorSchema,
           409: ApiResponseErrorSchema,
         },
@@ -181,8 +184,8 @@ export async function authRoutes(
         // Log successful registration
         fastify.log.info(`New user registered: ${newUser.username}`);
 
-        const response: RegisterSuccessResponseType = {
-          success: true,
+        const response = {
+          success: true as const,
           message: 'Registration successful',
           data: {
             user: {
@@ -211,7 +214,7 @@ export async function authRoutes(
   // Get current user profile
   fastify.get<{
     Headers: { authorization: string };
-    Reply: ProfileSuccessResponseType | ApiErrorResponseType;
+    Reply: ApiResponseType<typeof ProfileSuccessResponseSchema>;
   }>(
     '/profile',
     {
@@ -272,7 +275,7 @@ export async function authRoutes(
   // Refresh token endpoint
   fastify.post<{
     Body: RefreshRequest;
-    Reply: RefreshSuccessResponseType | ApiErrorResponseType;
+    Reply: ApiResponseType<typeof RefreshTokenSuccessResponseSchema>;
   }>(
     '/refresh',
     {
@@ -365,7 +368,7 @@ export async function authRoutes(
 
   fastify.post<{
     Headers: LogoutHeaders;
-    Reply: LogoutSuccessResponseType | ApiErrorResponseType;
+    Reply: ApiResponseType<typeof LogoutSuccessResponseSchema>;
   }>(
     '/logout',
     {

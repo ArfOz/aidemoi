@@ -10,18 +10,15 @@ import {
   ProfileSuccessResponseSchema,
   RefreshTokenRequestSchema,
   LogoutSuccessResponseSchema,
-  CategoryUpsertRequestSchema,
   CategoryUpsertSuccessResponseSchema,
   SubcategoryUpsertRequestSchema,
   // SubcategoryUpsertSuccessResponseSchema,
-  CategoriesListSuccessResponseSchema,
   CategoryGetRequestSchema,
   CategoriesListRequestSchema,
   QuestionAddSuccessResponseSchema,
   QuestionUpsertRequestSchema,
   QuestionGetSuccessResponseSchema,
   SubcategoryDetailRequestSchema,
-  SubcategoryDetailSuccessResponseSchema,
   QuestionGetRequestSchema,
   AnswerAddSuccessResponseSchema,
   AnswersCreateRequestSchema,
@@ -33,7 +30,12 @@ import {
   MyJobsGetSuccessResponseSchema,
   IdParamsSchema,
   MyJobDeleteSuccessResponseSchema,
-} from './schema';
+} from './schemas/schema';
+import {
+  CategoriesListSuccessResponseSchema,
+  CategoryDetailSuccessResponseSchema,
+  CategoryUpsertRequestSchema,
+} from './schemas';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
@@ -46,6 +48,9 @@ export type ApiSuccessResponseType<T extends TObject> = Static<
 export type ApiResponseType<T extends TObject> =
   | ApiSuccessResponseType<T>
   | ApiErrorResponseType;
+
+//Category area
+export type CategoriesListRequest = Static<typeof CategoriesListRequestSchema>;
 
 export type LoginSuccessResponseType = Static<
   typeof LoginSuccessResponseSchema
@@ -79,8 +84,6 @@ export interface LogoutHeaders {
 // export type LogoutRequest = Static<typeof LogoutRequestSchema>;
 export type CategoryUpsertRequest = Static<typeof CategoryUpsertRequestSchema>;
 
-export type CategoriesListRequest = Static<typeof CategoriesListRequestSchema>;
-
 export type CategoryUpsertSuccessResponse = Static<
   typeof CategoryUpsertSuccessResponseSchema
 >;
@@ -97,13 +100,13 @@ export type CategoriesListSuccessResponse = Static<
   typeof CategoriesListSuccessResponseSchema
 >;
 
+export type CategoryDetailSuccessResponse = Static<
+  typeof CategoryDetailSuccessResponseSchema
+>;
+
 export type CategoryGetRequest = Static<typeof CategoryGetRequestSchema>;
 
 export type QuestionGetRequest = Static<typeof QuestionGetRequestSchema>;
-
-export type SubcategoryDetailSuccessResponse = Static<
-  typeof SubcategoryDetailSuccessResponseSchema
->;
 
 export type QuestionAddSuccessResponse = Static<
   typeof QuestionAddSuccessResponseSchema

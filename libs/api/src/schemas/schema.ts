@@ -59,80 +59,50 @@ export const LoginSuccessResponseSchema = Type.Object({
   user: UserSchema,
 });
 
-export const LogoutSuccessResponseSchema = Type.Intersect([
-  Type.Object({
-    data: Type.Object({
-      loggedOut: Type.Boolean(),
-    }),
-  }),
-]);
+export const LogoutSuccessResponseSchema = Type.Object({
+  loggedOut: Type.Boolean(),
+});
 
-export const RefreshTokenSuccessResponseSchema = Type.Intersect([
-  Type.Object({
-    data: Type.Object({
-      tokens: Type.Object({
-        token: Type.String(),
-        refreshToken: Type.String(),
-        expiresIn: Type.String(),
-        expiresAt: Type.String(),
-        refreshExpiresIn: Type.String(),
-        refreshExpiresAt: Type.String(),
-      }),
-    }),
+export const RefreshTokenSuccessResponseSchema = Type.Object({
+  tokens: Type.Object({
+    token: Type.String(),
+    refreshToken: Type.String(),
+    expiresIn: Type.String(),
+    expiresAt: Type.String(),
+    refreshExpiresIn: Type.String(),
+    refreshExpiresAt: Type.String(),
   }),
-]);
+});
 
-export const ProfileSuccessResponseSchema = Type.Intersect([
-  Type.Object({
-    data: Type.Object({
-      user: Type.Object({
-        id: Type.String(),
-        username: Type.String(),
-        email: Type.String(),
-        roles: Type.Optional(Type.Array(Type.String())),
-      }),
-    }),
+export const ProfileSuccessResponseSchema = Type.Object({
+  user: Type.Object({
+    id: Type.String(),
+    username: Type.String(),
+    email: Type.String(),
+    roles: Type.Optional(Type.Array(Type.String())),
   }),
-]);
+});
 
-export const RegisterSuccessResponseSchema = Type.Intersect([
-  Type.Object({
-    data: Type.Object({
-      user: Type.Object({
-        id: Type.String(),
-        username: Type.String(),
-        email: Type.String(),
-        roles: Type.Optional(Type.Array(Type.String())),
-      }),
-    }),
+export const RegisterSuccessResponseSchema = Type.Object({
+  user: Type.Object({
+    id: Type.String(),
+    username: Type.String(),
+    email: Type.String(),
+    roles: Type.Optional(Type.Array(Type.String())),
   }),
-]);
+});
+
+//Category area
 
 // Category upsert schemas/types
-export const CategoryI18nSchema = Type.Object({
-  id: Type.Optional(Type.Integer()),
-  locale: Type.String({ minLength: 2, maxLength: 8 }),
-  name: Type.String({ minLength: 1, maxLength: 255 }),
-  description: Type.Union([Type.String(), Type.Null()]),
-});
-export const CategoryUpsertRequestSchema = Type.Object({
-  icon: Type.Optional(Type.String({ maxLength: 16 })),
-  sortOrder: Type.Optional(Type.Integer()),
-  i18n: Type.Array(CategoryI18nSchema, { minItems: 1 }),
-  id: Type.Optional(Type.String()), // for updates
-});
 
-export const CategoryUpsertSuccessResponseSchema = Type.Intersect([
-  Type.Object({
-    data: Type.Object({
-      category: Type.Object({
-        id: Type.String(),
-        created: Type.Boolean(),
-        updatedLocales: Type.Array(Type.String()),
-      }),
-    }),
+export const CategoryUpsertSuccessResponseSchema = Type.Object({
+  category: Type.Object({
+    id: Type.String(),
+    created: Type.Boolean(),
+    updatedLocales: Type.Array(Type.String()),
   }),
-]);
+});
 
 export const CategoriesListRequestSchema = Type.Object({
   includeSubcategories: Type.Optional(Type.Boolean({ default: false })),
@@ -170,53 +140,6 @@ export const SubcategoryUpsertSuccessResponseSchema = Type.Intersect([
   }),
 ]);
 
-export const SubcategoryOutSchema = Type.Object({
-  id: Type.Integer(),
-  categoryId: Type.String(),
-  slug: Type.String({ maxLength: 128 }),
-  icon: Type.Union([Type.String({ maxLength: 16 }), Type.Null()]),
-  sortOrder: Type.Integer({ default: 0 }),
-  name: Type.Union([Type.String(), Type.Null()]),
-  createdAt: Type.String({ format: 'date-time' }), // ✅ Fastify uyumlu
-  updatedAt: Type.String({ format: 'date-time' }), // ✅ Fastify uyumlu
-  i18n: Type.Array(
-    Type.Object({
-      locale: Type.String({ minLength: 2, maxLength: 8 }),
-      name: Type.String({ minLength: 1, maxLength: 255 }),
-      description: Type.Optional(Type.Union([Type.String(), Type.Null()])),
-    })
-  ),
-});
-
-export const CategoryDetailSchema = Type.Object({
-  id: Type.String(),
-  name: Type.String(),
-  icon: Type.Union([Type.String(), Type.Null()]),
-  sortOrder: Type.Integer({ default: 0 }), // Prisma default(0)
-  i18n: Type.Array(CategoryI18nSchema),
-  subcategories: Type.Array(SubcategoryOutSchema), // Prisma’da hep mevcut
-  createdAt: Type.String({ format: 'date-time' }), // ✅ Fastify uyumlu
-  updatedAt: Type.String({ format: 'date-time' }), // ✅ Fastify uyumlu
-});
-
-export const CategoryListSchema = Type.Object({
-  id: Type.String(),
-  name: Type.String(),
-  icon: Type.Union([Type.String(), Type.Null()]),
-  sortOrder: Type.Integer({ default: 0 }), // Prisma default(0)
-  i18n: Type.Array(CategoryI18nSchema),
-  createdAt: Type.String({ format: 'date-time' }), // ✅ Fastify uyumlu
-  updatedAt: Type.String({ format: 'date-time' }), // ✅ Fastify uyumlu
-});
-
-export const CategoriesListSuccessResponseSchema = Type.Intersect([
-  Type.Object({
-    data: Type.Object({
-      categories: Type.Array(CategoryListSchema),
-    }),
-  }),
-]);
-
 export const CategoryGetRequestSchema = Type.Object({
   includeSubcategories: Type.Optional(Type.Boolean({ default: false })),
   languages: Type.Optional(
@@ -231,22 +154,14 @@ export const SubcategoryDetailRequestSchema = Type.Object({
   ),
 });
 
-export const SubcategoryDetailSuccessResponseSchema = Type.Intersect([
-  Type.Object({
-    data: Type.Object({
-      subcategory: SubcategoryOutSchema,
-    }),
-  }),
-]);
+// export const SubcategoryDetailSuccessResponseSchema = Type.Object({
+//   subcategory: SubcategoryOutSchema,
+// });
 
-export const QuestionAddSuccessResponseSchema = Type.Intersect([
-  Type.Object({
-    data: Type.Object({
-      questionId: Type.Integer(),
-      submittedAt: Type.String({ format: 'date-time' }),
-    }),
-  }),
-]);
+export const QuestionAddSuccessResponseSchema = Type.Object({
+  questionId: Type.Integer(),
+  submittedAt: Type.String({ format: 'date-time' }),
+});
 
 // add Question i18n schema
 export const QuestionI18nSchema = Type.Object({
@@ -288,14 +203,10 @@ export const QuestionGetRequestSchema = Type.Object({
   lang: Type.String({ minLength: 1, maxLength: 8 }),
 });
 
-export const QuestionGetSuccessResponseSchema = Type.Intersect([
-  Type.Object({
-    data: Type.Object({
-      // allow any shape for question to avoid serializer schema mismatch
-      questions: Type.Any(),
-    }),
-  }),
-]);
+export const QuestionGetSuccessResponseSchema = Type.Object({
+  // allow any shape for question to avoid serializer schema mismatch
+  questions: Type.Any(),
+});
 
 // Questions helper removed — not used
 
@@ -335,14 +246,10 @@ export const QuestionUpdateRequestSchema = Type.Object({
   ),
 });
 
-export const QuestionUpdateSuccessResponseSchema = Type.Intersect([
-  Type.Object({
-    data: Type.Object({
-      questionId: Type.Integer(),
-      updatedAt: Type.String({ format: 'date-time' }),
-    }),
-  }),
-]);
+export const QuestionUpdateSuccessResponseSchema = Type.Object({
+  questionId: Type.Integer(),
+  updatedAt: Type.String({ format: 'date-time' }),
+});
 
 export const AnswersCreateRequestSchema = Type.Object({
   answers: Type.Array(
@@ -357,45 +264,37 @@ export const AnswersCreateRequestSchema = Type.Object({
   ),
 });
 
-export const AnswerAddSuccessResponseSchema = Type.Intersect([
-  Type.Object({
-    data: Type.Object({
-      answersCreated: Type.Number(),
-      answers: Type.Array(
-        Type.Object({
-          answerId: Type.Number(),
-          questionId: Type.Number(),
-          submittedAt: Type.String(),
-        })
-      ),
-    }),
-  }),
-]);
+export const AnswerAddSuccessResponseSchema = Type.Object({
+  answersCreated: Type.Number(),
+  answers: Type.Array(
+    Type.Object({
+      answerId: Type.Number(),
+      questionId: Type.Number(),
+      submittedAt: Type.String(),
+    })
+  ),
+});
 
-export const AnswerGetSuccessResponseSchema = Type.Intersect([
-  Type.Object({
-    data: Type.Object({
-      answers: Type.Array(
-        Type.Object({
-          id: Type.Number(),
-          questionId: Type.Number(),
-          userId: Type.Number(),
-          optionId: Type.Union([Type.Number(), Type.Null()]),
-          textValue: Type.Union([Type.String(), Type.Null()]),
-          numberValue: Type.Union([Type.Number(), Type.Null()]),
-          inputLanguage: Type.Union([Type.String(), Type.Null()]),
+export const AnswerGetSuccessResponseSchema = Type.Object({
+  answers: Type.Array(
+    Type.Object({
+      id: Type.Number(),
+      questionId: Type.Number(),
+      userId: Type.Number(),
+      optionId: Type.Union([Type.Number(), Type.Null()]),
+      textValue: Type.Union([Type.String(), Type.Null()]),
+      numberValue: Type.Union([Type.Number(), Type.Null()]),
+      inputLanguage: Type.Union([Type.String(), Type.Null()]),
 
-          //These are any because of serializer issues after it will be fixed we can change it to string with date-time format
-          createdAt: Type.Any(),
-          dateValue: Type.Any(),
-          updatedAt: Type.Any(),
-          question: Type.Union([Type.Any(), Type.Null()]),
-          option: Type.Union([Type.Any(), Type.Null()]),
-        })
-      ),
-    }),
-  }),
-]);
+      //These are any because of serializer issues after it will be fixed we can change it to string with date-time format
+      createdAt: Type.Any(),
+      dateValue: Type.Any(),
+      updatedAt: Type.Any(),
+      question: Type.Union([Type.Any(), Type.Null()]),
+      option: Type.Union([Type.Any(), Type.Null()]),
+    })
+  ),
+});
 
 export const AnswerGetRequestSchema = Type.Object({
   lang: Type.Optional(Type.Union([Type.Literal('en'), Type.Literal('fr')])),
@@ -422,14 +321,10 @@ export const JobCreateRequestSchema = Type.Object({
   // Add other fields as necessary
 });
 
-export const JobCreateSuccessResponseSchema = Type.Intersect([
-  Type.Object({
-    data: Type.Object({
-      jobId: Type.Number(),
-      createdAt: Type.String({ format: 'date-time' }),
-    }),
-  }),
-]);
+export const JobCreateSuccessResponseSchema = Type.Object({
+  jobId: Type.Number(),
+  createdAt: Type.String({ format: 'date-time' }),
+});
 
 // Job Schema for My Jobs Response
 export const JobSchema = Type.Object({
@@ -542,19 +437,15 @@ export const MyJobsGetRequestSchema = Type.Object({
 });
 
 // My Jobs Success Response Schema
-export const MyJobsGetSuccessResponseSchema = Type.Intersect([
-  Type.Object({
-    data: Type.Object({
-      jobs: Type.Array(JobSchema),
-      pagination: Type.Object({
-        page: Type.Integer(),
-        limit: Type.Integer(),
-        total: Type.Integer(),
-        totalPages: Type.Integer(),
-      }),
-    }),
+export const MyJobsGetSuccessResponseSchema = Type.Object({
+  jobs: Type.Array(JobSchema),
+  pagination: Type.Object({
+    page: Type.Integer(),
+    limit: Type.Integer(),
+    total: Type.Integer(),
+    totalPages: Type.Integer(),
   }),
-]);
+});
 
 // Job Detail Schema (with full answers and questions)
 export const JobDetailSchema = Type.Object({
@@ -643,11 +534,9 @@ export const JobDetailSchema = Type.Object({
 });
 
 // Job Detail Success Response Schema
-export const JobDetailSuccessResponseSchema = Type.Intersect([
-  Type.Object({
-    data: JobDetailSchema,
-  }),
-]);
+export const JobDetailSuccessResponseSchema = Type.Object({
+  data: JobDetailSchema,
+});
 
 export const JobGetIdRequestSchema = Type.Object({
   locale: Type.Optional(Type.String({ pattern: '^[a-z]{2}(-[A-Z]{2})?$' })),
@@ -668,10 +557,6 @@ export const IdParamsSchema = Type.Object({
   id: Type.String(),
 });
 
-export const MyJobDeleteSuccessResponseSchema = Type.Intersect([
-  Type.Object({
-    data: Type.Object({
-      jobDeleted: Type.Boolean(),
-    }),
-  }),
-]);
+export const MyJobDeleteSuccessResponseSchema = Type.Object({
+  jobDeleted: Type.Boolean(),
+});

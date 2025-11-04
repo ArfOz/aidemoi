@@ -12,6 +12,7 @@ import {
   AnswersCreateRequestSchema,
   ApiErrorResponseType,
   ApiResponseErrorSchema,
+  ApiResponseType,
   AuthHeadersSchema,
   IdParamsSchema,
   IdParamUrl,
@@ -119,6 +120,7 @@ export async function jobRoutes(
   fastify.get<{
     Headers: { authorization: string };
     Querystring: MyJobsGetRequest;
+    Reply: ApiResponseType<typeof MyJobsGetSuccessResponseSchema>;
   }>(
     '/my-jobs',
     {
@@ -170,7 +172,7 @@ export async function jobRoutes(
           ? { locale: request.query.locale }
           : undefined;
 
-        const jobs = await fastify.prisma.job.findMany({
+        const jobsRaw = await fastify.prisma.job.findMany({
           where,
           include: {
             subcategory: {
@@ -189,6 +191,39 @@ export async function jobRoutes(
           take: limit,
           skip,
         });
+
+        // Convert Date fields to ISO strings for each job
+        //Have to be fixed: Date fields conversion
+        const jobs = jobsRaw.map((job) => ({
+          ...job,
+          createdAt:
+            job.createdAt instanceof Date
+              ? job.createdAt.toISOString()
+              : job.createdAt,
+          updatedAt:
+            job.updatedAt instanceof Date
+              ? job.updatedAt.toISOString()
+              : job.updatedAt,
+          subcategory: job.subcategory
+            ? {
+                ...job.subcategory,
+                createdAt:
+                  job.subcategory.createdAt instanceof Date
+                    ? job.subcategory.createdAt.toISOString()
+                    : job.subcategory.createdAt,
+                updatedAt:
+                  job.subcategory.updatedAt instanceof Date
+                    ? job.subcategory.updatedAt.toISOString()
+                    : job.subcategory.updatedAt,
+                i18n: Array.isArray(job.subcategory.i18n)
+                  ? job.subcategory.i18n.map((i18n) => ({
+                      ...i18n,
+                      // If i18n has date fields, convert them here
+                    }))
+                  : job.subcategory.i18n,
+              }
+            : job.subcategory,
+        }));
 
         const total = await fastify.prisma.job.count({ where });
         const totalPages = Math.ceil(total / limit);
@@ -220,7 +255,7 @@ export async function jobRoutes(
   fastify.post<{
     Headers: { authorization: string };
     Body: JobCreateRequest;
-    Reply: JobCreateSuccessResponse | ApiErrorResponseType;
+    Reply: ApiResponseType<typeof JobCreateSuccessResponseSchema>;
   }>(
     '/jobs',
     {
@@ -439,7 +474,7 @@ export async function jobRoutes(
     Params: IdParamUrl;
     Headers: { authorization: string };
     Body: JobCreateRequest;
-    Reply: MyJobDeleteSuccessResponse | ApiErrorResponseType;
+    Reply: ApiResponseType<typeof MyJobDeleteSuccessResponseSchema>;
   }>(
     `/jobs/:id`,
     {
@@ -492,7 +527,7 @@ export async function jobRoutes(
         return reply.status(200).send({
           success: true,
           message: 'Job deleted successfully',
-          data: { jobDeleted: true },
+          data: { jobDeleted: true as const },
         });
       } catch (error) {
         fastify.log.error(error);

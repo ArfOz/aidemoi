@@ -5,18 +5,16 @@ import {
   SubCategoriesDBService,
 } from '../services/DatabaseService';
 import {
-  ApiErrorResponseType,
   ApiResponseErrorSchema,
-  QuestionAddSuccessResponse,
   QuestionGetRequest,
   QuestionGetRequestSchema,
-  QuestionGetSuccessResponse,
   QuestionGetSuccessResponseSchema,
   QuestionUpsertRequest,
   QuestionUpdateRequestSchema,
   QuestionUpdateSuccessResponseSchema,
   QuestionUpsertRequestSchema,
   QuestionAddSuccessResponseSchema,
+  ApiResponseType,
 } from '@api';
 import { Prisma } from '@prisma/client';
 
@@ -117,7 +115,7 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
   // POST /question -> create a new question
   fastify.post<{
     Body: QuestionUpsertRequest;
-    Reply: QuestionAddSuccessResponse | ApiErrorResponseType;
+    Reply: ApiResponseType<typeof QuestionAddSuccessResponseSchema>;
   }>(
     '/question',
     {
@@ -227,7 +225,7 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get<{
     Params: { id: string };
     Querystring: QuestionGetRequest;
-    Reply: QuestionGetSuccessResponse | ApiErrorResponseType;
+    Reply: ApiResponseType<typeof QuestionGetSuccessResponseSchema>;
   }>(
     '/question/:id',
     {
@@ -433,7 +431,7 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get<{
     Params: { subcategoryId: string };
     Querystring: { lang: string };
-    Reply: ApiErrorResponseType | QuestionGetSuccessResponse;
+    Reply: ApiResponseType<typeof QuestionGetSuccessResponseSchema>;
   }>(
     '/subcategory/:subcategoryId',
     {

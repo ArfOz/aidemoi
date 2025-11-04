@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from 'next-intl/server';
 import { CategoryCard } from '@components';
 import { apiAideMoi, CategoriesListSuccessResponse } from '@api';
+import { ApiResponse } from '@api/types.api';
 
 // Cache all fetches in this route for 60s
 export const revalidate = 60;
@@ -11,16 +12,24 @@ export default async function HomePage() {
 
   const params = new URLSearchParams({ languages: String(locale) });
 
-  let categoriesRes: CategoriesListSuccessResponse | null = null;
-  try {
-    categoriesRes = await apiAideMoi.get<CategoriesListSuccessResponse>(
-      `/categories/categories?${params.toString()}`
-    );
-  } catch {
-    // swallow and show fallback UI below
-  }
+  let categoriesRes: ApiResponse<CategoriesListSuccessResponse>;
+  let items: CategoriesListSuccessResponse['data']['categories'] | undefined;
 
-  const items = categoriesRes?.data?.categories ?? [];
+  categoriesRes = await apiAideMoi.get<
+    ApiResponse<CategoriesListSuccessResponse>
+  >(`/categories/categories?${params.toString()}`);
+
+  if (categoriesRes?.success) {
+    categoriesRes = categoriesRes;
+  }
+  if (!categoriesRes?.success || !categoriesRes.data) {
+    return (
+      <main className="p-4 max-w-xl mx-auto">
+        <h1 className="text-xl font-bold mb-4">{t('title')}</h1>
+      </main>
+    );
+  }
+  items = categoriesRes['data']['categories'];
 
   return (
     <main className="p-4 max-w-xl mx-auto">
