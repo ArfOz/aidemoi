@@ -1,6 +1,10 @@
 import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
-import { apiAideMoi, CategoryDetailSuccessResponseSchema } from '@api';
+import {
+  apiAideMoi,
+  CategoryDetailSuccessResponse,
+  CategoryDetailSuccessResponseSchema,
+} from '@api';
 // optional runtime validator
 
 import { CategoryDetailCard, SubCategoryCards } from './components';
@@ -12,14 +16,14 @@ export default async function CategoryPage({
 }) {
   const locale = await getLocale();
   const { category } = await params;
-  let active: any;
+  let active: CategoryDetailSuccessResponse['data']['details'] | undefined;
   try {
-    const res = await apiAideMoi.get<
-      typeof CategoryDetailSuccessResponseSchema
-    >(`/categories/category/${category}?languages=${locale}`);
+    const res = await apiAideMoi.get<CategoryDetailSuccessResponse>(
+      `/categories/category/${category}?languages=${locale}`
+    );
 
     if (res.success) {
-      active = res.data;
+      active = res.data.details;
     }
   } catch {
     active = undefined;
