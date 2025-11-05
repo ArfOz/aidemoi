@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
-import { apiAideMoi, CategoryDetailSuccessResponse } from '@api';
+import { apiAideMoi, CategoryDetailSuccessResponseSchema } from '@api';
+// optional runtime validator
+
 import { CategoryDetailCard, SubCategoryCards } from './components';
 
 export default async function CategoryPage({
@@ -10,12 +12,15 @@ export default async function CategoryPage({
 }) {
   const locale = await getLocale();
   const { category } = await params;
-  let active: CategoryDetailSuccessResponse['data']['category'] | undefined;
+  let active: any;
   try {
-    const json = await apiAideMoi.get<CategoryDetailSuccessResponse>(
-      `/categories/category/${category}?languages=${locale}`
-    );
-    active = json?.data?.category;
+    const res = await apiAideMoi.get<
+      typeof CategoryDetailSuccessResponseSchema
+    >(`/categories/category/${category}?languages=${locale}`);
+
+    if (res.success) {
+      active = res.data;
+    }
   } catch {
     active = undefined;
   }
@@ -31,8 +36,8 @@ export default async function CategoryPage({
   }
 
   const catI18n =
-    active.i18n?.find((x) => x.locale === locale) ||
-    active.i18n?.find((x) => x.locale?.startsWith('en')) ||
+    active.i18n?.find((x: { locale: string }) => x.locale === locale) ||
+    active.i18n?.find((x: { locale: string }) => x.locale?.startsWith('en')) ||
     active.i18n?.[0];
   const activeName = catI18n?.name || active.name || active.id;
   const activeDesc = catI18n?.description || '';

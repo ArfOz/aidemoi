@@ -1,4 +1,4 @@
-import { Type } from '@sinclair/typebox';
+import { Static, Type } from '@sinclair/typebox';
 import { ApiResponseSuccessSchema } from './schema';
 
 export const CategoryI18nSchema = Type.Object({
@@ -52,9 +52,14 @@ export const CategoryListSchema = Type.Object({
 export const CategoriesListResponseSchema = Type.Object({
   categories: Type.Array(CategoryListSchema),
 });
-export const CategoriesListSuccessResponseSchema = ApiResponseSuccessSchema(
-  CategoriesListResponseSchema
-);
+
+export type CategoriesListSuccessResponseSchema = Static<
+  typeof CategoriesListResponseSchema
+>;
+
+// export type CategoriesListResponseType = Static<
+//   typeof CategoriesListSuccessResponseSchema
+// >;
 
 //Category detail success response
 
