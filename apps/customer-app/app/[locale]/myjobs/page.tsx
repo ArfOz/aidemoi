@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { MyJobsGetSuccessResponse } from '@api';
+import { apiAideMoi, MyJobsGetSuccessResponse } from '@api';
 import { useAuth } from '@components';
 import {
   JobsError,
@@ -46,8 +46,11 @@ const MyJobsPage = () => {
           params.append('status', status);
         }
 
-        const response = await api.get<MyJobsGetSuccessResponse>(
-          `/jobs/my-jobs?${params.toString()}`
+        const response = await apiAideMoi.get<MyJobsGetSuccessResponse>(
+          `/jobs/my-jobs`,
+          {
+            useAuth: true,
+          }
         );
 
         // If response is null, it means 401 was handled and user was logged out

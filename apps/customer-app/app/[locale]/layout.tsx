@@ -18,15 +18,8 @@ export default async function LocaleLayout({
     notFound();
   }
 
-  let messages;
-  try {
-    messages = (await import(`../../messages/${locale}.json`)).default;
-  } catch {
-    notFound();
-  }
-
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
+    <NextIntlClientProvider locale={locale}>
       <AuthProvider>
         <div className="min-h-screen flex flex-col">
           <Navbar lang={locale} />

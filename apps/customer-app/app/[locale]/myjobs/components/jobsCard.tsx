@@ -1,5 +1,10 @@
-import { MyJobsGetSuccessResponse } from '@api';
-import React from 'react';
+import {
+  apiAideMoi,
+  MyJobDeleteSuccessResponse,
+  MyJobsGetSuccessResponse,
+} from '@api';
+import { ApiResponse } from '@api/types.api';
+import React, { useEffect, useState } from 'react';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -31,9 +36,45 @@ export const JobsCard = ({
   jobs: MyJobsGetSuccessResponse['data']['jobs'];
   loading: boolean;
 }) => {
+  // Local state for jobs and deletion status
+  const [localJobs, setLocalJobs] = useState(jobs);
+  const [deletingIds, setDeletingIds] = useState<number[]>([]);
+
+  useEffect(() => {
+    setLocalJobs(jobs);
+  }, [jobs]);
+
+  const deleteJob = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this job?')) return;
+    const token =
+      typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!token) {
+      alert('Not authenticated');
+      return;
+    }
+
+    try {
+      setDeletingIds((s) => [...s, id]);
+      const res = await apiAideMoi.delete<
+        ApiResponse<MyJobDeleteSuccessResponse>
+      >(`/jobs/my-jobs/${id}`, { useAuth: true });
+      if (!res.success) {
+        throw new Error(
+          `Delete failed: ${res.error?.code} ${res.error?.message}`
+        );
+      }
+      setLocalJobs((prev) => prev.filter((j) => j.id !== id));
+    } catch (err) {
+      console.error('Delete job error', err);
+      alert('Failed to delete job. Check console for details.');
+    } finally {
+      setDeletingIds((s) => s.filter((x) => x !== id));
+    }
+  };
+
   return (
     <div>
-      {jobs.length === 0 && !loading ? (
+      {localJobs.length === 0 && !loading ? (
         <div className="text-center py-12">
           <div className="text-gray-400 text-6xl mb-4">📋</div>
           <h3 className="text-xl font-semibold text-gray-900 mb-2">
@@ -43,7 +84,7 @@ export const JobsCard = ({
         </div>
       ) : (
         <div className="space-y-4">
-          {jobs.map((job) => (
+          {localJobs.map((job) => (
             <div
               key={job.id}
               className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow"
@@ -103,6 +144,17 @@ export const JobsCard = ({
                       Edit
                     </button>
                   )}
+                  <button
+                    onClick={() => deleteJob(job.id)}
+                    disabled={deletingIds.includes(job.id)}
+                    className={`px-4 py-2 rounded text-white transition-colors ${
+                      deletingIds.includes(job.id)
+                        ? 'bg-red-300 cursor-not-allowed'
+                        : 'bg-red-600 hover:bg-red-700'
+                    }`}
+                  >
+                    {deletingIds.includes(job.id) ? 'Deleting...' : 'Delete'}
+                  </button>
                 </div>
               </div>
             </div>

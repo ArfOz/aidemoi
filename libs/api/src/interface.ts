@@ -1,7 +1,7 @@
-import { Static } from '@sinclair/typebox';
+import { Static, TObject } from '@sinclair/typebox';
 import {
-  ApiResponseSchema,
-  ApiErrorSchema,
+  ApiResponseSuccessSchema,
+  ApiResponseErrorSchema,
   LoginRequestSchema,
   LoginSuccessResponseSchema,
   RegisterRequestSchema,
@@ -10,19 +10,15 @@ import {
   ProfileSuccessResponseSchema,
   RefreshTokenRequestSchema,
   LogoutSuccessResponseSchema,
-  CategoryUpsertRequestSchema,
   CategoryUpsertSuccessResponseSchema,
   SubcategoryUpsertRequestSchema,
-  SubcategoryUpsertSuccessResponseSchema,
-  CategoriesListSuccessResponseSchema,
+  // SubcategoryUpsertSuccessResponseSchema,
   CategoryGetRequestSchema,
-  CategoryDetailSuccessResponseSchema,
   CategoriesListRequestSchema,
   QuestionAddSuccessResponseSchema,
   QuestionUpsertRequestSchema,
   QuestionGetSuccessResponseSchema,
   SubcategoryDetailRequestSchema,
-  SubcategoryDetailSuccessResponseSchema,
   QuestionGetRequestSchema,
   AnswerAddSuccessResponseSchema,
   AnswersCreateRequestSchema,
@@ -33,18 +29,31 @@ import {
   MyJobsGetRequestSchema,
   MyJobsGetSuccessResponseSchema,
   IdParamsSchema,
-} from './schema';
+  MyJobDeleteSuccessResponseSchema,
+  CategoriesListSuccessResponseSchema,
+  CategoryDetailSuccessResponseSchema,
+  CategoryUpsertRequestSchema,
+} from './schemas';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
-export type ApiResponseType = Static<typeof ApiResponseSchema>;
+export type ApiErrorResponseType = Static<typeof ApiResponseErrorSchema>;
+
+export type ApiSuccessResponseType<T extends TObject> = Static<
+  ReturnType<typeof ApiResponseSuccessSchema<T>>
+>;
+
+export type ApiResponseType<T extends TObject> =
+  | ApiSuccessResponseType<T>
+  | ApiErrorResponseType;
+
+//Category area
+export type CategoriesListRequest = Static<typeof CategoriesListRequestSchema>;
 
 export type LoginSuccessResponseType = Static<
   typeof LoginSuccessResponseSchema
 >;
 export type LoginRequestType = Static<typeof LoginRequestSchema>;
-
-export type ApiErrorResponseType = Static<typeof ApiErrorSchema>;
 
 export type LoginResponseType = LoginSuccessResponseType | ApiErrorResponseType;
 
@@ -73,8 +82,6 @@ export interface LogoutHeaders {
 // export type LogoutRequest = Static<typeof LogoutRequestSchema>;
 export type CategoryUpsertRequest = Static<typeof CategoryUpsertRequestSchema>;
 
-export type CategoriesListRequest = Static<typeof CategoriesListRequestSchema>;
-
 export type CategoryUpsertSuccessResponse = Static<
   typeof CategoryUpsertSuccessResponseSchema
 >;
@@ -83,25 +90,21 @@ export type SubcategoryUpsertRequest = Static<
   typeof SubcategoryUpsertRequestSchema
 >;
 
-export type SubcategoryUpsertSuccessResponse = Static<
-  typeof SubcategoryUpsertSuccessResponseSchema
->;
+// export type SubcategoryUpsertSuccessResponse = Static<
+//   typeof SubcategoryUpsertSuccessResponseSchema
+// >;
 
 export type CategoriesListSuccessResponse = Static<
   typeof CategoriesListSuccessResponseSchema
 >;
 
-export type CategoryGetRequest = Static<typeof CategoryGetRequestSchema>;
-
-export type QuestionGetRequest = Static<typeof QuestionGetRequestSchema>;
-
 export type CategoryDetailSuccessResponse = Static<
   typeof CategoryDetailSuccessResponseSchema
 >;
 
-export type SubcategoryDetailSuccessResponse = Static<
-  typeof SubcategoryDetailSuccessResponseSchema
->;
+export type CategoryGetRequest = Static<typeof CategoryGetRequestSchema>;
+
+export type QuestionGetRequest = Static<typeof QuestionGetRequestSchema>;
 
 export type QuestionAddSuccessResponse = Static<
   typeof QuestionAddSuccessResponseSchema
@@ -141,3 +144,7 @@ export type MyJobsGetSuccessResponse = Static<
 >;
 
 export type IdParamUrl = Static<typeof IdParamsSchema>;
+
+export type MyJobDeleteSuccessResponse = Static<
+  typeof MyJobDeleteSuccessResponseSchema
+>;

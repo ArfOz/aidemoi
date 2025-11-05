@@ -1,48 +1,45 @@
 import React from 'react';
 import { NavigationButtonProps } from './types';
 
-export const NavigationButton = ({
+export function NavigationButton({
   question,
   goToPreviousQuestion,
   currentQuestionIndex,
   isQuestionAnswered,
   goToNextQuestion,
-}: NavigationButtonProps) => {
+  isLast,
+  onSubmit,
+}: {
+  question: NavigationButtonProps['question'];
+  goToPreviousQuestion: NavigationButtonProps['goToPreviousQuestion'];
+  currentQuestionIndex: NavigationButtonProps['currentQuestionIndex'];
+  isQuestionAnswered: NavigationButtonProps['isQuestionAnswered'];
+  goToNextQuestion: NavigationButtonProps['goToNextQuestion'];
+  isLast: boolean;
+  onSubmit: () => void;
+}) {
   return (
-    <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
+    <div style={{ display: 'flex', gap: 8, marginTop: 24 }}>
       <button
-        onClick={goToPreviousQuestion}
+        type="button"
         disabled={currentQuestionIndex === 0}
-        style={{
-          padding: '10px 20px',
-          border: '2px solid #d1d5db',
-          borderRadius: 6,
-          backgroundColor: currentQuestionIndex === 0 ? '#f3f4f6' : 'white',
-          color: currentQuestionIndex === 0 ? '#9ca3af' : '#374151',
-          cursor: currentQuestionIndex === 0 ? 'not-allowed' : 'pointer',
-          fontSize: 14,
-          fontWeight: 500,
-        }}
+        onClick={goToPreviousQuestion}
       >
         Previous
       </button>
-
-      <button
-        onClick={goToNextQuestion}
-        disabled={!isQuestionAnswered}
-        style={{
-          padding: '10px 20px',
-          border: '2px solid #3b82f6',
-          borderRadius: 6,
-          backgroundColor: !isQuestionAnswered ? '#f3f4f6' : '#3b82f6',
-          color: !isQuestionAnswered ? '#9ca3af' : 'white',
-          cursor: !isQuestionAnswered ? 'not-allowed' : 'pointer',
-          fontSize: 14,
-          fontWeight: 500,
-        }}
-      >
-        Next
-      </button>
+      {isLast ? (
+        <button type="submit" disabled={!isQuestionAnswered} onClick={onSubmit}>
+          Submit
+        </button>
+      ) : (
+        <button
+          type="button"
+          disabled={!isQuestionAnswered}
+          onClick={goToNextQuestion}
+        >
+          Next
+        </button>
+      )}
     </div>
   );
-};
+}

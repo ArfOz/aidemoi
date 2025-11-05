@@ -5,18 +5,16 @@ import {
   SubCategoriesDBService,
 } from '../services/DatabaseService';
 import {
-  ApiErrorResponseType,
-  ApiErrorSchema,
-  QuestionAddSuccessResponse,
+  ApiResponseErrorSchema,
   QuestionGetRequest,
   QuestionGetRequestSchema,
-  QuestionGetSuccessResponse,
   QuestionGetSuccessResponseSchema,
   QuestionUpsertRequest,
   QuestionUpdateRequestSchema,
   QuestionUpdateSuccessResponseSchema,
   QuestionUpsertRequestSchema,
   QuestionAddSuccessResponseSchema,
+  ApiResponseType,
 } from '@api';
 import { Prisma } from '@prisma/client';
 
@@ -117,7 +115,7 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
   // POST /question -> create a new question
   fastify.post<{
     Body: QuestionUpsertRequest;
-    Reply: QuestionAddSuccessResponse | ApiErrorResponseType;
+    Reply: ApiResponseType<typeof QuestionAddSuccessResponseSchema>;
   }>(
     '/question',
     {
@@ -126,8 +124,8 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
         body: QuestionUpsertRequestSchema,
         response: {
           200: QuestionAddSuccessResponseSchema,
-          400: ApiErrorSchema,
-          500: ApiErrorSchema,
+          400: ApiResponseErrorSchema,
+          500: ApiResponseErrorSchema,
         },
       },
     },
@@ -227,7 +225,7 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get<{
     Params: { id: string };
     Querystring: QuestionGetRequest;
-    Reply: QuestionGetSuccessResponse | ApiErrorResponseType;
+    Reply: ApiResponseType<typeof QuestionGetSuccessResponseSchema>;
   }>(
     '/question/:id',
     {
@@ -240,7 +238,7 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
         querystring: QuestionGetRequestSchema,
         response: {
           200: QuestionGetSuccessResponseSchema,
-          500: ApiErrorSchema,
+          500: ApiResponseErrorSchema,
         },
       },
     },
@@ -297,9 +295,9 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
         body: QuestionUpdateRequestSchema,
         response: {
           200: QuestionUpdateSuccessResponseSchema,
-          400: ApiErrorSchema,
-          404: ApiErrorSchema,
-          500: ApiErrorSchema,
+          400: ApiResponseErrorSchema,
+          404: ApiResponseErrorSchema,
+          500: ApiResponseErrorSchema,
         },
       },
     },
@@ -433,7 +431,7 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get<{
     Params: { subcategoryId: string };
     Querystring: { lang: string };
-    Reply: ApiErrorResponseType | QuestionGetSuccessResponse;
+    Reply: ApiResponseType<typeof QuestionGetSuccessResponseSchema>;
   }>(
     '/subcategory/:subcategoryId',
     {
@@ -451,7 +449,7 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
         },
         response: {
           200: QuestionGetSuccessResponseSchema,
-          500: ApiErrorSchema,
+          500: ApiResponseErrorSchema,
         },
       },
     },
@@ -498,7 +496,6 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
             : 'Failed to fetch questions';
         return reply.status(500).send({
           success: false,
-          message: 'Request failed',
           error: { message: devMsg, code: 500 },
         });
       }

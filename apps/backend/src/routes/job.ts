@@ -11,7 +11,8 @@ import {
   AnswersCreateRequest,
   AnswersCreateRequestSchema,
   ApiErrorResponseType,
-  ApiErrorSchema,
+  ApiResponseErrorSchema,
+  ApiResponseType,
   AuthHeadersSchema,
   IdParamsSchema,
   IdParamUrl,
@@ -22,6 +23,8 @@ import {
   JobCreateSuccessResponseSchema,
   JobDetailSuccessResponseSchema,
   JobGetIdRequestSchema,
+  MyJobDeleteSuccessResponse,
+  MyJobDeleteSuccessResponseSchema,
   MyJobsGetRequest,
   MyJobsGetRequestSchema,
   MyJobsGetSuccessResponseSchema,
@@ -32,6 +35,7 @@ import {
   JobsDBService,
   SubCategoriesDBService, // Fixed: Changed from SubCategoriesDBService
 } from '../services/DatabaseService';
+import { tr } from 'zod/v4/locales';
 
 export async function jobRoutes(
   fastify: FastifyInstance,
@@ -73,7 +77,7 @@ export async function jobRoutes(
         querystring: JobGetIdRequestSchema,
         response: {
           200: MyJobsGetSuccessResponseSchema,
-          404: ApiErrorSchema,
+          404: ApiResponseErrorSchema,
         },
       },
     },
@@ -116,6 +120,7 @@ export async function jobRoutes(
   fastify.get<{
     Headers: { authorization: string };
     Querystring: MyJobsGetRequest;
+    Reply: ApiResponseType<typeof MyJobsGetSuccessResponseSchema>;
   }>(
     '/my-jobs',
     {
@@ -125,9 +130,9 @@ export async function jobRoutes(
         querystring: MyJobsGetRequestSchema,
         response: {
           200: MyJobsGetSuccessResponseSchema,
-          400: ApiErrorSchema,
-          401: ApiErrorSchema,
-          500: ApiErrorSchema,
+          400: ApiResponseErrorSchema,
+          401: ApiResponseErrorSchema,
+          500: ApiResponseErrorSchema,
         },
       },
     },
@@ -167,7 +172,7 @@ export async function jobRoutes(
           ? { locale: request.query.locale }
           : undefined;
 
-        const jobs = await fastify.prisma.job.findMany({
+        const jobsRaw = await fastify.prisma.job.findMany({
           where,
           include: {
             subcategory: {
@@ -186,6 +191,39 @@ export async function jobRoutes(
           take: limit,
           skip,
         });
+
+        // Convert Date fields to ISO strings for each job
+        //Have to be fixed: Date fields conversion
+        const jobs = jobsRaw.map((job) => ({
+          ...job,
+          createdAt:
+            job.createdAt instanceof Date
+              ? job.createdAt.toISOString()
+              : job.createdAt,
+          updatedAt:
+            job.updatedAt instanceof Date
+              ? job.updatedAt.toISOString()
+              : job.updatedAt,
+          subcategory: job.subcategory
+            ? {
+                ...job.subcategory,
+                createdAt:
+                  job.subcategory.createdAt instanceof Date
+                    ? job.subcategory.createdAt.toISOString()
+                    : job.subcategory.createdAt,
+                updatedAt:
+                  job.subcategory.updatedAt instanceof Date
+                    ? job.subcategory.updatedAt.toISOString()
+                    : job.subcategory.updatedAt,
+                i18n: Array.isArray(job.subcategory.i18n)
+                  ? job.subcategory.i18n.map((i18n) => ({
+                      ...i18n,
+                      // If i18n has date fields, convert them here
+                    }))
+                  : job.subcategory.i18n,
+              }
+            : job.subcategory,
+        }));
 
         const total = await fastify.prisma.job.count({ where });
         const totalPages = Math.ceil(total / limit);
@@ -217,7 +255,7 @@ export async function jobRoutes(
   fastify.post<{
     Headers: { authorization: string };
     Body: JobCreateRequest;
-    Reply: JobCreateSuccessResponse | ApiErrorResponseType;
+    Reply: ApiResponseType<typeof JobCreateSuccessResponseSchema>;
   }>(
     '/jobs',
     {
@@ -227,9 +265,9 @@ export async function jobRoutes(
         body: JobCreateRequestSchema,
         response: {
           201: JobCreateSuccessResponseSchema,
-          400: ApiErrorSchema,
-          401: ApiErrorSchema,
-          500: ApiErrorSchema,
+          400: ApiResponseErrorSchema,
+          401: ApiResponseErrorSchema,
+          500: ApiResponseErrorSchema,
         },
       },
     },
@@ -278,10 +316,20 @@ export async function jobRoutes(
           });
         }
 
-        // Validate answers if provided
-        const createdAnswers = [];
+        // --- No existing job: proceed to create the job and its answers ---
+        // Create the job first, then create answers attached to that job.
+        const jobData = {
+          title: title.trim(),
+          description: description?.trim() || null,
+          user: { connect: { id: Number(userId) } },
+          subcategory: { connect: { id: subcategoryId } },
+        };
+
+        const createdJob = await jobDBService.create(jobData);
+
+        // If answers provided, create them attached to createdJob
+        const createdAnswers: number[] = [];
         if (answers && answers.length > 0) {
-          // Create answers first
           for (const answerData of answers) {
             const {
               questionId,
@@ -327,10 +375,25 @@ export async function jobRoutes(
                 }
               }
 
-              // Create the answer
+              // Check for existing answer
+              const existingAnswer = await fastify.prisma.answer.findFirst({
+                where: {
+                  userId: Number(userId),
+                  questionId,
+                  optionId: optionId ?? null,
+                },
+              });
+
+              if (existingAnswer) {
+                createdAnswers.push(existingAnswer.id);
+                continue; // Skip creating a duplicate answer
+              }
+
+              // Create the answer attached to the job
               const answerCreateData: any = {
                 user: { connect: { id: Number(userId) } },
                 question: { connect: { id: questionId } },
+                job: { connect: { id: createdJob.id } },
                 textValue,
                 numberValue,
                 dateValue: dateValue ? new Date(dateValue) : undefined,
@@ -345,6 +408,25 @@ export async function jobRoutes(
               createdAnswers.push(answer.id);
             } catch (answerError) {
               fastify.log.error(answerError);
+              // Rollback: delete created answers and the job to avoid partial state
+              try {
+                if (createdAnswers.length > 0) {
+                  await fastify.prisma.answer.deleteMany({
+                    where: {
+                      id: { in: createdAnswers },
+                      userId: Number(userId),
+                    },
+                  });
+                }
+                await jobDBService.delete(createdJob.id);
+              } catch (cleanupErr) {
+                fastify.log.error(
+                  'Cleanup after answer creation failed',
+                  undefined,
+                  cleanupErr
+                );
+              }
+
               return reply.status(400).send({
                 success: false,
                 error: {
@@ -358,29 +440,6 @@ export async function jobRoutes(
           }
         }
 
-        // Create the job
-        const jobData = {
-          title: title.trim(),
-          description: description?.trim() || null,
-          user: { connect: { id: Number(userId) } },
-          subcategory: { connect: { id: subcategoryId } },
-        };
-
-        const createdJob = await jobDBService.create(jobData);
-
-        // Link answers to the job if any were created
-        if (createdAnswers.length > 0) {
-          await fastify.prisma.answer.updateMany({
-            where: {
-              id: { in: createdAnswers },
-              userId: userId,
-            },
-            data: {
-              jobId: createdJob.id,
-            },
-          });
-        }
-
         return reply.status(201).send({
           success: true,
           message: 'Job created successfully',
@@ -391,6 +450,17 @@ export async function jobRoutes(
         });
       } catch (error) {
         fastify.log.error(error);
+        // Prisma unique constraint (race or DB-level uniqueness) -> treat as client error
+        if ((error as any)?.code === 'P2002') {
+          return reply.status(400).send({
+            success: false,
+            error: {
+              message:
+                'A job for this subcategory already exists for this user.',
+              code: 400,
+            },
+          });
+        }
         return reply.status(500).send({
           success: false,
           error: { message: 'Failed to create job', code: 500 },
@@ -399,23 +469,23 @@ export async function jobRoutes(
     }
   );
 
-  // ✅ POST /answers → create multiple answers
-  fastify.post<{
+  //delete job
+  fastify.delete<{
+    Params: IdParamUrl;
     Headers: { authorization: string };
-    Body: AnswersCreateRequest;
-    Reply: AnswerAddSuccessResponse | ApiErrorResponseType;
+    Body: JobCreateRequest;
+    Reply: ApiResponseType<typeof MyJobDeleteSuccessResponseSchema>;
   }>(
-    '/answers',
+    `/jobs/:id`,
     {
       preHandler: authenticateToken,
       schema: {
         headers: AuthHeadersSchema,
-        body: AnswersCreateRequestSchema,
         response: {
-          201: AnswerAddSuccessResponseSchema,
-          400: ApiErrorSchema,
-          401: ApiErrorSchema,
-          500: ApiErrorSchema,
+          200: MyJobDeleteSuccessResponseSchema,
+          400: ApiResponseErrorSchema,
+          401: ApiResponseErrorSchema,
+          500: ApiResponseErrorSchema,
         },
       },
     },
@@ -425,216 +495,45 @@ export async function jobRoutes(
           (request as any).user?.userId ??
           (request as any).user?.id ??
           (request as any).userId;
-
+        console.log(
+          'Deleting job for userId:',
+          userId,
+          'jobId:',
+          request.params.id
+        );
         if (!userId) {
           return reply.status(401).send({
             success: false,
             error: { message: 'Unauthorized', code: 401 },
           });
         }
-
-        const { answers } = request.body;
-
-        if (!answers || answers.length === 0) {
+        const jobId = parseInt(request.params.id);
+        if (isNaN(jobId)) {
           return reply.status(400).send({
             success: false,
-            error: { message: 'No answers provided', code: 400 },
+            error: { message: 'Invalid job ID', code: 400 },
           });
         }
-
-        const createdAnswers = [];
-        const errors = [];
-
-        for (const answerData of answers) {
-          const {
-            questionId,
-            optionId = null,
-            textValue = null,
-            numberValue = null,
-            dateValue,
-            inputLanguage = null,
-          } = answerData;
-
-          try {
-            // Validate question exists using Prisma directly
-            const question = await fastify.prisma.question.findUnique({
-              where: { id: questionId },
-              select: { id: true, isActive: true },
-            });
-
-            if (!question || !question.isActive) {
-              errors.push(
-                `Question with ID ${questionId} not found or inactive`
-              );
-              continue;
-            }
-
-            // Validate option exists if provided
-            if (optionId) {
-              // Use Prisma directly to check if option exists and belongs to question
-              const option = await fastify.prisma.option.findFirst({
-                where: {
-                  id: optionId,
-                  questionId: questionId,
-                },
-              });
-
-              if (!option) {
-                errors.push(
-                  `Option with ID ${optionId} not found or does not belong to question ${questionId}`
-                );
-                continue;
-              }
-            }
-
-            // Create the answer
-            const answerCreateData: any = {
-              user: { connect: { id: Number(userId) } },
-              question: { connect: { id: questionId } },
-              textValue,
-              numberValue,
-              dateValue: dateValue ? new Date(dateValue) : undefined,
-              inputLanguage,
-            };
-
-            // Only connect option if optionId is provided and valid
-            if (optionId) {
-              answerCreateData.option = { connect: { id: optionId } };
-            }
-
-            const answer = await answerDBService.create(answerCreateData);
-
-            if (answer) {
-              createdAnswers.push({
-                answerId: answer.id,
-                questionId,
-                submittedAt: answer.createdAt.toISOString(),
-              });
-            }
-          } catch (answerError) {
-            fastify.log.error(answerError);
-            errors.push(
-              `Failed to create answer for question ${questionId}: ${
-                (answerError as Error).message
-              }`
-            );
-          }
-        }
-
-        // If all answers failed
-        if (createdAnswers.length === 0 && errors.length > 0) {
-          return reply.status(400).send({
+        const job = await jobDBService.findUnique({
+          where: { id: jobId, userId: Number(userId) },
+        });
+        if (!job || job.userId !== Number(userId)) {
+          return reply.status(404).send({
             success: false,
-            error: {
-              message: `Failed to create any answers. Errors: ${errors.join(
-                ', '
-              )}`,
-              code: 400,
-            },
+            error: { message: 'Job not found', code: 404 },
           });
         }
-
-        // Return success response
-        return reply.status(201).send({
-          success: true,
-          message: `${createdAnswers.length} answers created successfully${
-            errors.length > 0 ? ` (${errors.length} failed)` : ''
-          }`,
-          data: {
-            answersCreated: createdAnswers.length,
-            answers: createdAnswers,
-          },
-        });
-      } catch (error) {
-        fastify.log.error(error);
-        return reply.status(500).send({
-          success: false,
-          error: { message: 'Failed to create answers', code: 500 },
-        });
-      }
-    }
-  );
-
-  // ✅ GET /answers → with questions and optional locale filtering
-  fastify.get<{
-    Headers: { authorization: string };
-    Querystring: AnswerGetRequest;
-    Reply: AnswerGetSuccessResponse | ApiErrorResponseType;
-  }>(
-    '/answers',
-    {
-      preHandler: authenticateToken,
-      schema: {
-        headers: AuthHeadersSchema,
-        querystring: AnswerGetRequestSchema,
-        response: {
-          200: AnswerGetSuccessResponseSchema,
-          400: ApiErrorSchema,
-          401: ApiErrorSchema,
-          500: ApiErrorSchema,
-        },
-      },
-    },
-    async (request, reply) => {
-      try {
-        const userId =
-          (request as any).user?.userId ??
-          (request as any).user?.id ??
-          (request as any).userId;
-
-        if (!userId) {
-          return reply.status(401).send({
-            success: false,
-            error: { message: 'Unauthorized', code: 401 },
-          });
-        }
-
-        const { lang } = request.query;
-
-        // Build translation filters based on lang
-        const translationWhere = lang ? { locale: lang } : undefined;
-
-        // Use Prisma directly to ensure we get the exact structure needed
-        const answers = await fastify.prisma.answer.findMany({
-          where: {
-            userId: userId,
-            question: {
-              isActive: true,
-            },
-          },
-          include: {
-            question: {
-              include: {
-                translations: translationWhere
-                  ? { where: translationWhere }
-                  : true,
-                subcategory: true,
-              },
-            },
-            option: {
-              include: {
-                translations: translationWhere
-                  ? { where: translationWhere }
-                  : true,
-                answers: true,
-              },
-            },
-          },
-          orderBy: {
-            createdAt: 'desc',
-          },
-        });
-
+        await jobDBService.delete(jobId);
         return reply.status(200).send({
           success: true,
-          message: 'Answers retrieved successfully',
-          data: { answers: answers },
+          message: 'Job deleted successfully',
+          data: { jobDeleted: true as const },
         });
       } catch (error) {
         fastify.log.error(error);
         return reply.status(500).send({
           success: false,
-          error: { message: 'Failed to retrieve answers', code: 500 },
+          error: { message: 'Failed to delete job', code: 500 },
         });
       }
     }

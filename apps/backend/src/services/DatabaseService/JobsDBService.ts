@@ -88,11 +88,17 @@ export class JobsDBService {
   /**
    * Find job by ID with full details
    */
-  async findUnique(id: number, locale?: string): Promise<Job | null> {
+  async findUnique({
+    where,
+    locale,
+  }: {
+    where: Prisma.JobWhereUniqueInput;
+    locale?: string;
+  }): Promise<Job | null> {
     const translationWhere = locale ? { locale } : undefined;
 
     return await this.prisma.job.findUnique({
-      where: { id },
+      where,
       include: {
         user: {
           select: {
