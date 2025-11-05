@@ -53,13 +53,13 @@ export const CategoriesListResponseSchema = Type.Object({
   categories: Type.Array(CategoryListSchema),
 });
 
-export type CategoriesListSuccessResponseSchema = Static<
-  typeof CategoriesListResponseSchema
->;
+export const CategoriesListSuccessResponseSchema = ApiResponseSuccessSchema(
+  CategoriesListResponseSchema
+);
 
-// export type CategoriesListResponseType = Static<
-//   typeof CategoriesListSuccessResponseSchema
-// >;
+export type CategoriesListResponseType = Static<
+  typeof CategoriesListSuccessResponseSchema
+>;
 
 //Category detail success response
 

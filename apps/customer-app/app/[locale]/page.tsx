@@ -22,10 +22,9 @@ export default async function HomePage() {
   let categories: CategoriesListData['categories'] = [];
 
   try {
-    const res: CategoriesListSuccessResponse =
-      await apiAideMoi.get<CategoriesListSuccessResponse>(
-        `/categories/categories?${params.toString()}`
-      );
+    const res = await apiAideMoi.get<CategoriesListSuccessResponse>(
+      `/categories/categories?${params.toString()}`
+    );
 
     if (res.success) {
       // ✅ Artık TS biliyor: res.data.categories mevcut ve doğru tipte

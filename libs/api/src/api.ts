@@ -8,9 +8,7 @@ import { ApiErrorResponseType } from './interface';
 async function apiRequest<TData>(
   endpoint: string,
   options: RequestOptions = {}
-): Promise<
-  { success: true; message: string; data: TData } | ApiErrorResponseType
-> {
+): Promise<TData | ApiErrorResponseType> {
   const {
     method = 'GET',
     headers = {},
@@ -55,9 +53,7 @@ async function apiRequest<TData>(
     }
 
     const data = await response.json();
-    return data as
-      | { success: true; message: string; data: TData }
-      | ApiErrorResponseType;
+    return data as TData | ApiErrorResponseType;
   } catch (err) {
     clearTimeout(timeoutId);
 
