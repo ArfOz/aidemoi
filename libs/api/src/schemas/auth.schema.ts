@@ -1,0 +1,89 @@
+import { Static, Type } from '@sinclair/typebox';
+
+export const LoginRequestSchema = Type.Object({
+  email: Type.String({ format: 'email' }),
+  password: Type.String(),
+});
+
+export const TokenSchema = Type.Object({
+  token: Type.String(),
+  refreshToken: Type.String(),
+  expiresIn: Type.String(),
+  expiresAt: Type.String(),
+  refreshExpiresIn: Type.String(),
+  refreshExpiresAt: Type.String(),
+});
+
+export type TokenType = Static<typeof TokenSchema>;
+
+export const UserSchema = Type.Object({
+  id: Type.String(),
+  username: Type.String(),
+  email: Type.String(),
+});
+export const RegisterRequestSchema = Type.Object({
+  username: Type.String(),
+  email: Type.String({ format: 'email' }),
+  password: Type.String(),
+});
+
+export const RefreshTokenRequestSchema = Type.Object({
+  refreshToken: Type.String(),
+});
+
+export const LogoutRequestSchema = Type.Object({
+  refreshToken: Type.String(),
+});
+
+export const LoginSuccessResponseSchema = Type.Object({
+  tokens: TokenSchema,
+  user: UserSchema,
+});
+
+export const LogoutSuccessResponseSchema = Type.Object({
+  loggedOut: Type.Boolean(),
+});
+
+export const RefreshTokenSuccessResponseSchema = Type.Object({
+  tokens: Type.Object({
+    token: Type.String(),
+    refreshToken: Type.String(),
+    expiresIn: Type.String(),
+    expiresAt: Type.String(),
+    refreshExpiresIn: Type.String(),
+    refreshExpiresAt: Type.String(),
+  }),
+});
+
+export const ProfileSuccessResponseSchema = Type.Object({
+  user: Type.Object({
+    id: Type.String(),
+    username: Type.String(),
+    email: Type.String(),
+    roles: Type.Optional(Type.Array(Type.String())),
+  }),
+});
+
+export const RegisterSuccessResponseSchema = Type.Object({
+  user: Type.Object({
+    id: Type.String(),
+    username: Type.String(),
+    email: Type.String(),
+    roles: Type.Optional(Type.Array(Type.String())),
+  }),
+});
+
+export const AuthTokenSchema = Type.Object({
+  headers: Type.Object({
+    authorization: Type.String(),
+  }),
+  token: Type.String(),
+});
+
+export const AuthHeadersSchema = Type.Object({
+  authorization: Type.String(),
+});
+
+export const IdParamsSchema = Type.Object({
+  id: Type.String(),
+});

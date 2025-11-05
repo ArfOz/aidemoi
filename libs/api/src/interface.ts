@@ -30,8 +30,6 @@ import {
   MyJobsGetSuccessResponseSchema,
   IdParamsSchema,
   MyJobDeleteSuccessResponseSchema,
-} from './schemas/schema';
-import {
   CategoriesListSuccessResponseSchema,
   CategoryDetailSuccessResponseSchema,
   CategoryUpsertRequestSchema,
