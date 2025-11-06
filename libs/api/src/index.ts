@@ -1,4 +1,3 @@
-export * from './auth';
 export * from './schemas';
 export * from './api';
 export * from './apiConfig';

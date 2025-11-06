@@ -3,7 +3,27 @@ import { API_CONFIG, APIError, RequestOptions } from './apiConfig';
 import { ApiErrorResponseType } from './interface';
 
 /**
- * Generic fetch wrapper with type-safe response (no schema required)
+ * JWT decode helper
+ */
+function decodeJwt(token: string): { exp?: number } | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+    const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const json = decodeURIComponent(
+      atob(payload)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Generic fetch wrapper with type-safe response
  */
 async function apiRequest<TData>(
   endpoint: string,
@@ -34,15 +54,14 @@ async function apiRequest<TData>(
       localStorage.getItem('accessToken');
 
     if (token) {
-      // Check token expiry based on JWT "exp" claim
+      // 🔹 Token expiry kontrolü
       const payload = decodeJwt(token);
       const nowSec = Math.floor(Date.now() / 1000);
       if (payload?.exp && payload.exp <= nowSec) {
-        console.warn('Access token expired — clearing storage');
-        localStorage.clear();
-        // Optional: redirect user to the login page
-        window.location.href = '/login';
-
+        console.warn('Access token expired — removing from storage');
+        localStorage.removeItem('token');
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('accessToken');
         throw new APIError('Token expired', 401, 'TOKEN_EXPIRED');
       }
 
@@ -83,27 +102,7 @@ async function apiRequest<TData>(
 }
 
 /**
- * JWT decode helper
- */
-function decodeJwt(token: string): { exp?: number } | null {
-  try {
-    const parts = token.split('.');
-    if (parts.length < 2) return null;
-    const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-    const json = decodeURIComponent(
-      atob(payload)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(json);
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Public API wrapper (no schema parameter needed)
+ * Public API wrapper
  */
 export const apiAideMoi = {
   get: <TData>(endpoint: string, options?: Omit<RequestOptions, 'method'>) =>
