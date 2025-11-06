@@ -32,7 +32,22 @@ async function apiRequest<TData>(
       localStorage.getItem('token') ||
       localStorage.getItem('authToken') ||
       localStorage.getItem('accessToken');
-    if (token) requestHeaders.Authorization = `Bearer ${token}`;
+
+    if (token) {
+      // Check token expiry based on JWT "exp" claim
+      const payload = decodeJwt(token);
+      const nowSec = Math.floor(Date.now() / 1000);
+      if (payload?.exp && payload.exp <= nowSec) {
+        console.warn('Access token expired — clearing storage');
+        localStorage.clear();
+        // Optional: redirect user to the login page
+        window.location.href = '/login';
+
+        throw new APIError('Token expired', 401, 'TOKEN_EXPIRED');
+      }
+
+      requestHeaders.Authorization = `Bearer ${token}`;
+    }
   }
 
   const config: RequestInit = { method, headers: requestHeaders, cache };
@@ -64,6 +79,26 @@ async function apiRequest<TData>(
     const message =
       err instanceof Error ? err.message : 'An unexpected error occurred';
     throw new APIError(message, 500, 'UNKNOWN_ERROR');
+  }
+}
+
+/**
+ * JWT decode helper
+ */
+function decodeJwt(token: string): { exp?: number } | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+    const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const json = decodeURIComponent(
+      atob(payload)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(json);
+  } catch {
+    return null;
   }
 }
 
