@@ -29,6 +29,9 @@ import {
   ApiResponseSuccessSchema,
   ApiResponseType,
   ApiSuccessResponseType,
+  LoginResponseSchema,
+  RegisterResponseSchema,
+  ProfileResponseSchema,
 } from '@api';
 import { TokenDBService } from '../services/DatabaseService/TokenDBService';
 
@@ -42,14 +45,14 @@ export async function authRoutes(
 
   fastify.post<{
     Body: LoginRequestType;
-    Reply: ApiResponseType<typeof LoginSuccessResponseSchema>;
+    Reply: ApiResponseType<typeof LoginResponseSchema>;
   }>(
     '/login',
     {
       schema: {
         body: LoginRequestSchema,
         response: {
-          200: ApiResponseSuccessSchema(LoginSuccessResponseSchema),
+          200: LoginSuccessResponseSchema,
           401: ApiResponseErrorSchema,
           500: ApiResponseErrorSchema,
         },
@@ -133,7 +136,7 @@ export async function authRoutes(
   // Register endpoint
   fastify.post<{
     Body: RegisterRequestType;
-    Reply: ApiResponseType<typeof RegisterSuccessResponseSchema>;
+    Reply: ApiResponseType<typeof RegisterResponseSchema>;
   }>(
     '/register',
     {
@@ -214,7 +217,7 @@ export async function authRoutes(
   // Get current user profile
   fastify.get<{
     Headers: { authorization: string };
-    Reply: ApiResponseType<typeof ProfileSuccessResponseSchema>;
+    Reply: ApiResponseType<typeof ProfileResponseSchema>;
   }>(
     '/profile',
     {

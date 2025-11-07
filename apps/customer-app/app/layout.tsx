@@ -1,4 +1,4 @@
-import TokenWatcher from '@api/auth/TokenWatcher';
+import TokenWatcher from '@components/auth/TokenWatcher';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 

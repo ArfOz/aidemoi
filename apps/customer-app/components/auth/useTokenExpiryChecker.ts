@@ -4,7 +4,7 @@ interface TokenExpiryCheckerProps {
   getToken: () => string | null;
   onExpire: () => void;
   onWarn?: (secondsLeft: number) => void;
-  checkIntervalMs?: number; // default: 5 min
+  checkIntervalMs?: number; // varsayılan: 5 dakika
 }
 
 /**
