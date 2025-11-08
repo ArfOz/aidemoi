@@ -32,6 +32,8 @@ import {
   LoginResponseSchema,
   RegisterResponseSchema,
   ProfileResponseSchema,
+  RefreshTokenResponseSchema,
+  LogoutResponseSchema,
 } from '@api';
 import { TokenDBService } from '../services/DatabaseService/TokenDBService';
 
@@ -278,7 +280,7 @@ export async function authRoutes(
   // Refresh token endpoint
   fastify.post<{
     Body: RefreshRequest;
-    Reply: ApiResponseType<typeof RefreshTokenSuccessResponseSchema>;
+    Reply: ApiResponseType<typeof RefreshTokenResponseSchema>;
   }>(
     '/refresh',
     {
@@ -371,7 +373,7 @@ export async function authRoutes(
 
   fastify.post<{
     Headers: LogoutHeaders;
-    Reply: ApiResponseType<typeof LogoutSuccessResponseSchema>;
+    Reply: ApiResponseType<typeof LogoutResponseSchema>;
   }>(
     '/logout',
     {

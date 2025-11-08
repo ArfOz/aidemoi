@@ -44,11 +44,14 @@ export const LoginResponseSchema = Type.Object({
 export const LoginSuccessResponseSchema =
   ApiResponseSuccessSchema(LoginResponseSchema);
 
-export const LogoutSuccessResponseSchema = Type.Object({
+export const LogoutResponseSchema = Type.Object({
   loggedOut: Type.Boolean(),
 });
 
-export const RefreshTokenSuccessResponseSchema = Type.Object({
+export const LogoutSuccessResponseSchema =
+  ApiResponseSuccessSchema(LogoutResponseSchema);
+
+export const RefreshTokenResponseSchema = Type.Object({
   tokens: Type.Object({
     token: Type.String(),
     refreshToken: Type.String(),
@@ -58,6 +61,10 @@ export const RefreshTokenSuccessResponseSchema = Type.Object({
     refreshExpiresAt: Type.String(),
   }),
 });
+
+export const RefreshTokenSuccessResponseSchema = ApiResponseSuccessSchema(
+  RefreshTokenResponseSchema
+);
 
 export const ProfileResponseSchema = Type.Object({
   user: Type.Object({
