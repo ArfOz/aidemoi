@@ -1,4 +1,6 @@
 import { Prisma, PrismaClient, Job, JobStatus } from '@prisma/client';
+import fastify from 'fastify';
+import { serializeDates } from '../../plugins/utils/serializeDates';
 
 export type JobWithDetailsAndAnswers = Job & {
   subcategory: {
@@ -351,8 +353,8 @@ export class JobsDBService {
   async findUniqueWithAnswersAndQuestions(
     where: Prisma.JobWhereUniqueInput,
     locale?: string
-  ): Promise<JobWithDetailsAndAnswers | null> {
-    return await this.prisma.job.findUnique({
+  ) {
+    const res = await this.prisma.job.findUnique({
       where,
       include: {
         subcategory: {
@@ -409,6 +411,8 @@ export class JobsDBService {
         },
       },
     });
+
+    return serializeDates(res);
   }
 
   async findManyWithAnswersAndQuestions(

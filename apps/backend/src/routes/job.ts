@@ -25,8 +25,11 @@ import {
   JobGetIdRequestSchema,
   MyJobDeleteSuccessResponse,
   MyJobDeleteSuccessResponseSchema,
+  MyJobGetResponseSchema,
+  MyJobGetSuccessResponseSchema,
   MyJobsGetRequest,
   MyJobsGetRequestSchema,
+  MyJobsGetResponseSchema,
   MyJobsGetSuccessResponseSchema,
 } from '@api';
 import {
@@ -68,6 +71,7 @@ export async function jobRoutes(
   fastify.get<{
     Params: IdParamUrl; // TypeScript type for the parameter
     Querystring: { locale?: string };
+    Reply: ApiResponseType<typeof MyJobGetResponseSchema>;
   }>(
     '/job/:id', // Route with :id parameter
     {
@@ -76,7 +80,7 @@ export async function jobRoutes(
         headers: AuthHeadersSchema,
         querystring: JobGetIdRequestSchema,
         response: {
-          200: MyJobsGetSuccessResponseSchema,
+          200: MyJobGetSuccessResponseSchema,
           404: ApiResponseErrorSchema,
         },
       },
@@ -88,8 +92,8 @@ export async function jobRoutes(
       try {
         if (isNaN(jobId)) {
           return reply.status(400).send({
-            error: 'Bad Request',
-            message: 'Invalid job ID',
+            success: false,
+            error: { message: 'Invalid job ID', code: 400 },
           });
         }
 
@@ -100,17 +104,21 @@ export async function jobRoutes(
 
         if (!job) {
           return reply.status(404).send({
-            error: 'Not Found',
-            message: `Job with id ${jobId} not found`,
+            success: false,
+            error: { message: `Job with id ${jobId} not found`, code: 404 },
           });
         }
 
-        return reply.send(job);
+        return reply.send({
+          success: true,
+          message: 'Job retrieved successfully',
+          data: { job },
+        });
       } catch (error) {
         fastify.log.error(error);
         return reply.status(500).send({
-          error: 'Internal Server Error',
-          message: 'Failed to retrieve job',
+          success: false,
+          error: { message: 'Failed to retrieve job', code: 500 },
         });
       }
     }
@@ -120,7 +128,7 @@ export async function jobRoutes(
   fastify.get<{
     Headers: { authorization: string };
     Querystring: MyJobsGetRequest;
-    Reply: ApiResponseType<typeof MyJobsGetSuccessResponseSchema>;
+    Reply: ApiResponseType<typeof MyJobsGetResponseSchema>;
   }>(
     '/my-jobs',
     {
