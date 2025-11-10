@@ -4,7 +4,6 @@ import { useParams } from 'next/navigation';
 import {
   AnswerAddSuccessResponse,
   apiAideMoi,
-  ApiResponse,
   CategoryDetailSuccessResponse,
   JobCreateSuccessResponse,
   QuestionGetSuccessResponse,
@@ -171,10 +170,12 @@ export default function Page() {
 
     async function fetchData() {
       try {
-        const catRes = await apiAideMoi.get<
-          ApiResponse<CategoryDetailSuccessResponse>
-        >(`/categories/category/${category}?languages=${locale}`);
-        const activeCat = catRes?.data?.category;
+        const catRes = await apiAideMoi.get<CategoryDetailSuccessResponse>(
+          `/categories/category/${category}?languages=${locale}`
+        );
+        if (!catRes.success) return;
+
+        const activeCat = catRes?.data?.details;
         if (!activeCat) return;
 
         const subcat = activeCat.subcategories?.find(

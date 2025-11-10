@@ -350,14 +350,18 @@ export async function categoriesRoutes(
         const query: any = request.query || {};
         const languages: string[] | undefined = query.languages;
 
+        console.log('Fetching subcategory', id, 'with languages', languages);
+
         const subcategories = await subcategoriesDBService.findAll({
           where: {
-            slug: id,
+            id: parseInt(id, 10),
             ...(languages && languages.length > 0
               ? { i18n: { some: { locale: { in: languages } } } }
               : {}),
           },
         });
+
+        console.log('Fetched subcategories:', subcategories);
 
         const subcategory = subcategories?.[0];
 
