@@ -106,8 +106,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setError(null);
 
     try {
-      // Replace with: const response = await authRegister(data);
-      const response = {} as RegisterSuccessResponseType; // placeholder
+      const response = await apiAideMoi.post<RegisterSuccessResponseType>(
+        '/auth/register',
+        data
+      );
       if (!response || !response.success || !response.data)
         throw new Error('Registration failed');
       const newUser = response.data.user;
