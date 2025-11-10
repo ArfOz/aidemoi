@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
+  apiAideMoi,
   LoginRequestType,
   LoginSuccessResponseType,
   RegisterRequestType,
@@ -76,8 +77,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setError(null);
 
     try {
-      // Replace with: const response = await authLogin(credentials);
-      const response = {} as LoginSuccessResponseType; // placeholder
+      // Replace with:
+      const response = await apiAideMoi.post<LoginSuccessResponseType>(
+        '/auth/login',
+        credentials
+      );
       if (!response || !response.success) throw new Error('Login failed');
       const { user: u, tokens: t } = response.data;
       setUser(u);
