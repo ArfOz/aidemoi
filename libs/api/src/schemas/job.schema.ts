@@ -22,10 +22,14 @@ export const JobCreateRequestSchema = Type.Object({
   // Add other fields as necessary
 });
 
-export const JobCreateSuccessResponseSchema = Type.Object({
+export const JobCreateResponseSchema = Type.Object({
   jobId: Type.Number(),
   createdAt: Type.String({ format: 'date-time' }),
 });
+
+export const JobCreateSuccessResponseSchema = ApiResponseSuccessSchema(
+  JobCreateResponseSchema
+);
 
 // Job Schema for My Jobs Response
 export const JobSchema = Type.Object({

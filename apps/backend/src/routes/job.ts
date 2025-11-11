@@ -19,6 +19,7 @@ import {
   // Add job-related imports
   JobCreateRequest,
   JobCreateRequestSchema,
+  JobCreateResponseSchema,
   JobCreateSuccessResponse,
   JobCreateSuccessResponseSchema,
   JobDetailSuccessResponseSchema,
@@ -263,7 +264,7 @@ export async function jobRoutes(
   fastify.post<{
     Headers: { authorization: string };
     Body: JobCreateRequest;
-    Reply: ApiResponseType<typeof JobCreateSuccessResponseSchema>;
+    Reply: ApiResponseType<typeof JobCreateResponseSchema>;
   }>(
     '/jobs',
     {
