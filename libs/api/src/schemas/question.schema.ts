@@ -1,4 +1,5 @@
 import { Type } from '@sinclair/typebox';
+import { ApiResponseSuccessSchema } from './schema';
 
 export const QuestionAddSuccessResponseSchema = Type.Object({
   questionId: Type.Integer(),
@@ -45,10 +46,14 @@ export const QuestionGetRequestSchema = Type.Object({
   lang: Type.String({ minLength: 1, maxLength: 8 }),
 });
 
-export const QuestionGetSuccessResponseSchema = Type.Object({
+export const QuestionGetResponseSchema = Type.Object({
   // allow any shape for question to avoid serializer schema mismatch
   questions: Type.Any(),
 });
+
+export const QuestionGetSuccessResponseSchema = ApiResponseSuccessSchema(
+  QuestionGetResponseSchema
+);
 
 // Questions helper removed — not used
 

@@ -1,10 +1,6 @@
 import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
-import {
-  apiAideMoi,
-  CategoryDetailSuccessResponse,
-  CategoryDetailSuccessResponseSchema,
-} from '@api';
+import { apiAideMoi, CategoryDetailSuccessResponse } from '@api';
 // optional runtime validator
 
 import { CategoryDetailCard, SubCategoryCards } from './components';

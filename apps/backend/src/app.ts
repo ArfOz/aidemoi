@@ -8,11 +8,6 @@ import healthRoutes from './routes/health';
 import apiRoutes from './routes/api';
 import { authRoutes } from './routes/auth';
 
-/**
- * Create and configure Fastify instance
- * @param opts - Fastify options
- * @returns Fastify instance
- */
 function build(opts: FastifyServerOptions = {}): FastifyInstance {
   const app = fastify({
     logger: {
@@ -28,20 +23,18 @@ function build(opts: FastifyServerOptions = {}): FastifyInstance {
   });
 
   /**
-   * Global hook: response payload’ındaki tüm Date objelerini
-   * ISO string formatına çevirir. Böylece Fastify + TypeBox JSON Schema
-   * ile tam uyumlu olur.
+   * 🪄 Global Serializer:
+   * Tüm Date nesnelerini otomatik ISO string'e çevirir.
+   * Fastify + TypeBox JSON Schema ile tam uyumludur.
    */
-  app.addHook('onSend', async (request, reply, payload) => {
-    if (payload && typeof payload === 'object') {
-      return JSON.parse(
-        JSON.stringify(payload, (key, value) =>
-          value instanceof Date ? value.toISOString() : value
-        )
+  app.setSerializerCompiler(() => {
+    return (data) =>
+      JSON.stringify(data, (_, value) =>
+        value instanceof Date ? value.toISOString() : value
       );
-    }
-    return payload;
   });
+
+  // ✅ onSend hook artık gereksiz, kaldırıldı
 
   // Register plugins
   app.register(prismaPlugin);

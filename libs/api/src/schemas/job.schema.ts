@@ -1,4 +1,5 @@
 import { Type } from '@sinclair/typebox';
+import { ApiResponseSuccessSchema } from './schema';
 
 export const JobCreateRequestSchema = Type.Object({
   subcategoryId: Type.Number(),
@@ -21,10 +22,14 @@ export const JobCreateRequestSchema = Type.Object({
   // Add other fields as necessary
 });
 
-export const JobCreateSuccessResponseSchema = Type.Object({
+export const JobCreateResponseSchema = Type.Object({
   jobId: Type.Number(),
   createdAt: Type.String({ format: 'date-time' }),
 });
+
+export const JobCreateSuccessResponseSchema = ApiResponseSuccessSchema(
+  JobCreateResponseSchema
+);
 
 // Job Schema for My Jobs Response
 export const JobSchema = Type.Object({
@@ -114,10 +119,12 @@ export const JobSchema = Type.Object({
       })
     )
   ),
-  _count: Type.Object({
-    bids: Type.Integer(),
-    answers: Type.Integer(),
-  }),
+  _count: Type.Optional(
+    Type.Object({
+      bids: Type.Integer(),
+      answers: Type.Integer(),
+    })
+  ),
 });
 
 // My Jobs Request Schema
@@ -136,8 +143,18 @@ export const MyJobsGetRequestSchema = Type.Object({
   subcategoryId: Type.Optional(Type.Integer()),
 });
 
-// My Jobs Success Response Schema
-export const MyJobsGetSuccessResponseSchema = Type.Object({
+// My Job (One Job) Success Response Schema
+
+export const MyJobGetResponseSchema = Type.Object({
+  job: JobSchema,
+});
+export const MyJobGetSuccessResponseSchema = ApiResponseSuccessSchema(
+  MyJobGetResponseSchema
+);
+
+// My Jobs (Multiple Jobs) Success Response Schema
+
+export const MyJobsGetResponseSchema = Type.Object({
   jobs: Type.Array(JobSchema),
   pagination: Type.Object({
     page: Type.Integer(),
@@ -147,6 +164,9 @@ export const MyJobsGetSuccessResponseSchema = Type.Object({
   }),
 });
 
+export const MyJobsGetSuccessResponseSchema = ApiResponseSuccessSchema(
+  MyJobsGetResponseSchema
+);
 // Job Detail Schema (with full answers and questions)
 export const JobDetailSchema = Type.Object({
   id: Type.Integer(),

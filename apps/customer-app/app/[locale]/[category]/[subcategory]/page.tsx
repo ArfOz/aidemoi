@@ -4,7 +4,6 @@ import { useParams } from 'next/navigation';
 import {
   AnswerAddSuccessResponse,
   apiAideMoi,
-  ApiResponse,
   CategoryDetailSuccessResponse,
   JobCreateSuccessResponse,
   QuestionGetSuccessResponse,
@@ -171,10 +170,12 @@ export default function Page() {
 
     async function fetchData() {
       try {
-        const catRes = await apiAideMoi.get<
-          ApiResponse<CategoryDetailSuccessResponse>
-        >(`/categories/category/${category}?languages=${locale}`);
-        const activeCat = catRes?.data?.category;
+        const catRes = await apiAideMoi.get<CategoryDetailSuccessResponse>(
+          `/categories/category/${category}?languages=${locale}`
+        );
+        if (!catRes.success) return;
+
+        const activeCat = catRes?.data?.details;
         if (!activeCat) return;
 
         const subcat = activeCat.subcategories?.find(
@@ -187,6 +188,7 @@ export default function Page() {
         const questionsRes = await apiAideMoi.get<QuestionGetSuccessResponse>(
           `/questions/subcategory/${subcat.id}?lang=${locale}`
         );
+        if (!questionsRes.success) return;
         setQuestions(questionsRes?.data?.questions || []);
       } catch (error) {
         console.error('Failed to fetch data:', error);
@@ -284,25 +286,28 @@ export default function Page() {
     console.log('Request body:', JSON.stringify(fullJobPayload));
 
     try {
-      let res: JobCreateSuccessResponse | undefined;
       try {
-        res = await apiAideMoi.post<JobCreateSuccessResponse>(
+        const res = await apiAideMoi.post<JobCreateSuccessResponse>(
           `/jobs/jobs`,
           fullJobPayload,
           { useAuth: true } // pass useAuth in options
         );
+        if (res.success) {
+          alert('Answers submitted successfully!');
+          return;
+        }
+
+        if (!res || !res.success) {
+          throw new Error(
+            'Failed to create job — server returned unsuccessful response'
+          );
+        }
       } catch (err: any) {
         if (err?.response?.status === 404) {
           console.warn(
             '/jobs/jobs endpoint not found, retrying with /jobs/create'
           );
         }
-      }
-
-      if (!res || !res.success) {
-        throw new Error(
-          'Failed to create job — server returned unsuccessful response'
-        );
       }
 
       alert('Answers submitted successfully!');

@@ -15,6 +15,7 @@ import {
   QuestionUpsertRequestSchema,
   QuestionAddSuccessResponseSchema,
   ApiResponseType,
+  QuestionGetResponseSchema,
 } from '@api';
 import { Prisma } from '@prisma/client';
 
@@ -225,7 +226,7 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get<{
     Params: { id: string };
     Querystring: QuestionGetRequest;
-    Reply: ApiResponseType<typeof QuestionGetSuccessResponseSchema>;
+    Reply: ApiResponseType<typeof QuestionGetResponseSchema>;
   }>(
     '/question/:id',
     {
@@ -431,7 +432,7 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get<{
     Params: { subcategoryId: string };
     Querystring: { lang: string };
-    Reply: ApiResponseType<typeof QuestionGetSuccessResponseSchema>;
+    Reply: ApiResponseType<typeof QuestionGetResponseSchema>;
   }>(
     '/subcategory/:subcategoryId',
     {

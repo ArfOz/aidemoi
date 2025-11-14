@@ -1,4 +1,5 @@
 import { Static, Type } from '@sinclair/typebox';
+import { ApiResponseSuccessSchema } from './schema';
 
 export const LoginRequestSchema = Type.Object({
   email: Type.String({ format: 'email' }),
@@ -35,16 +36,22 @@ export const LogoutRequestSchema = Type.Object({
   refreshToken: Type.String(),
 });
 
-export const LoginSuccessResponseSchema = Type.Object({
+export const LoginResponseSchema = Type.Object({
   tokens: TokenSchema,
   user: UserSchema,
 });
 
-export const LogoutSuccessResponseSchema = Type.Object({
+export const LoginSuccessResponseSchema =
+  ApiResponseSuccessSchema(LoginResponseSchema);
+
+export const LogoutResponseSchema = Type.Object({
   loggedOut: Type.Boolean(),
 });
 
-export const RefreshTokenSuccessResponseSchema = Type.Object({
+export const LogoutSuccessResponseSchema =
+  ApiResponseSuccessSchema(LogoutResponseSchema);
+
+export const RefreshTokenResponseSchema = Type.Object({
   tokens: Type.Object({
     token: Type.String(),
     refreshToken: Type.String(),
@@ -55,7 +62,11 @@ export const RefreshTokenSuccessResponseSchema = Type.Object({
   }),
 });
 
-export const ProfileSuccessResponseSchema = Type.Object({
+export const RefreshTokenSuccessResponseSchema = ApiResponseSuccessSchema(
+  RefreshTokenResponseSchema
+);
+
+export const ProfileResponseSchema = Type.Object({
   user: Type.Object({
     id: Type.String(),
     username: Type.String(),
@@ -64,7 +75,11 @@ export const ProfileSuccessResponseSchema = Type.Object({
   }),
 });
 
-export const RegisterSuccessResponseSchema = Type.Object({
+export const ProfileSuccessResponseSchema = ApiResponseSuccessSchema(
+  ProfileResponseSchema
+);
+
+export const RegisterResponseSchema = Type.Object({
   user: Type.Object({
     id: Type.String(),
     username: Type.String(),
@@ -72,6 +87,10 @@ export const RegisterSuccessResponseSchema = Type.Object({
     roles: Type.Optional(Type.Array(Type.String())),
   }),
 });
+
+export const RegisterSuccessResponseSchema = ApiResponseSuccessSchema(
+  RegisterResponseSchema
+);
 
 export const AuthTokenSchema = Type.Object({
   headers: Type.Object({
