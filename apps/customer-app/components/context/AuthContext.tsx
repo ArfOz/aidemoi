@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { isTokenExpired } from './tokenUtils';
 import {
   apiAideMoi,
   LoginRequestType,
@@ -58,8 +59,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         if (storedUser && storedTokens) {
           const parsedUser = JSON.parse(storedUser);
           const parsedTokens = JSON.parse(storedTokens);
-          setUser(parsedUser);
-          setTokens(parsedTokens);
+          // Token time control
+          if (parsedTokens?.token && isTokenExpired(parsedTokens.token)) {
+            // Token expired ise logout
+            localStorage.removeItem('auth_user');
+            localStorage.removeItem('auth_tokens');
+            setUser(null);
+            setTokens(null);
+          } else {
+            setUser(parsedUser);
+            setTokens(parsedTokens);
+          }
         }
       }
     } catch {

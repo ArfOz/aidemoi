@@ -254,14 +254,22 @@ export const JobDetailSchema = Type.Object({
 });
 
 // Job Detail Success Response Schema
-export const JobDetailSuccessResponseSchema = Type.Object({
+
+export const JobDetailResponseSchema = Type.Object({
   data: JobDetailSchema,
 });
 
+export const JobDetailSuccessResponseSchema = ApiResponseSuccessSchema(
+  JobDetailResponseSchema
+);
 export const JobGetIdRequestSchema = Type.Object({
   locale: Type.Optional(Type.String({ pattern: '^[a-z]{2}(-[A-Z]{2})?$' })),
 });
 
-export const MyJobDeleteSuccessResponseSchema = Type.Object({
+export const MyJobDeleteResponseSchema = Type.Object({
   jobDeleted: Type.Boolean(),
 });
+
+export const MyJobDeleteSuccessResponseSchema = ApiResponseSuccessSchema(
+  MyJobDeleteResponseSchema
+);

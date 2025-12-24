@@ -13,7 +13,6 @@ import {
 } from './components';
 
 const MyJobsPage = () => {
-  const { api } = useAuth();
   const [jobs, setJobs] = useState<MyJobsGetSuccessResponse['data']['jobs']>(
     []
   );
@@ -30,48 +29,45 @@ const MyJobsPage = () => {
     page: 1,
   });
 
-  const fetchMyJobs = useCallback(
-    async (page = 1, status = '') => {
-      try {
-        setLoading(true);
-        setError(null);
+  const fetchMyJobs = useCallback(async (page = 1, status = '') => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        // Build query parameters
-        const params = new URLSearchParams({
-          page: page.toString(),
-          limit: '10',
-        });
+      // Build query parameters
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: '10',
+      });
 
-        if (status) {
-          params.append('status', status);
-        }
-
-        const response = await apiAideMoi.get<MyJobsGetSuccessResponse>(
-          `/jobs/my-jobs`,
-          {
-            useAuth: true,
-          }
-        );
-
-        // If response is null, it means 401 was handled and user was logged out
-        if (response === null) {
-          return;
-        }
-
-        if (response.success) {
-          setJobs(response.data.jobs);
-          setPagination(response.data.pagination);
-        } else {
-          setError('Failed to fetch jobs');
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-      } finally {
-        setLoading(false);
+      if (status) {
+        params.append('status', status);
       }
-    },
-    [api] // Only depend on the api wrapper
-  );
+
+      const response = await apiAideMoi.get<MyJobsGetSuccessResponse>(
+        `/jobs/my-jobs`,
+        {
+          useAuth: true,
+        }
+      );
+
+      // If response is null, it means 401 was handled and user was logged out
+      if (response === null) {
+        return;
+      }
+
+      if (response.success) {
+        setJobs(response.data.jobs);
+        setPagination(response.data.pagination);
+      } else {
+        setError('Failed to fetch jobs');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     fetchMyJobs(filters.page, filters.status);

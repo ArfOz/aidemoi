@@ -39,7 +39,6 @@ import {
   JobsDBService,
   SubCategoriesDBService, // Fixed: Changed from SubCategoriesDBService
 } from '../services/DatabaseService';
-import { tr } from 'zod/v4/locales';
 
 export async function jobRoutes(
   fastify: FastifyInstance,
