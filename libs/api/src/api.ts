@@ -47,6 +47,12 @@ async function apiRequest<TData>(
     ...headers,
   };
 
+  // Remove Content-Type for GET/DELETE if no body
+  if (!body && ['GET', 'DELETE'].includes(method)) {
+    if (requestHeaders['Content-Type']) delete requestHeaders['Content-Type'];
+    if (requestHeaders['content-type']) delete requestHeaders['content-type'];
+  }
+
   if (useAuth && typeof window !== 'undefined') {
     const token =
       localStorage.getItem('token') ||
@@ -70,7 +76,11 @@ async function apiRequest<TData>(
   }
 
   const config: RequestInit = { method, headers: requestHeaders, cache };
-  if (body && method !== 'GET') config.body = JSON.stringify(body);
+  if (body && !['GET', 'DELETE'].includes(method)) {
+    config.body = JSON.stringify(body);
+  }
+
+  console.log('API Request:', method, url, config, body);
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);

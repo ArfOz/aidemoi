@@ -46,18 +46,13 @@ export const JobsCard = ({
   }, [jobs]);
 
   const deleteJob = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this job?')) return;
-    const token =
-      typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    if (!token) {
-      alert('Not authenticated');
-      return;
-    }
-
     try {
       setDeletingIds((s) => [...s, id]);
+
+      console.log('Deleting job with id:', id);
+      // Do not send a body or Content-Type for DELETE
       const res = await apiAideMoi.delete<MyJobDeleteSuccessResponse>(
-        `/jobs/my-jobs/${id}`,
+        `/jobs/job/${id}`,
         { useAuth: true }
       );
       if (!res.success) {

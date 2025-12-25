@@ -255,13 +255,12 @@ export const JobDetailSchema = Type.Object({
 
 // Job Detail Success Response Schema
 
-export const JobDetailResponseSchema = Type.Object({
-  data: JobDetailSchema,
+export const MyJobDetailResponseSchema = Type.Object({
+  job: JobDetailSchema,
 });
 
-export const JobDetailSuccessResponseSchema = ApiResponseSuccessSchema(
-  JobDetailResponseSchema
-);
+export const MyJobDetailSuccessResponseSchema =
+  ApiResponseSuccessSchema(JobDetailSchema);
 export const JobGetIdRequestSchema = Type.Object({
   locale: Type.Optional(Type.String({ pattern: '^[a-z]{2}(-[A-Z]{2})?$' })),
 });

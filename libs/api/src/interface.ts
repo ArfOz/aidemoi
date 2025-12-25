@@ -33,6 +33,7 @@ import {
   CategoriesListSuccessResponseSchema,
   CategoryDetailSuccessResponseSchema,
   CategoryUpsertRequestSchema,
+  MyJobDetailSuccessResponseSchema,
 } from './schemas';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -147,4 +148,8 @@ export type IdParamUrl = Static<typeof IdParamsSchema>;
 
 export type MyJobDeleteSuccessResponse = Static<
   typeof MyJobDeleteSuccessResponseSchema
+>;
+
+export type MyJobDetailsSuccessResponse = Static<
+  typeof MyJobDetailSuccessResponseSchema
 >;

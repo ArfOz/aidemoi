@@ -1,4 +1,4 @@
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import { TokenType } from '@api';
 
 export function isTokenExpired(token: string): boolean {

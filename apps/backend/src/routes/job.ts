@@ -11,6 +11,7 @@ import {
   AnswersCreateRequest,
   AnswersCreateRequestSchema,
   ApiErrorResponseType,
+  MyJobDetailResponseSchema,
   ApiResponseErrorSchema,
   ApiResponseType,
   AuthHeadersSchema,
@@ -22,16 +23,15 @@ import {
   JobCreateResponseSchema,
   JobCreateSuccessResponse,
   JobCreateSuccessResponseSchema,
-  JobDetailSuccessResponseSchema,
+  MyJobDetailSuccessResponseSchema,
   JobGetIdRequestSchema,
+  MyJobDeleteResponseSchema,
   MyJobDeleteSuccessResponse,
   MyJobDeleteSuccessResponseSchema,
-  MyJobGetResponseSchema,
-  MyJobGetSuccessResponseSchema,
-  MyJobsGetRequest,
-  MyJobsGetRequestSchema,
   MyJobsGetResponseSchema,
   MyJobsGetSuccessResponseSchema,
+  MyJobsGetRequestSchema,
+  MyJobsGetRequest,
 } from '@api';
 import {
   AnswersDBService,
@@ -71,7 +71,7 @@ export async function jobRoutes(
   fastify.get<{
     Params: IdParamUrl; // TypeScript type for the parameter
     Querystring: { locale?: string };
-    Reply: ApiResponseType<typeof MyJobGetResponseSchema>;
+    Reply: ApiResponseType<typeof MyJobDetailResponseSchema>;
   }>(
     '/job/:id', // Route with :id parameter
     {
@@ -80,7 +80,7 @@ export async function jobRoutes(
         headers: AuthHeadersSchema,
         querystring: JobGetIdRequestSchema,
         response: {
-          200: MyJobGetSuccessResponseSchema,
+          200: MyJobDetailSuccessResponseSchema,
           404: ApiResponseErrorSchema,
         },
       },
@@ -112,7 +112,7 @@ export async function jobRoutes(
         return reply.send({
           success: true,
           message: 'Job retrieved successfully',
-          data: { job },
+          data: job,
         });
       } catch (error) {
         fastify.log.error(error);
@@ -481,10 +481,9 @@ export async function jobRoutes(
   fastify.delete<{
     Params: IdParamUrl;
     Headers: { authorization: string };
-    Body: JobCreateRequest;
-    Reply: ApiResponseType<typeof MyJobDeleteSuccessResponseSchema>;
+    Reply: ApiResponseType<typeof MyJobDeleteResponseSchema>;
   }>(
-    `/jobs/:id`,
+    `/job/:id`,
     {
       preHandler: authenticateToken,
       schema: {
@@ -504,7 +503,7 @@ export async function jobRoutes(
           (request as any).user?.id ??
           (request as any).userId;
         console.log(
-          'Deleting job for userId:',
+          'Deleting job for userId:ssssssssssssssssssssss',
           userId,
           'jobId:',
           request.params.id
@@ -516,6 +515,7 @@ export async function jobRoutes(
           });
         }
         const jobId = parseInt(request.params.id);
+        console.log('Parsed jobId:', jobId);
         if (isNaN(jobId)) {
           return reply.status(400).send({
             success: false,

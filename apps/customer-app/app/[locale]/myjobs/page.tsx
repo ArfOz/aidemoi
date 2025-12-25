@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { apiAideMoi, MyJobsGetSuccessResponse } from '@api';
-import { useAuth } from '@components';
 import {
   JobsError,
   PaginationButton,
