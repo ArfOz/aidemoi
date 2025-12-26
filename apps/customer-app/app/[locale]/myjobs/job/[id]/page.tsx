@@ -1,6 +1,8 @@
 'use client';
 import { apiAideMoi, MyJobDetailsSuccessResponse } from '@api';
 import React, { useEffect, useState } from 'react';
+import ReturnToHomePageButton from './ReturnToHomePageButton';
+import ReturnToMyJobsButton from './ReturnToMyJobsButton';
 const JobDetailsPage = ({
   params,
 }: {
@@ -70,7 +72,51 @@ const JobDetailsPage = ({
       <div className="mb-2">
         <strong>Created At:</strong> {job.createdAt}
       </div>
-      {/* Add more fields as needed */}
+      {/* Show questions and answers from job.answers if available */}
+      {Array.isArray(job.answers) && job.answers.length > 0 && (
+        <div className="mb-2">
+          <strong>Questions & Answers:</strong>
+          <ul className="list-disc pl-6 mt-2">
+            {job.answers.map((a: any, idx: number) => {
+              // Get question label in user's locale, fallback to first translation or empty string
+              const questionLabel =
+                a.question?.translations?.find((t: any) => t.locale === locale)
+                  ?.label ||
+                a.question?.translations?.[0]?.label ||
+                '';
+              // For select/single type, get option label in user's locale, fallback to first translation or value
+              let answerLabel = '';
+              if (a.option) {
+                answerLabel =
+                  a.option.translations?.find((t: any) => t.locale === locale)
+                    ?.label ||
+                  a.option.translations?.[0]?.label ||
+                  a.option.value;
+              } else if (a.textValue) {
+                answerLabel = a.textValue;
+              } else if (a.numberValue) {
+                answerLabel = a.numberValue;
+              } else if (a.dateValue) {
+                answerLabel = a.dateValue;
+              }
+              return (
+                <li key={idx} className="mb-2">
+                  <div>
+                    <span className="font-semibold">Q:</span> {questionLabel}
+                  </div>
+                  <div>
+                    <span className="font-semibold">A:</span> {answerLabel}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+      {/* Return buttons */}
+      <div className="flex flex-col gap-2 mt-4">
+        <ReturnToMyJobsButton />
+      </div>
     </div>
   );
 };
