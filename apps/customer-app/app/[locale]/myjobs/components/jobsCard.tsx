@@ -3,8 +3,8 @@ import {
   MyJobDeleteSuccessResponse,
   MyJobsGetSuccessResponse,
 } from '@api';
-import { ApiResponse } from '@api/types.api';
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -36,6 +36,7 @@ export const JobsCard = ({
   jobs: MyJobsGetSuccessResponse['data']['jobs'];
   loading: boolean;
 }) => {
+  const router = useRouter();
   // Local state for jobs and deletion status
   const [localJobs, setLocalJobs] = useState(jobs);
   const [deletingIds, setDeletingIds] = useState<number[]>([]);
@@ -45,19 +46,15 @@ export const JobsCard = ({
   }, [jobs]);
 
   const deleteJob = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this job?')) return;
-    const token =
-      typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    if (!token) {
-      alert('Not authenticated');
-      return;
-    }
-
     try {
       setDeletingIds((s) => [...s, id]);
-      const res = await apiAideMoi.delete<
-        ApiResponse<MyJobDeleteSuccessResponse>
-      >(`/jobs/my-jobs/${id}`, { useAuth: true });
+
+      console.log('Deleting job with id:', id);
+      // Do not send a body or Content-Type for DELETE
+      const res = await apiAideMoi.delete<MyJobDeleteSuccessResponse>(
+        `/jobs/job/${id}`,
+        { useAuth: true }
+      );
       if (!res.success) {
         throw new Error(
           `Delete failed: ${res.error?.code} ${res.error?.message}`
@@ -130,13 +127,15 @@ export const JobsCard = ({
                       'N/A'}
                   </span>
                   <span>•</span>
-                  <span>{job._count.bids} bids</span>
-                  <span>•</span>
-                  <span>{job._count.answers} answers</span>
+
+                  <span>Posted by: {job.user?.username || 'N/A'}</span>
                 </div>
 
                 <div className="flex space-x-2">
-                  <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+                  <button
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                    onClick={() => router.push(`myjobs/job/${job.id}`)}
+                  >
                     View Details
                   </button>
                   {job.status === 'OPEN' && (
