@@ -97,9 +97,14 @@ export async function jobRoutes(
           });
         }
 
+        // Set default locale to 'en' if not provided
+        const locale = request.query.locale || 'en';
+
+        console.log('Fetching job with ID:', jobId, 'and locale:', locale);
+
         const job = await jobDBService.findUniqueWithAnswersAndQuestions(
           { id: jobId },
-          request.query.locale
+          locale
         );
 
         if (!job) {
@@ -175,13 +180,21 @@ export async function jobRoutes(
           where.subcategoryId = request.query.subcategoryId;
         }
 
+        // Set default locale to 'en' if not provided
+        const locale = request.query.locale || 'en';
         // Build translation filters based on locale
-        const translationWhere = request.query.locale
-          ? { locale: request.query.locale }
-          : undefined;
+        const translationWhere = locale ? { locale } : undefined;
+
+        console.log(
+          'Fetching jobs with where clause:',
+          where,
+          'locale:',
+          locale
+        );
 
         const jobsRaw = await fastify.prisma.job.findMany({
           where,
+
           include: {
             subcategory: {
               include: {

@@ -1,29 +1,9 @@
 'use client';
 
-import { useAuth } from '@aidemoi/shared-auth';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 import Link from 'next/link';
 
 export default function HomePage() {
-  const { user, isAuthenticated, isLoading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isLoading && isAuthenticated && user) {
-      // Redirect to dashboard if already logged in
-      router.push('/dashboard');
-    }
-  }, [isAuthenticated, isLoading, user, router]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
+  // Auth logic for company app will be implemented separately
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-800 via-indigo-700 to-purple-600">
       <div className="container mx-auto px-4 py-16">
