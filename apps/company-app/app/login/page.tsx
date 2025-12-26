@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@aidemoi/shared-auth';
 import Link from 'next/link';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isLoading, error } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -53,17 +53,20 @@ export default function LoginPage() {
 
     if (!validateForm()) return;
 
-    try {
-      await login({
-        email: formData.email,
-        password: formData.password,
-      });
-
-      // Redirect to dashboard
-      router.push('/dashboard');
-    } catch (err) {
-      console.error('Login error:', err);
-    }
+    setIsLoading(true);
+    setError(null);
+    // TODO: Replace with real company-app login API call
+    setTimeout(() => {
+      if (
+        formData.email === 'test@company.com' &&
+        formData.password === 'password123'
+      ) {
+        router.push('/dashboard');
+      } else {
+        setError('Invalid email or password');
+      }
+      setIsLoading(false);
+    }, 1200);
   };
 
   return (

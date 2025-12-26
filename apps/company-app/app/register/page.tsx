@@ -1,45 +1,69 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@aidemoi/shared-auth';
 import Link from 'next/link';
-
-const specialtyOptions = [
-  'Plumbing',
-  'Electrical',
-  'HVAC',
-  'Carpentry',
-  'Painting',
-  'Roofing',
-  'Appliance Repair',
-  'General Handyman',
-  'Flooring',
-  'Tile Work',
-  'Landscaping',
-  'Cleaning Services',
-];
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const { register, isLoading, error } = useAuth();
+  // List of specialties moved inside the component
+  const specialtyOptions = [
+    'Plumbing',
+    'Electrical',
+    'Painting',
+    'Carpentry',
+    'Cleaning',
+    'Moving',
+    'Appliance Repair',
+    'Other',
+  ];
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     phone: '',
     specialties: [] as string[],
-    hourlyRate: '',
+    document: null as File | null,
   });
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+  const router = useRouter();
+
+  const validateForm = () => {
+    const errors: { [key: string]: string } = {};
+    if (!formData.name.trim()) {
+      errors.name = 'Name is required';
+    }
+    if (!formData.email) {
+      errors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+    if (!formData.password) {
+      errors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      errors.password = 'Password must be at least 6 characters';
+    }
+    if (!formData.phone.trim()) {
+      errors.phone = 'Phone number is required';
+    }
+    if (formData.specialties.length === 0) {
+      errors.specialties = 'Please select at least one specialty';
+    }
+    if (!formData.document) {
+      errors.document = 'Please upload a document';
+    }
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const { name, value, type, files } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === 'file' ? (files && files[0] ? files[0] : null) : value,
     }));
-    // Clear error when user starts typing
+    // Clear error when user starts typing or selects file
     if (formErrors[name]) {
       setFormErrors((prev) => ({
         ...prev,
@@ -57,61 +81,27 @@ export default function RegisterPage() {
     }));
   };
 
-  const validateForm = () => {
-    const errors: { [key: string]: string } = {};
-
-    if (!formData.name.trim()) {
-      errors.name = 'Name is required';
-    }
-
-    if (!formData.email) {
-      errors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = 'Please enter a valid email address';
-    }
-
-    if (!formData.password) {
-      errors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      errors.password = 'Password must be at least 6 characters';
-    }
-
-    if (!formData.phone.trim()) {
-      errors.phone = 'Phone number is required';
-    }
-
-    if (formData.specialties.length === 0) {
-      errors.specialties = 'Please select at least one specialty';
-    }
-
-    if (!formData.hourlyRate || parseFloat(formData.hourlyRate) <= 0) {
-      errors.hourlyRate = 'Please enter a valid hourly rate';
-    }
-
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validateForm()) return;
-
-    try {
-      await register({
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        role: 'repairman',
-        phone: formData.phone,
-        specialties: formData.specialties,
-      });
-
-      // Redirect to dashboard
-      router.push('/dashboard');
-    } catch (err) {
-      console.error('Registration error:', err);
-    }
+    setIsLoading(true);
+    setError(null);
+    // TODO: Replace with real company-app register API call
+    setTimeout(() => {
+      if (
+        formData.email === 'test@company.com' &&
+        formData.password === 'password123' &&
+        formData.name &&
+        formData.phone &&
+        formData.specialties.length > 0 &&
+        formData.document
+      ) {
+        router.push('/dashboard');
+      } else {
+        setError('Registration failed. Please check your details.');
+      }
+      setIsLoading(false);
+    }, 1200);
   };
 
   return (
@@ -120,10 +110,10 @@ export default function RegisterPage() {
         {/* Logo/Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Join RepairMen Network
+            Join AiderMan Network
           </h1>
           <p className="text-gray-600 mt-2">
-            Start your journey as a professional repairman
+            Start your journey as a professional AiderMan
           </p>
         </div>
 
@@ -242,32 +232,27 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {/* Hourly Rate */}
+          {/* Document Upload */}
           <div>
             <label
-              htmlFor="hourlyRate"
+              htmlFor="document"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Hourly Rate ($) *
+              Upload Document (PDF, JPG, PNG) *
             </label>
             <input
-              type="number"
-              id="hourlyRate"
-              name="hourlyRate"
-              value={formData.hourlyRate}
+              type="file"
+              id="document"
+              name="document"
+              accept=".pdf,.jpg,.jpeg,.png"
               onChange={handleInputChange}
-              min="1"
-              step="0.01"
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors ${
-                formErrors.hourlyRate ? 'border-red-300' : 'border-gray-300'
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors ${
+                formErrors.document ? 'border-red-300' : 'border-gray-300'
               }`}
-              placeholder="Enter your hourly rate"
               required
             />
-            {formErrors.hourlyRate && (
-              <p className="text-red-500 text-sm mt-1">
-                {formErrors.hourlyRate}
-              </p>
+            {formErrors.document && (
+              <p className="text-red-500 text-sm mt-1">{formErrors.document}</p>
             )}
           </div>
 

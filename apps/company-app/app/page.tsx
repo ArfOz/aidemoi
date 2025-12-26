@@ -9,13 +9,13 @@ export default function HomePage() {
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <h1 className="text-6xl font-bold text-white mb-6">
-            RepairMen
+            AiderMan
             <span className="block text-4xl text-blue-200">
               Professional Network
             </span>
           </h1>
           <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-            Join our network of skilled professionals and grow your repair
+            Join our network of skilled professionals and grow your AiderMan
             business. Connect with customers, manage your schedule, and increase
             your earnings.
           </p>
@@ -50,7 +50,7 @@ export default function HomePage() {
                 For Professionals
               </h2>
               <p className="text-gray-600">
-                Manage your repair business with our comprehensive tools
+                Manage your AiderMan business with our comprehensive tools
               </p>
             </div>
 
@@ -274,7 +274,7 @@ export default function HomePage() {
                 Verified Professionals
               </h3>
               <p className="text-blue-100">
-                All repairmen are background checked and verified
+                All AiderMan professionals are background checked and verified
               </p>
             </div>
             <div>
