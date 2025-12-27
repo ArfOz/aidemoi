@@ -11,10 +11,12 @@ export class CategoriesDBService {
     where,
     orderBy,
     languages,
+    include,
   }: {
     where?: Prisma.CategoryWhereInput;
     orderBy?: Prisma.CategoryOrderByWithRelationInput[];
     languages?: string[];
+    include?: { subcategories: boolean };
   } = {}): Promise<CategoryWithI18n[]> {
     return await this.prisma.category.findMany({
       where,
@@ -27,6 +29,20 @@ export class CategoriesDBService {
                 },
               }
             : true,
+        subcategories: include?.subcategories
+          ? {
+              include: {
+                i18n:
+                  languages && languages.length > 0
+                    ? {
+                        where: {
+                          locale: { in: languages },
+                        },
+                      }
+                    : true,
+              },
+            }
+          : false,
       },
       orderBy,
     });

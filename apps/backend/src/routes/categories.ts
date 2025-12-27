@@ -1,3 +1,4 @@
+import { Subcategory } from '@prisma/client';
 import { FastifyInstance } from 'fastify';
 import {
   ApiErrorResponseType,
@@ -231,12 +232,15 @@ export async function categoriesRoutes(
     async (request, reply) => {
       try {
         // Get languages from query parameters
-        const { languages: lang } = request.query;
+        const { languages: lang, includeSubcategories: includeSubcategories } =
+          request.query;
 
+        const subcategories = includeSubcategories ? true : false;
         // Fetch all categories with language filtering
-        const categories = await categoriesDBService.findAll(
-          lang && lang.length > 0 ? { languages: lang } : undefined
-        );
+        const categories = await categoriesDBService.findAll({
+          languages: lang && lang.length > 0 ? lang : undefined,
+          include: { subcategories },
+        });
 
         // return exact shape required by CategoriesListSuccessResponseSchema
         return reply.status(200).send({
