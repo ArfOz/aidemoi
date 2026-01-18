@@ -38,10 +38,7 @@ import {
 import { TokenDBService } from '../services/DatabaseService/TokenDBService';
 
 // Add Static for typing
-export async function authRoutes(
-  fastify: FastifyInstance,
-  _options: FastifyPluginOptions
-) {
+export async function authRoutes(fastify: FastifyInstance, _options: FastifyPluginOptions) {
   const userService = new UserDBService(fastify.prisma);
   const tokenService = new TokenDBService(fastify.prisma);
 
@@ -79,19 +76,17 @@ export async function authRoutes(
           username: user.username || '',
         };
 
-        const { accessToken, refreshToken } =
-          JwtService.generateTokenPair(tokenPayload);
+        const { accessToken, refreshToken } = JwtService.generateTokenPair(tokenPayload);
 
         const accessTokenExpiresIn = process.env.JWT_EXPIRES_IN || '24h';
-        const refreshTokenExpiresIn =
-          process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
+        const refreshTokenExpiresIn = process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
 
         const now = new Date();
         const accessTokenExpiresAt = new Date(
-          now.getTime() + parseExpirationTime(accessTokenExpiresIn)
+          now.getTime() + parseExpirationTime(accessTokenExpiresIn),
         );
         const refreshTokenExpiresAt = new Date(
-          now.getTime() + parseExpirationTime(refreshTokenExpiresIn)
+          now.getTime() + parseExpirationTime(refreshTokenExpiresIn),
         );
 
         await tokenService.createToken({
@@ -132,7 +127,7 @@ export async function authRoutes(
           error: { message: 'Login failed', code: 500 },
         });
       }
-    }
+    },
   );
 
   // Register endpoint
@@ -213,7 +208,7 @@ export async function authRoutes(
           },
         });
       }
-    }
+    },
   );
 
   // Get current user profile
@@ -274,7 +269,7 @@ export async function authRoutes(
           error: { message: 'Failed to get user profile', code: 500 },
         });
       }
-    }
+    },
   );
 
   // Refresh token endpoint
@@ -326,15 +321,14 @@ export async function authRoutes(
           JwtService.generateTokenPair(payload);
 
         const accessTokenExpiresIn = process.env.JWT_EXPIRES_IN || '24h';
-        const refreshTokenExpiresIn =
-          process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
+        const refreshTokenExpiresIn = process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
 
         const now = new Date();
         const accessTokenExpiresAt = new Date(
-          now.getTime() + parseExpirationTime(accessTokenExpiresIn)
+          now.getTime() + parseExpirationTime(accessTokenExpiresIn),
         );
         const refreshTokenExpiresAt = new Date(
-          now.getTime() + parseExpirationTime(refreshTokenExpiresIn)
+          now.getTime() + parseExpirationTime(refreshTokenExpiresIn),
         );
 
         await tokenService.createToken({
@@ -366,7 +360,7 @@ export async function authRoutes(
           error: { message: 'Token refresh failed', code: 500 },
         });
       }
-    }
+    },
   );
 
   // Logout endpoint
@@ -394,6 +388,6 @@ export async function authRoutes(
         message: 'Logged out successfully',
         data: { loggedOut: true },
       });
-    }
+    },
   );
 }

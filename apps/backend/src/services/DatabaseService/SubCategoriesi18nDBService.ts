@@ -25,8 +25,7 @@ export class SubCategoriesI18nDBService {
     const subcategory = await this.prisma.subcategory.findUnique({
       where: { id: input.subcategoryId },
     });
-    if (!subcategory)
-      throw new Error(`Subcategory not found: ${input.subcategoryId}`);
+    if (!subcategory) throw new Error(`Subcategory not found: ${input.subcategoryId}`);
 
     return this.prisma.subcategoryI18n.create({
       data: {

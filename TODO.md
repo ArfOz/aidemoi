@@ -13,6 +13,7 @@ Bu dosya asistan tarafından oluşturuldu — isteklerin geldiğinde burayı gü
 - [x] 9 — Export todo to TODO.md: Bu dosya oluşturuldu.
 
 Nasıl devam etmemi istersin?
+
 - Yeni bir madde eklemek için söyle, ben eklerim.
 - Kalan ESLint uyarı/hatalarını benim düzeltmemi istersen (ör. `company.ts`) hangi dosyalara müdahale etmemi istediğini belirt.
 

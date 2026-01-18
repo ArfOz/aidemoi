@@ -1,11 +1,6 @@
 import { ApiResponseErrorSchema, ApiResponseType } from '@api';
 import { CompanyDBService } from './../services/DatabaseService/CompanyDBService';
-import {
-  FastifyInstance,
-  FastifyPluginOptions,
-  FastifyRequest,
-  FastifyReply,
-} from 'fastify';
+import { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
 import { RegisterCompanyResponseSchema } from '@api';
 
 interface CreateCompanyBody {
@@ -26,10 +21,7 @@ interface CompanyParams {
   id: string;
 }
 
-async function companyRoutes(
-  fastify: FastifyInstance,
-  _options: FastifyPluginOptions
-) {
+async function companyRoutes(fastify: FastifyInstance, _options: FastifyPluginOptions) {
   // Initialize CompanyService with database connection
   const companyService = new CompanyDBService(fastify.prisma);
   // Get all companies
@@ -66,7 +58,7 @@ async function companyRoutes(
     },
     async (_request: FastifyRequest, _reply: FastifyReply) => {
       return await companyService.findAll();
-    }
+    },
   );
 
   // Get company by ID
@@ -86,10 +78,7 @@ async function companyRoutes(
         },
       } as any,
     },
-    async (
-      request: FastifyRequest<{ Params: CompanyParams }>,
-      reply: FastifyReply
-    ) => {
+    async (request: FastifyRequest<{ Params: CompanyParams }>, reply: FastifyReply) => {
       const companyId = parseInt(request.params.id);
 
       if (isNaN(companyId)) {
@@ -113,30 +102,26 @@ async function companyRoutes(
       }
 
       return company;
-    }
+    },
   );
 
   // Create new company
-  fastify.post<{ Body: CreateCompanyBody,
-     Reply: ApiResponseType<typeof RegisterCompanyResponseSchema>;
-   }>(
+  fastify.post<{
+    Body: CreateCompanyBody;
+    Reply: ApiResponseType<typeof RegisterCompanyResponseSchema>;
+  }>(
     '/',
     {
       schema: {
-       
         body: RegisterCompanyResponseSchema,
         response: {
           201: RegisterCompanyResponseSchema,
           400: ApiResponseErrorSchema,
-                    409: ApiResponseErrorSchema,
+          409: ApiResponseErrorSchema,
         },
-     
-      } as any,
+      },
     },
-    async (
-      request: FastifyRequest<{ Body: CreateCompanyBody }>,
-      reply: FastifyReply
-    ) => {
+    async (request, reply) => {
       try {
         const company = await companyService.create(request.body);
         return reply.status(201).send(company);
@@ -148,7 +133,7 @@ async function companyRoutes(
           },
         });
       }
-    }
+    },
   );
 
   // Update company
@@ -189,7 +174,7 @@ async function companyRoutes(
         Params: CompanyParams;
         Body: Partial<CreateCompanyBody>;
       }>,
-      reply: FastifyReply
+      reply: FastifyReply,
     ) => {
       const companyId = parseInt(request.params.id);
 
@@ -205,9 +190,7 @@ async function companyRoutes(
       try {
         // Check if email is being updated and if it conflicts
         if (request.body.email) {
-          const existingCompany = await companyService.findByEmail(
-            request.body.email
-          );
+          const existingCompany = await companyService.findByEmail(request.body.email);
           if (existingCompany && existingCompany.id !== companyId) {
             return reply.status(400).send({
               error: {
@@ -238,7 +221,7 @@ async function companyRoutes(
           },
         });
       }
-    }
+    },
   );
 
   // Delete company
@@ -276,10 +259,7 @@ async function companyRoutes(
         },
       } as any,
     },
-    async (
-      request: FastifyRequest<{ Params: CompanyParams }>,
-      reply: FastifyReply
-    ) => {
+    async (request: FastifyRequest<{ Params: CompanyParams }>, reply: FastifyReply) => {
       const companyId = parseInt(request.params.id);
 
       if (isNaN(companyId)) {
@@ -303,7 +283,7 @@ async function companyRoutes(
       }
 
       return reply.status(204).send();
-    }
+    },
   );
 }
 export default companyRoutes;

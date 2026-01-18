@@ -29,9 +29,7 @@ function build(opts: FastifyServerOptions = {}): FastifyInstance {
    */
   app.setSerializerCompiler(() => {
     return (data) =>
-      JSON.stringify(data, (_, value) =>
-        value instanceof Date ? value.toISOString() : value
-      );
+      JSON.stringify(data, (_, value) => (value instanceof Date ? value.toISOString() : value));
   });
 
   // ✅ onSend hook artık gereksiz, kaldırıldı

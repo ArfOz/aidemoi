@@ -1,14 +1,6 @@
-import {
-  FastifyInstance,
-  FastifyPluginOptions,
-  FastifyRequest,
-  FastifyReply,
-} from 'fastify';
+import { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
 
-async function healthRoutes(
-  fastify: FastifyInstance,
-  _options: FastifyPluginOptions
-) {
+async function healthRoutes(fastify: FastifyInstance, _options: FastifyPluginOptions) {
   // Health check endpoint
   fastify.get(
     '/',
@@ -36,7 +28,7 @@ async function healthRoutes(
         uptime: process.uptime(),
         environment: process.env.NODE_ENV || 'development',
       };
-    }
+    },
   );
 
   // Detailed health check
@@ -83,7 +75,7 @@ async function healthRoutes(
           system: cpuUsage.system,
         },
       };
-    }
+    },
   );
 }
 

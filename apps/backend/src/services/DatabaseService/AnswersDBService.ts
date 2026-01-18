@@ -120,10 +120,7 @@ export class AnswersDBService {
   /**
    * Find answers by subcategory ID
    */
-  async findAnswersBySubcategoryId(
-    subcategoryId: number,
-    userId?: number
-  ): Promise<Answer[]> {
+  async findAnswersBySubcategoryId(subcategoryId: number, userId?: number): Promise<Answer[]> {
     const where: Prisma.AnswerWhereInput = {
       question: {
         subcategoryId,
@@ -162,10 +159,7 @@ export class AnswersDBService {
   /**
    * Find user's answer for a specific question
    */
-  async findUserAnswerForQuestion(
-    userId: number,
-    questionId: number
-  ): Promise<Answer[]> {
+  async findUserAnswerForQuestion(userId: number, questionId: number): Promise<Answer[]> {
     return this.prisma.answer.findMany({
       where: {
         userId,
@@ -191,7 +185,7 @@ export class AnswersDBService {
    */
   async deleteUserAnswersForQuestion(
     userId: number,
-    questionId: number
+    questionId: number,
   ): Promise<{ count: number }> {
     return this.prisma.answer.deleteMany({
       where: {
@@ -237,10 +231,7 @@ export class AnswersDBService {
   /**
    * Check if user has completed a subcategory
    */
-  async hasUserCompletedSubcategory(
-    userId: number,
-    subcategoryId: number
-  ): Promise<boolean> {
+  async hasUserCompletedSubcategory(userId: number, subcategoryId: number): Promise<boolean> {
     const questions = await this.prisma.question.findMany({
       where: {
         subcategoryId,

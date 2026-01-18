@@ -118,16 +118,12 @@ export class JobsDBService {
           include: {
             question: {
               include: {
-                translations: translationWhere
-                  ? { where: translationWhere }
-                  : true,
+                translations: translationWhere ? { where: translationWhere } : true,
               },
             },
             option: {
               include: {
-                translations: translationWhere
-                  ? { where: translationWhere }
-                  : true,
+                translations: translationWhere ? { where: translationWhere } : true,
               },
             },
           },
@@ -182,16 +178,12 @@ export class JobsDBService {
           include: {
             question: {
               include: {
-                translations: translationWhere
-                  ? { where: translationWhere }
-                  : true,
+                translations: translationWhere ? { where: translationWhere } : true,
               },
             },
             option: {
               include: {
-                translations: translationWhere
-                  ? { where: translationWhere }
-                  : true,
+                translations: translationWhere ? { where: translationWhere } : true,
               },
             },
           },
@@ -280,10 +272,7 @@ export class JobsDBService {
   /**
    * Connect answers to a job
    */
-  async connectAnswers(
-    jobId: number,
-    answerIds: number[]
-  ): Promise<Job | null> {
+  async connectAnswers(jobId: number, answerIds: number[]): Promise<Job | null> {
     try {
       return await this.prisma.job.update({
         where: { id: jobId },
@@ -304,10 +293,7 @@ export class JobsDBService {
   /**
    * Disconnect answers from a job
    */
-  async disconnectAnswers(
-    jobId: number,
-    answerIds: number[]
-  ): Promise<Job | null> {
+  async disconnectAnswers(jobId: number, answerIds: number[]): Promise<Job | null> {
     try {
       return await this.prisma.job.update({
         where: { id: jobId },
@@ -350,10 +336,7 @@ export class JobsDBService {
     };
   }
 
-  async findUniqueWithAnswersAndQuestions(
-    where: Prisma.JobWhereUniqueInput,
-    locale?: string
-  ) {
+  async findUniqueWithAnswersAndQuestions(where: Prisma.JobWhereUniqueInput, locale?: string) {
     const res = await this.prisma.job.findUnique({
       where,
       include: {
@@ -422,7 +405,7 @@ export class JobsDBService {
       take?: number;
       skip?: number;
       locale?: string;
-    } = {}
+    } = {},
   ): Promise<JobWithDetailsAndAnswers[]> {
     return await this.prisma.job.findMany({
       where: opts.where,

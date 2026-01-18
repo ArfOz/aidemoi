@@ -1,10 +1,7 @@
 import fp from 'fastify-plugin';
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 
-async function rateLimitPlugin(
-  fastify: FastifyInstance,
-  _options: FastifyPluginOptions
-) {
+async function rateLimitPlugin(fastify: FastifyInstance, _options: FastifyPluginOptions) {
   await fastify.register(require('@fastify/rate-limit'), {
     max: 100, // Maximum 100 requests
     timeWindow: '1 minute', // Per minute

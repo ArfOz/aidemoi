@@ -1,9 +1,4 @@
-import {
-  MigrationInterface,
-  QueryRunner,
-  TableColumn,
-  TableIndex,
-} from 'typeorm';
+import { MigrationInterface, QueryRunner, TableColumn, TableIndex } from 'typeorm';
 
 export class AddCategoryNameUnique1724567890123 implements MigrationInterface {
   name = 'AddCategoryNameUnique1724567890123';
@@ -16,7 +11,7 @@ export class AddCategoryNameUnique1724567890123 implements MigrationInterface {
         type: 'varchar',
         length: '255',
         isNullable: false,
-      })
+      }),
     );
 
     await queryRunner.createIndex(
@@ -25,7 +20,7 @@ export class AddCategoryNameUnique1724567890123 implements MigrationInterface {
         name: 'UQ_category_name',
         columnNames: ['name'],
         isUnique: true,
-      })
+      }),
     );
   }
 

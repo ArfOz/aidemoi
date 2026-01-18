@@ -95,7 +95,7 @@ class CreateCompanyTable1720000000000 {
             onUpdate: 'CURRENT_TIMESTAMP',
           },
         ],
-      })
+      }),
     );
   }
 

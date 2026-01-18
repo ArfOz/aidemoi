@@ -42,7 +42,7 @@ class CreateUserTable1704290400000 {
             onUpdate: 'CURRENT_TIMESTAMP',
           },
         ],
-      })
+      }),
     );
   }
 

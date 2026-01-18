@@ -7,7 +7,7 @@ export class SubCategoriesDBService {
     opts: {
       where?: Prisma.SubcategoryWhereInput;
       order?: Prisma.SubcategoryOrderByWithRelationInput;
-    } = {}
+    } = {},
   ): Promise<Subcategory[]> {
     return await this.prisma.subcategory.findMany({
       where: opts.where,
@@ -45,12 +45,8 @@ export class SubCategoriesDBService {
     //   throw new Error(`Category not found: ${input.categoryId}`);
     // }
 
-    const preferred =
-      input.i18n.find((e) => e.locale.toLowerCase() === 'en') ?? input.i18n[0];
-    const baseSlug = (input.slug ?? preferred.name)
-      .toString()
-      .replace(/\s+/g, '-')
-      .toLowerCase();
+    const preferred = input.i18n.find((e) => e.locale.toLowerCase() === 'en') ?? input.i18n[0];
+    const baseSlug = (input.slug ?? preferred.name).toString().replace(/\s+/g, '-').toLowerCase();
 
     // ensure unique slug within category
     let slug = baseSlug;
@@ -85,7 +81,7 @@ export class SubCategoriesDBService {
 
   async update(
     where: Prisma.SubcategoryWhereUniqueInput,
-    input: Prisma.SubcategoryUpdateInput
+    input: Prisma.SubcategoryUpdateInput,
   ): Promise<Subcategory> {
     return await this.prisma.subcategory.update({
       where,

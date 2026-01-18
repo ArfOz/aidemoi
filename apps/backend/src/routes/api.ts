@@ -1,9 +1,4 @@
-import {
-  FastifyInstance,
-  FastifyPluginOptions,
-  FastifyRequest,
-  FastifyReply,
-} from 'fastify';
+import { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
 // import userRoutes from './users';
 import { authRoutes } from './auth';
 import { categoriesRoutes } from './categories';
@@ -11,10 +6,7 @@ import { questionsRoutes } from './question';
 import { jobRoutes } from './job';
 // import { categoriesRoutes } from './categories';
 
-async function apiRoutes(
-  fastify: FastifyInstance,
-  _options: FastifyPluginOptions
-) {
+async function apiRoutes(fastify: FastifyInstance, _options: FastifyPluginOptions) {
   // Register sub-routes
   // fastify.register(userRoutes, { prefix: '/users' });
   // fastify.register(companyRoutes, { prefix: '/companies' });
@@ -49,7 +41,7 @@ async function apiRoutes(
         version: '1.0.0',
         timestamp: new Date().toISOString(),
       };
-    }
+    },
   );
 }
 

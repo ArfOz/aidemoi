@@ -12,12 +12,11 @@ interface DecodedToken extends TokenPayload {
 }
 
 export class JwtService {
-  private static readonly JWT_SECRET: Secret =
-    process.env.JWT_SECRET || 'your-super-secret-key';
+  private static readonly JWT_SECRET: Secret = process.env.JWT_SECRET || 'your-super-secret-key';
   private static readonly JWT_EXPIRES_IN = (process.env.JWT_EXPIRES_IN ||
     '24h') as SignOptions['expiresIn'];
-  private static readonly REFRESH_TOKEN_EXPIRES_IN = (process.env
-    .REFRESH_TOKEN_EXPIRES_IN || '7d') as SignOptions['expiresIn'];
+  private static readonly REFRESH_TOKEN_EXPIRES_IN = (process.env.REFRESH_TOKEN_EXPIRES_IN ||
+    '7d') as SignOptions['expiresIn'];
 
   /**
    * Generate access token

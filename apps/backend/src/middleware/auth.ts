@@ -5,10 +5,7 @@ import { parseBearerToken, TokenPayload } from '@api';
 
 export type AuthenticatedRequest = FastifyRequest & { user: TokenPayload };
 
-export async function authenticateToken(
-  request: FastifyRequest,
-  reply: FastifyReply
-) {
+export async function authenticateToken(request: FastifyRequest, reply: FastifyReply) {
   const tokenService = new TokenDBService(request.server.prisma);
   try {
     const token = parseBearerToken(request.headers.authorization);

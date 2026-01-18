@@ -21,13 +21,11 @@ const start = async (): Promise<void> => {
 
 // Handle graceful shutdown
 process.on('SIGINT', async () => {
-   
   console.log('\nReceived SIGINT. Graceful shutdown...');
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
-   
   console.log('\nReceived SIGTERM. Graceful shutdown...');
   process.exit(0);
 });

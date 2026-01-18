@@ -97,10 +97,7 @@ export class CategoriesDBService {
     return created;
   }
 
-  async update(
-    id: string,
-    input: Prisma.CategoryUpdateInput
-  ): Promise<CategoryWithI18n> {
+  async update(id: string, input: Prisma.CategoryUpdateInput): Promise<CategoryWithI18n> {
     const updated = await this.prisma.category.update({
       where: { id },
       data: input,

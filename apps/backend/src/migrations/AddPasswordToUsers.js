@@ -14,7 +14,7 @@ class AddPasswordToUsers1720000000001 {
         type: 'varchar',
         length: '255',
         isNullable: true,
-      })
+      }),
     );
   }
 

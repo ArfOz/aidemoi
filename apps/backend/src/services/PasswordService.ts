@@ -24,10 +24,7 @@ export class PasswordService {
    * @param hashedPassword - Hashed password from database
    * @returns Promise with boolean result
    */
-  static async comparePassword(
-    password: string,
-    hashedPassword: string
-  ): Promise<boolean> {
+  static async comparePassword(password: string, hashedPassword: string): Promise<boolean> {
     try {
       return await compare(password, hashedPassword);
     } catch (error) {

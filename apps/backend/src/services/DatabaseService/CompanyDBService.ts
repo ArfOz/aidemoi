@@ -55,9 +55,7 @@ export class CompanyDBService {
       const known = error as Prisma.PrismaClientKnownRequestError;
       if (known?.code === 'P2002') {
         // unique constraint violation
-        throw new Error(
-          'Unique constraint failed: a company with that value already exists'
-        );
+        throw new Error('Unique constraint failed: a company with that value already exists');
       }
       throw error;
     }
@@ -66,10 +64,7 @@ export class CompanyDBService {
   /**
    * Update an existing company by ID. Returns updated company or null if not found.
    */
-  async update(
-    id: number,
-    companyData: Prisma.CompanyUpdateInput
-  ): Promise<Company | null> {
+  async update(id: number, companyData: Prisma.CompanyUpdateInput): Promise<Company | null> {
     try {
       return await this.prisma.company.update({
         where: { id },
@@ -82,9 +77,7 @@ export class CompanyDBService {
         return null;
       }
       if (known?.code === 'P2002') {
-        throw new Error(
-          'Unique constraint failed: update would violate uniqueness'
-        );
+        throw new Error('Unique constraint failed: update would violate uniqueness');
       }
       throw error;
     }
