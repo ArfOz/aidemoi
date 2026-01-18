@@ -13,6 +13,9 @@
     "dev:backend": "npx nx run backend:serve --configuration=development ",
     "test": "nx test",
     "lint": "nx lint",
+    "lint:fix": "npx eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "lint:backend": "npx nx lint backend",
+    "lint:fix:backend": "npx nx lint backend --fix",
     "e2e": "nx e2e",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

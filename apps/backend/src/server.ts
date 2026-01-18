@@ -21,13 +21,13 @@ const start = async (): Promise<void> => {
 
 // Handle graceful shutdown
 process.on('SIGINT', async () => {
-  // eslint-disable-next-line no-console
+   
   console.log('\nReceived SIGINT. Graceful shutdown...');
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
-  // eslint-disable-next-line no-console
+   
   console.log('\nReceived SIGTERM. Graceful shutdown...');
   process.exit(0);
 });

@@ -22,7 +22,9 @@ const prismaPlugin: FastifyPluginAsync = async (server) => {
     await prisma.$connect();
   } catch (err) {
     // ensure any partial connections are closed and bubble up
-    await prisma.$disconnect().catch(() => {});
+    await prisma.$disconnect().catch(() => {
+      console.error('Error during disconnection after failed connection');
+    });
     throw err;
   }
 

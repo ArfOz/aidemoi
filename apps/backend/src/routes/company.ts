@@ -1,3 +1,4 @@
+import { ApiResponseErrorSchema, ApiResponseType } from '@api';
 import { CompanyDBService } from './../services/DatabaseService/CompanyDBService';
 import {
   FastifyInstance,
@@ -5,6 +6,7 @@ import {
   FastifyRequest,
   FastifyReply,
 } from 'fastify';
+import { RegisterCompanyResponseSchema } from '@api';
 
 interface CreateCompanyBody {
   name: string;
@@ -115,30 +117,20 @@ async function companyRoutes(
   );
 
   // Create new company
-  fastify.post<{ Body: CreateCompanyBody }>(
+  fastify.post<{ Body: CreateCompanyBody,
+     Reply: ApiResponseType<typeof RegisterCompanyResponseSchema>;
+   }>(
     '/',
     {
       schema: {
-        tags: ['companies'],
-        summary: 'Create new company',
-        description: 'Create a new company',
-        body: {
-          type: 'object',
-          required: ['name', 'email'],
-          properties: {
-            name: { type: 'string', minLength: 1 },
-            email: { type: 'string', format: 'email' },
-            description: { type: 'string' },
-            website: { type: 'string' },
-            phone: { type: 'string' },
-            address: { type: 'string' },
-            city: { type: 'string' },
-            country: { type: 'string' },
-            postalCode: { type: 'string' },
-            status: { type: 'string' },
-            employeeCount: { type: 'integer', minimum: 0 },
-          },
+       
+        body: RegisterCompanyResponseSchema,
+        response: {
+          201: RegisterCompanyResponseSchema,
+          400: ApiResponseErrorSchema,
+                    409: ApiResponseErrorSchema,
         },
+     
       } as any,
     },
     async (
