@@ -124,12 +124,23 @@ async function companyRoutes(fastify: FastifyInstance, _options: FastifyPluginOp
     async (request, reply) => {
       try {
         const company = await companyService.create(request.body);
-        return reply.status(201).send(company);
+
+        const data = {
+          id: company.id,
+          name: company.name,
+          email: company.email,
+        };
+        return reply.status(201).send({
+          success: true,
+          data,
+          message: 'Company created successfully',
+        });
       } catch (error: any) {
         return reply.status(400).send({
+          success: false,
           error: {
             message: error.message || 'Failed to create company',
-            statusCode: 400,
+            code: 400,
           },
         });
       }
