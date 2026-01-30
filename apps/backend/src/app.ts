@@ -6,7 +6,7 @@ import rateLimitPlugin from './plugins/rateLimit';
 import swaggerPlugin from './plugins/swagger';
 import healthRoutes from './routes/health';
 import apiRoutes from './routes/api';
-import { authRoutes } from './routes/auth';
+import { authRoutes } from './routes/auth.user';
 
 function build(opts: FastifyServerOptions = {}): FastifyInstance {
   const app = fastify({

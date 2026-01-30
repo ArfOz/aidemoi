@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
 // import userRoutes from './users';
-import { authRoutes } from './auth';
+import { authRoutes } from './auth.user';
 import { categoriesRoutes } from './categories';
 import { questionsRoutes } from './question';
 import { jobRoutes } from './job';
