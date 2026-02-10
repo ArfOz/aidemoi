@@ -19,8 +19,7 @@
     "customConditions": ["development"],
     "baseUrl": ".",
     "paths": {
-      "@api": ["libs/api/src/index.ts"],
-      "@authcontext": ["libs/authcontext/src/index.ts"]
+      "@api": ["libs/api/src/index.ts"]
     }
   },
   "rootDirs": [".", "apps", "libs"],

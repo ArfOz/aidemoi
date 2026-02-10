@@ -1,41 +1,33 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
-import { UserDBService } from '../services/DatabaseService/UserDBService';
-import { JwtService } from '../services/JwtService';
-import { Type } from '@sinclair/typebox';
-import { authenticateToken } from '../middleware/auth';
+import { UserDBService } from '../../services/DatabaseService/UserDBService';
+import { JwtService } from '../../services/JwtService';
+import { authenticateToken } from '../../middleware/auth';
 
 import {
-  ApiErrorResponseType,
   ApiResponseErrorSchema,
   LoginRequestType,
   LoginRequestSchema,
   LoginSuccessResponseSchema,
-  LoginSuccessResponseType,
   RegisterRequestType,
   RegisterSuccessResponseSchema,
-  RegisterSuccessResponseType,
   RegisterRequestSchema,
   parseExpirationTime,
   ProfileSuccessResponseSchema,
-  ProfileSuccessResponseType,
-  RefreshSuccessResponseType,
   RefreshTokenRequestSchema,
   RefreshTokenSuccessResponseSchema,
   LogoutSuccessResponseSchema,
   RefreshRequest,
-  LogoutSuccessResponseType,
   LogoutHeaders,
   AuthHeadersSchema,
   ApiResponseSuccessSchema,
   ApiResponseType,
-  ApiSuccessResponseType,
   LoginResponseSchema,
   RegisterResponseSchema,
   ProfileResponseSchema,
   RefreshTokenResponseSchema,
   LogoutResponseSchema,
 } from '@api';
-import { TokenDBService } from '../services/DatabaseService/TokenDBService';
+import { TokenDBService } from '../../services/DatabaseService/TokenDBService';
 
 // Add Static for typing
 export async function authRoutes(fastify: FastifyInstance, _options: FastifyPluginOptions) {

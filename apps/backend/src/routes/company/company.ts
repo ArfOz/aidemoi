@@ -1,5 +1,5 @@
 import { ApiResponseErrorSchema, ApiResponseType } from '@api';
-import { CompanyDBService } from './../services/DatabaseService/CompanyDBService';
+import { CompanyDBService } from '../../services/DatabaseService/CompanyDBService';
 import { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
 import { RegisterCompanyResponseSchema } from '@api';
 
