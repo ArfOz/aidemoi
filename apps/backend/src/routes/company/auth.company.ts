@@ -27,6 +27,7 @@ import {
   RefreshTokenResponseSchema,
   LogoutResponseSchema,
 } from '@api';
+import { parseBearerToken } from '@api';
 import { TokenDBService } from '../../services/DatabaseService/TokenDBService';
 
 // Add Static for typing
@@ -374,12 +375,23 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
       },
     },
     async (_request, reply) => {
-      // No DB revoke; reply success only
-      return reply.status(200).send({
-        success: true,
-        message: 'Logged out successfully',
-        data: { loggedOut: true },
-      });
+      try {
+        const token = parseBearerToken((_request.headers as any).authorization);
+        if (token) {
+          await tokenService.deleteToken(token);
+        }
+        return reply.status(200).send({
+          success: true,
+          message: 'Logged out successfully',
+          data: { loggedOut: true },
+        });
+      } catch (error) {
+        fastify.log.error(error);
+        return reply.status(500).send({
+          success: false,
+          error: { message: 'Logout failed', code: 500 },
+        });
+      }
     },
   );
 }

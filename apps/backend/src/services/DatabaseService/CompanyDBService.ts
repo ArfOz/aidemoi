@@ -88,7 +88,11 @@ export class CompanyDBService {
    */
   async deleteById(id: number): Promise<boolean> {
     try {
-      await this.prisma.company.delete({ where: { id } });
+      // delete tokens and company in a transaction to ensure tokens are revoked
+      await this.prisma.$transaction([
+        this.prisma.companyToken.deleteMany({ where: { companyId: id } }),
+        this.prisma.company.delete({ where: { id } }),
+      ]);
       return true;
     } catch (error) {
       const known = error as Prisma.PrismaClientKnownRequestError;

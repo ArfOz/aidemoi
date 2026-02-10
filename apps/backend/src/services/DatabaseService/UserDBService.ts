@@ -113,9 +113,11 @@ export class UserDBService {
 
   async delete(id: number): Promise<boolean> {
     try {
-      await this.prisma.user.delete({
-        where: { id },
-      });
+      // delete tokens and user in a transaction to ensure tokens are revoked
+      await this.prisma.$transaction([
+        this.prisma.userToken.deleteMany({ where: { userId: id } }),
+        this.prisma.user.delete({ where: { id } }),
+      ]);
       return true;
     } catch (error) {
       return false;
