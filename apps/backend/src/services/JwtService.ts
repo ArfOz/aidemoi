@@ -1,15 +1,29 @@
 import { sign, verify, decode, SignOptions, Secret } from 'jsonwebtoken';
 
-interface TokenPayload {
-  userId: number;
-  email: string;
-  username: string;
+interface BaseTokenPayload {
+  type: 'user' | 'company';
 }
 
-interface DecodedToken extends TokenPayload {
+export interface UserTokenPayload extends BaseTokenPayload {
+  type: 'user';
+  userId: number;
+  email?: string;
+  username?: string;
+}
+
+export interface CompanyTokenPayload extends BaseTokenPayload {
+  type: 'company';
+  companyId: number;
+  email?: string;
+  name?: string;
+}
+
+type TokenPayload = UserTokenPayload | CompanyTokenPayload;
+
+type DecodedToken = TokenPayload & {
   iat: number;
   exp: number;
-}
+};
 
 export class JwtService {
   private static readonly JWT_SECRET: Secret = process.env.JWT_SECRET || 'your-super-secret-key';
@@ -85,5 +99,27 @@ export class JwtService {
       accessToken: this.generateAccessToken(payload),
       refreshToken: this.generateRefreshToken(payload),
     };
+  }
+
+  /** Convenience: generate tokens for a user */
+  static generateUserTokenPair(user: { userId: number; email?: string; username?: string }) {
+    const payload: UserTokenPayload = {
+      type: 'user',
+      userId: user.userId,
+      email: user.email,
+      username: user.username,
+    };
+    return this.generateTokenPair(payload);
+  }
+
+  /** Convenience: generate tokens for a company */
+  static generateCompanyTokenPair(company: { companyId: number; email?: string; name?: string }) {
+    const payload: CompanyTokenPayload = {
+      type: 'company',
+      companyId: company.companyId,
+      email: company.email,
+      name: company.name,
+    };
+    return this.generateTokenPair(payload);
   }
 }
