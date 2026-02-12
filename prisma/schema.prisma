@@ -100,6 +100,7 @@ model CompanyToken {
 model Company {
   id            Int            @id @default(autoincrement())
   name          String
+  password      String
   email         String         @unique
   description   String?
   website       String?

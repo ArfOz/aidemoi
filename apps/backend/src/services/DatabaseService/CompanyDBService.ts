@@ -1,4 +1,5 @@
 import { Prisma, PrismaClient, Company } from '@prisma/client';
+import { PasswordService } from '../PasswordService';
 
 export class CompanyDBService {
   constructor(private prisma: PrismaClient) {} // injected by Fastify plugin
@@ -139,5 +140,36 @@ export class CompanyDBService {
       createdAt: company.createdAt,
       employeeCount: company.employeeCount ?? null,
     };
+  }
+
+  async findByEmailWithPassword(email: string) {
+    return this.prisma.company.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        password: true, // Include password for auth
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  async authenticateUser(email: string, password: string) {
+    // Find user with password included
+    const company = await this.findByEmailWithPassword(email);
+    if (!company || !company.password) {
+      return null;
+    }
+
+    // Compare password
+    const isPasswordValid = await PasswordService.comparePassword(password, company.password);
+    if (!isPasswordValid) {
+      return null;
+    }
+
+    // Return user without password
+    return this.findById(company.id);
   }
 }

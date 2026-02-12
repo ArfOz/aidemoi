@@ -1,10 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 
 export class CompanyTokenDBService {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private prisma: PrismaClient) {} // Will be injected by Fastify plugin
 
-  // Create or update token for a company (one row per company)
-  async upsertToken(data: {
+  // Upsert a company token (one row per company)
+  async createToken(data: {
     companyId: number;
     token: string;
     refreshToken: string;
@@ -39,22 +39,22 @@ export class CompanyTokenDBService {
   }
 
   // Find token row by access or refresh token
-  async findByValue(value: string) {
+  async getTokenByValue(value: string) {
     return this.prisma.companyToken.findFirst({
       where: { OR: [{ accessToken: value }, { refreshToken: value }] },
     });
   }
 
   // Validate refresh token expiry
-  async findValidByRefreshToken(value: string, now: Date = new Date()) {
+  async getValidTokenByValue(value: string, now: Date = new Date()) {
     return this.prisma.companyToken.findFirst({
       where: { refreshToken: value, expiresAtRefreshToken: { gt: now } },
     });
   }
 
   // Delete a token row by its token value
-  async deleteByValue(value: string) {
-    const token = await this.findByValue(value);
+  async deleteToken(value: string) {
+    const token = await this.getTokenByValue(value);
     if (!token) return null;
     await this.prisma.companyToken.delete({ where: { id: token.id } });
     return token;
@@ -75,7 +75,7 @@ export class CompanyTokenDBService {
   }
 
   // List tokens for a company
-  async listTokensByCompany(companyId: number) {
+  async getTokensByCompany(companyId: number) {
     return this.prisma.companyToken.findMany({
       where: { companyId },
       orderBy: { createdAt: 'desc' },

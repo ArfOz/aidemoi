@@ -7,7 +7,6 @@ import {
   ApiResponseErrorSchema,
   LoginRequestType,
   LoginRequestSchema,
-  LoginSuccessResponseSchema,
   RegisterRequestType,
   RegisterSuccessResponseSchema,
   RegisterRequestSchema,
@@ -21,7 +20,6 @@ import {
   AuthHeadersSchema,
   ApiResponseSuccessSchema,
   ApiResponseType,
-  LoginResponseSchema,
   RegisterResponseSchema,
   ProfileResponseSchema,
   RefreshTokenResponseSchema,
@@ -30,10 +28,11 @@ import {
 } from '@api';
 import { parseBearerToken } from '@api';
 import { CompanyTokenDBService } from '../../services/DatabaseService/TokenDatabaseService/CompanyTokenDBservice';
+import { CompanyDBService } from '../../services/DatabaseService/CompanyDBService';
 
 // Add Static for typing
 export async function authRoutes(fastify: FastifyInstance, _options: FastifyPluginOptions) {
-  const userService = new UserDBService(fastify.prisma);
+  const companyService = new CompanyDBService(fastify.prisma);
   const tokenService = new CompanyTokenDBService(fastify.prisma);
 
   fastify.post<{
@@ -55,9 +54,9 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
       const { email, password } = request.body;
 
       try {
-        const user = await userService.authenticateUser(email, password);
+        const company = await companyService.authenticateUser(email, password);
 
-        if (!user) {
+        if (!company) {
           return reply.status(401).send({
             success: false,
             error: { message: 'Invalid email or password', code: 401 },
@@ -65,9 +64,9 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
         }
 
         const tokenPayload = {
-          companyId: user.id,
-          email: user.email,
-          username: user.username || '',
+          companyId: company.id,
+          email: company.email,
+          username: company.username || '',
           type: 'company' as const,
         };
 
@@ -84,8 +83,8 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
           now.getTime() + parseExpirationTime(refreshTokenExpiresIn),
         );
 
-        await tokenService.upsertToken({
-          companyId: user.id,
+        await tokenService.createToken({
+          companyId: company.id,
           token: accessToken,
           refreshToken: refreshToken,
           // store the correct expiries for each token
@@ -106,7 +105,7 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
               refreshExpiresAt: refreshTokenExpiresAt.toISOString(),
             },
             company: {
-              id: user.id.toString(),
+              id: company.id.toString(),
               username: user.username || '',
               email: user.email,
               roles: 'company' as const,
@@ -146,7 +145,7 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
 
       try {
         // Check if user already exists
-        const existingUser = await userService.findAll({
+        const existingUser = await companyService.findAll({
           where: { email },
         });
 
@@ -160,7 +159,7 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
           });
         }
 
-        const existingUsername = await userService.findAll({
+        const existingUsername = await companyService.findAll({
           where: { username },
         });
         if (existingUsername.length > 0) {
@@ -174,7 +173,7 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
         }
 
         // Create new user
-        const newUser = await userService.create({ username, email, password });
+        const newUser = await companyService.create({ username, email, password });
 
         // Log successful registration
         fastify.log.info(`New user registered: ${newUser.username}`);
@@ -237,7 +236,7 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
           });
         }
 
-        const user = await userService.findById(Number(userId));
+        const user = await companyService.findById(Number(userId));
         if (!user) {
           return reply.status(404).send({
             success: false,
@@ -298,7 +297,7 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
         }
 
         const decoded = JwtService.verifyToken(refreshToken);
-        if (!decoded || !decoded.userId) {
+        if (!decoded || !decoded.companyId) {
           return reply.status(401).send({
             success: false,
             error: { message: 'Invalid refresh token', code: 401 },
@@ -306,7 +305,7 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
         }
 
         const payload = {
-          userId: decoded.userId,
+          companyId: decoded.companyId as number,
           email: decoded.email,
           username: decoded.username,
         };
@@ -327,7 +326,7 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
         );
 
         await tokenService.createToken({
-          userId: decoded.userId,
+          companyId: decoded.companyId as number,
           token: accessToken,
           refreshToken: newRefreshToken,
           expiresAtToken: accessTokenExpiresAt,
