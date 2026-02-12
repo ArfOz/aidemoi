@@ -106,3 +106,8 @@ export const AuthHeadersSchema = Type.Object({
 export const IdParamsSchema = Type.Object({
   id: Type.String(),
 });
+
+export const LoginCompanyResponseSchema = Type.Object({
+  tokens: TokenSchema,
+  company: UserSchema,
+});

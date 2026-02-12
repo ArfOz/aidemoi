@@ -28,7 +28,7 @@ import {
   LogoutResponseSchema,
 } from '@api';
 import { parseBearerToken } from '@api';
-import { TokenDBService } from '../../services/DatabaseService/TokenDBService';
+import { TokenDBService } from '../../services/DatabaseService';
 
 // Add Static for typing
 export async function authRoutes(fastify: FastifyInstance, _options: FastifyPluginOptions) {
@@ -64,6 +64,7 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
         }
 
         const tokenPayload = {
+          type: 'user' as const,
           userId: user.id,
           email: user.email,
           username: user.username || '',
@@ -296,7 +297,7 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
         }
 
         const decoded = JwtService.verifyToken(refreshToken);
-        if (!decoded || !decoded.userId) {
+        if (!decoded || decoded.type !== 'user') {
           return reply.status(401).send({
             success: false,
             error: { message: 'Invalid refresh token', code: 401 },
@@ -304,6 +305,7 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
         }
 
         const payload = {
+          type: 'user' as const,
           userId: decoded.userId,
           email: decoded.email,
           username: decoded.username,

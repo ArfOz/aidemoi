@@ -26,25 +26,26 @@ import {
   ProfileResponseSchema,
   RefreshTokenResponseSchema,
   LogoutResponseSchema,
+  LoginCompanyResponseSchema,
 } from '@api';
 import { parseBearerToken } from '@api';
-import { TokenDBService } from '../../services/DatabaseService/TokenDBService';
+import { CompanyTokenDBService } from '../../services/DatabaseService/TokenDatabaseService/CompanyTokenDBservice';
 
 // Add Static for typing
 export async function authRoutes(fastify: FastifyInstance, _options: FastifyPluginOptions) {
   const userService = new UserDBService(fastify.prisma);
-  const tokenService = new TokenDBService(fastify.prisma);
+  const tokenService = new CompanyTokenDBService(fastify.prisma);
 
   fastify.post<{
     Body: LoginRequestType;
-    Reply: ApiResponseType<typeof LoginResponseSchema>;
+    Reply: ApiResponseType<typeof LoginCompanyResponseSchema>;
   }>(
     '/login',
     {
       schema: {
         body: LoginRequestSchema,
         response: {
-          200: LoginSuccessResponseSchema,
+          200: LoginCompanyResponseSchema,
           401: ApiResponseErrorSchema,
           500: ApiResponseErrorSchema,
         },
@@ -64,9 +65,10 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
         }
 
         const tokenPayload = {
-          userId: user.id,
+          companyId: user.id,
           email: user.email,
           username: user.username || '',
+          type: 'company' as const,
         };
 
         const { accessToken, refreshToken } = JwtService.generateTokenPair(tokenPayload);
@@ -82,8 +84,8 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
           now.getTime() + parseExpirationTime(refreshTokenExpiresIn),
         );
 
-        await tokenService.createToken({
-          userId: user.id,
+        await tokenService.upsertToken({
+          companyId: user.id,
           token: accessToken,
           refreshToken: refreshToken,
           // store the correct expiries for each token
@@ -103,11 +105,11 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
               refreshExpiresIn: refreshTokenExpiresIn,
               refreshExpiresAt: refreshTokenExpiresAt.toISOString(),
             },
-            user: {
+            company: {
               id: user.id.toString(),
               username: user.username || '',
               email: user.email,
-              // roles: ['user'],
+              roles: 'company' as const,
             },
           },
         };
@@ -185,7 +187,7 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
               id: newUser.id.toString(),
               username: newUser.username || '',
               email: newUser.email,
-              roles: ['user'],
+              roles: ['company'],
             },
           },
         };
