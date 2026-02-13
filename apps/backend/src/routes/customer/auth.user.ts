@@ -8,9 +8,9 @@ import {
   LoginRequestType,
   LoginRequestSchema,
   LoginSuccessResponseSchema,
-  RegisterRequestType,
+  RegisterUserRequestType,
   RegisterSuccessResponseSchema,
-  RegisterRequestSchema,
+  RegisterUserRequestSchema,
   parseExpirationTime,
   ProfileSuccessResponseSchema,
   RefreshTokenRequestSchema,
@@ -23,7 +23,7 @@ import {
   ApiResponseType,
   LoginResponseSchema,
   RegisterResponseSchema,
-  ProfileResponseSchema,
+  ProfileUserResponseSchema,
   RefreshTokenResponseSchema,
   LogoutResponseSchema,
 } from '@api';
@@ -126,13 +126,13 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
 
   // Register endpoint
   fastify.post<{
-    Body: RegisterRequestType;
+    Body: RegisterUserRequestType;
     Reply: ApiResponseType<typeof RegisterResponseSchema>;
   }>(
     '/register',
     {
       schema: {
-        body: RegisterRequestSchema,
+        body: RegisterUserRequestSchema,
         response: {
           201: ApiResponseSuccessSchema(RegisterSuccessResponseSchema),
           400: ApiResponseErrorSchema,
@@ -208,7 +208,7 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
   // Get current user profile
   fastify.get<{
     Headers: { authorization: string };
-    Reply: ApiResponseType<typeof ProfileResponseSchema>;
+    Reply: ApiResponseType<typeof ProfileUserResponseSchema>;
   }>(
     '/profile',
     {

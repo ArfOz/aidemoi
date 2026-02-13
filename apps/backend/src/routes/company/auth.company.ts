@@ -7,9 +7,9 @@ import {
   ApiResponseErrorSchema,
   LoginRequestType,
   LoginRequestSchema,
-  RegisterRequestType,
+  RegisterUserRequestType,
   RegisterSuccessResponseSchema,
-  RegisterRequestSchema,
+  RegisterUserRequestSchema,
   parseExpirationTime,
   ProfileSuccessResponseSchema,
   RefreshTokenRequestSchema,
@@ -21,10 +21,14 @@ import {
   ApiResponseSuccessSchema,
   ApiResponseType,
   RegisterResponseSchema,
-  ProfileResponseSchema,
+  ProfileUserResponseSchema,
   RefreshTokenResponseSchema,
   LogoutResponseSchema,
   LoginCompanyResponseSchema,
+  RegisterCompanyRequestSchema,
+  RegisterCompanyRequestType,
+  ProfileCompanyResponseSchema,
+  RegisterCompanySuccessResponseSchema,
 } from '@api';
 import { parseBearerToken } from '@api';
 import { CompanyTokenDBService } from '../../services/DatabaseService/TokenDatabaseService/CompanyTokenDBservice';
@@ -66,7 +70,7 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
         const tokenPayload = {
           companyId: company.id,
           email: company.email,
-          username: company.username || '',
+          name: company.name || '',
           type: 'company' as const,
         };
 
@@ -106,8 +110,8 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
             },
             company: {
               id: company.id.toString(),
-              username: user.username || '',
-              email: user.email,
+              name: company.name || '',
+              email: company.email,
               roles: 'company' as const,
             },
           },
@@ -126,68 +130,66 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
 
   // Register endpoint
   fastify.post<{
-    Body: RegisterRequestType;
-    Reply: ApiResponseType<typeof RegisterResponseSchema>;
+    Body: RegisterCompanyRequestType;
+    Reply: ApiResponseType<typeof RegisterCompanySuccessResponseSchema>;
   }>(
     '/register',
     {
       schema: {
-        body: RegisterRequestSchema,
+        body: RegisterCompanyRequestSchema,
         response: {
-          201: ApiResponseSuccessSchema(RegisterSuccessResponseSchema),
+          201: ApiResponseSuccessSchema(RegisterCompanySuccessResponseSchema),
           400: ApiResponseErrorSchema,
           409: ApiResponseErrorSchema,
         },
       },
     },
     async (request, reply) => {
-      const { username, email, password } = request.body;
+      const { name, email, password } = request.body;
 
       try {
-        // Check if user already exists
-        const existingUser = await companyService.findAll({
+        // Check if company already exists
+        const existingCompany = await companyService.findAll({
           where: { email },
         });
 
-        if (existingUser.length > 0) {
+        if (existingCompany.length > 0) {
           return reply.status(409).send({
             success: false,
             error: {
-              message: 'User with this email already exists',
+              message: 'Company with this email already exists',
               code: 409,
             },
           });
         }
 
-        const existingUsername = await companyService.findAll({
-          where: { username },
+        const existingName = await companyService.findAll({
+          where: { name },
         });
-        if (existingUsername.length > 0) {
+        if (existingName.length > 0) {
           return reply.status(409).send({
             success: false,
             error: {
-              message: 'Username is already taken',
+              message: 'Company with this name already exists',
               code: 409,
             },
           });
         }
 
-        // Create new user
-        const newUser = await companyService.create({ username, email, password });
+        // Create new company
+        const newCompany = await companyService.create({ name, email, password });
 
         // Log successful registration
-        fastify.log.info(`New user registered: ${newUser.username}`);
+        fastify.log.info(`New company registered: ${newCompany.name}`);
 
         const response = {
           success: true as const,
           message: 'Registration successful',
           data: {
-            user: {
-              id: newUser.id.toString(),
-              username: newUser.username || '',
-              email: newUser.email,
-              roles: ['company'],
-            },
+            id: newCompany.id.toString() || '',
+            name: newCompany.name || '',
+            email: newCompany.email || '',
+            roles: 'company' as const,
           },
         };
 
@@ -208,7 +210,7 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
   // Get current user profile
   fastify.get<{
     Headers: { authorization: string };
-    Reply: ApiResponseType<typeof ProfileResponseSchema>;
+    Reply: ApiResponseType<typeof ProfileCompanyResponseSchema>;
   }>(
     '/profile',
     {
@@ -240,7 +242,7 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
         if (!user) {
           return reply.status(404).send({
             success: false,
-            error: { message: 'User not found', code: 404 },
+            error: { message: 'Company not found', code: 404 },
           });
         }
 
@@ -248,11 +250,11 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
           success: true,
           message: 'Profile fetched',
           data: {
-            user: {
+            company: {
               id: user.id.toString(),
-              username: user.username || '',
+              name: user.name || '',
               email: user.email,
-              roles: ['user'],
+              roles: 'company' as const,
             },
           },
         });

@@ -6,7 +6,7 @@ import {
   apiAideMoi,
   LoginRequestType,
   LoginSuccessResponseType,
-  RegisterRequestType,
+  RegisterUserRequestType,
   RegisterSuccessResponseType,
   TokenType,
   User,
@@ -22,7 +22,7 @@ interface AuthContextType {
     credentials: LoginRequestType
   ) => Promise<LoginSuccessResponseType['data']>;
   register: (
-    data: RegisterRequestType
+    data: RegisterUserRequestType
   ) => Promise<RegisterSuccessResponseType['data']>;
   logout: () => void;
   updateUser: (data: Partial<User>) => void;
@@ -111,7 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const register = async (data: RegisterRequestType) => {
+  const register = async (data: RegisterUserRequestType) => {
     setIsLoading(true);
     setError(null);
 

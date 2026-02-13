@@ -4,7 +4,7 @@ import {
   ApiResponseErrorSchema,
   LoginRequestSchema,
   LoginSuccessResponseSchema,
-  RegisterRequestSchema,
+  RegisterUserRequestSchema,
   RegisterSuccessResponseSchema,
   RefreshTokenSuccessResponseSchema,
   ProfileSuccessResponseSchema,
@@ -34,6 +34,7 @@ import {
   CategoryDetailSuccessResponseSchema,
   CategoryUpsertRequestSchema,
   MyJobDetailSuccessResponseSchema,
+  RegisterCompanyRequestSchema,
 } from './schemas';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -58,7 +59,10 @@ export type LoginRequestType = Static<typeof LoginRequestSchema>;
 
 export type LoginResponseType = LoginSuccessResponseType | ApiErrorResponseType;
 
-export type RegisterRequestType = Static<typeof RegisterRequestSchema>;
+export type RegisterUserRequestType = Static<typeof RegisterUserRequestSchema>;
+export type RegisterCompanyRequestType = Static<
+  typeof RegisterCompanyRequestSchema
+>;
 export type RegisterSuccessResponseType = Static<
   typeof RegisterSuccessResponseSchema
 >;
