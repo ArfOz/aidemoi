@@ -80,17 +80,13 @@ export const ProfileSuccessResponseSchema = ApiResponseSuccessSchema(
 );
 
 export const RegisterResponseSchema = Type.Object({
-  user: Type.Object({
-    id: Type.String(),
-    username: Type.String(),
-    email: Type.String(),
-    roles: Type.Optional(Type.Array(Type.String())),
-  }),
+  id: Type.String(),
+  username: Type.String(),
+  email: Type.String(),
+  roles: Type.Optional(Type.Array(Type.String())),
 });
 
-export const RegisterSuccessResponseSchema = ApiResponseSuccessSchema(
-  RegisterResponseSchema
-);
+export const RegisterSuccessResponseSchema = RegisterResponseSchema;
 
 export const AuthTokenSchema = Type.Object({
   headers: Type.Object({
@@ -105,24 +101,4 @@ export const AuthHeadersSchema = Type.Object({
 
 export const IdParamsSchema = Type.Object({
   id: Type.String(),
-});
-
-export const CompanySchema = Type.Object({
-  id: Type.String(),
-  name: Type.String(),
-  email: Type.String(),
-});
-
-export const LoginCompanyResponseSchema = Type.Object({
-  tokens: TokenSchema,
-  company: CompanySchema,
-});
-
-export const ProfileCompanyResponseSchema = Type.Object({
-  company: Type.Object({
-    id: Type.String(),
-    name: Type.String(),
-    email: Type.String(),
-    roles: Type.Optional(Type.String()),
-  }),
 });

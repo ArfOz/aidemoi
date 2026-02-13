@@ -29,6 +29,7 @@ import {
   RegisterCompanyRequestType,
   ProfileCompanyResponseSchema,
   RegisterCompanySuccessResponseSchema,
+  RegisterCompanyResponseSchema,
 } from '@api';
 import { parseBearerToken } from '@api';
 import { CompanyTokenDBService } from '../../services/DatabaseService/TokenDatabaseService/CompanyTokenDBservice';
@@ -131,14 +132,14 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
   // Register endpoint
   fastify.post<{
     Body: RegisterCompanyRequestType;
-    Reply: ApiResponseType<typeof RegisterCompanySuccessResponseSchema>;
+    Reply: ApiResponseType<typeof RegisterCompanyResponseSchema>;
   }>(
     '/register',
     {
       schema: {
         body: RegisterCompanyRequestSchema,
         response: {
-          201: ApiResponseSuccessSchema(RegisterCompanySuccessResponseSchema),
+          201: RegisterCompanySuccessResponseSchema,
           400: ApiResponseErrorSchema,
           409: ApiResponseErrorSchema,
         },
@@ -299,7 +300,8 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
         }
 
         const decoded = JwtService.verifyToken(refreshToken);
-        if (!decoded || !decoded.companyId) {
+        // ensure token exists and is a company token before accessing companyId
+        if (!decoded || decoded.type !== 'company' || !decoded.companyId) {
           return reply.status(401).send({
             success: false,
             error: { message: 'Invalid refresh token', code: 401 },
@@ -307,9 +309,10 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
         }
 
         const payload = {
-          companyId: decoded.companyId as number,
+          companyId: decoded.companyId,
           email: decoded.email,
-          username: decoded.username,
+          name: decoded.name,
+          type: 'company' as const,
         };
 
         // Issue a fresh pair (no DB interaction)
@@ -328,7 +331,7 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
         );
 
         await tokenService.createToken({
-          companyId: decoded.companyId as number,
+          companyId: decoded.companyId,
           token: accessToken,
           refreshToken: newRefreshToken,
           expiresAtToken: accessTokenExpiresAt,

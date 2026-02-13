@@ -134,7 +134,7 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
       schema: {
         body: RegisterUserRequestSchema,
         response: {
-          201: ApiResponseSuccessSchema(RegisterSuccessResponseSchema),
+          201: RegisterSuccessResponseSchema,
           400: ApiResponseErrorSchema,
           409: ApiResponseErrorSchema,
         },
@@ -182,12 +182,10 @@ export async function authRoutes(fastify: FastifyInstance, _options: FastifyPlug
           success: true as const,
           message: 'Registration successful',
           data: {
-            user: {
-              id: newUser.id.toString(),
-              username: newUser.username || '',
-              email: newUser.email,
-              roles: ['user'],
-            },
+            id: newUser.id.toString(),
+            username: newUser.username || '',
+            email: newUser.email,
+            roles: ['user'],
           },
         };
 
