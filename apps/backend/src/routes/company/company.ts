@@ -1,21 +1,12 @@
-import { ApiResponseErrorSchema, ApiResponseType } from '@api';
+import {
+  ApiResponseErrorSchema,
+  ApiResponseType,
+  RegisterCompanyRequestSchema,
+  RegisterCompanyRequestType,
+} from '@api';
 import { CompanyDBService } from '../../services/DatabaseService/CompanyDBService';
 import { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
 import { RegisterCompanyResponseSchema } from '@api';
-
-interface CreateCompanyBody {
-  name: string;
-  email: string;
-  description?: string;
-  website?: string;
-  phone?: string;
-  address?: string;
-  city?: string;
-  country?: string;
-  postalCode?: string;
-  status?: string;
-  employeeCount?: number;
-}
 
 interface CompanyParams {
   id: string;
@@ -107,13 +98,13 @@ async function companyRoutes(fastify: FastifyInstance, _options: FastifyPluginOp
 
   // Create new company
   fastify.post<{
-    Body: CreateCompanyBody;
+    Body: RegisterCompanyRequestType;
     Reply: ApiResponseType<typeof RegisterCompanyResponseSchema>;
   }>(
     '/',
     {
       schema: {
-        body: RegisterCompanyResponseSchema,
+        body: RegisterCompanyRequestSchema,
         response: {
           201: RegisterCompanyResponseSchema,
           400: ApiResponseErrorSchema,
@@ -126,7 +117,7 @@ async function companyRoutes(fastify: FastifyInstance, _options: FastifyPluginOp
         const company = await companyService.create(request.body);
 
         const data = {
-          id: company.id,
+          id: company.id.toString(),
           name: company.name,
           email: company.email,
         };
@@ -148,7 +139,7 @@ async function companyRoutes(fastify: FastifyInstance, _options: FastifyPluginOp
   );
 
   // Update company
-  fastify.put<{ Params: CompanyParams; Body: Partial<CreateCompanyBody> }>(
+  fastify.put<{ Params: CompanyParams; Body: Partial<RegisterCompanyRequestType> }>(
     '/:id',
     {
       schema: {
@@ -183,7 +174,7 @@ async function companyRoutes(fastify: FastifyInstance, _options: FastifyPluginOp
     async (
       request: FastifyRequest<{
         Params: CompanyParams;
-        Body: Partial<CreateCompanyBody>;
+        Body: Partial<RegisterCompanyRequestType>;
       }>,
       reply: FastifyReply,
     ) => {

@@ -3,7 +3,7 @@ export * from './AnswersDBService';
 export * from './BidsDBService';
 export * from './CategoriesDBService';
 export * from './CategoryI18nDBService';
-export * from './TokenDatabaseService/CompanyTokenDBservice
+export * from './TokenDatabaseService';
 export * from './JobsDBService';
 export * from './QuestionsDBService';
 export * from './SubCategoriesDBService';

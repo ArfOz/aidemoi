@@ -1,12 +1,19 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { JwtService } from '../services/JwtService';
-import { TokenDBService } from '../services/DatabaseService/TokenDBService';
+import {
+  TokenDBService,
+  CompanyTokenDBService,
+} from '../services/DatabaseService/TokenDatabaseService';
 import { parseBearerToken, TokenPayload } from '@api';
 
 export type AuthenticatedRequest = FastifyRequest & { user: TokenPayload };
 
 export async function authenticateToken(request: FastifyRequest, reply: FastifyReply) {
-  const tokenService = new TokenDBService(request.server.prisma);
+  // Choose token DB service based on route: company routes use company tokens
+  const isCompanyRoute = typeof request.url === 'string' && request.url.startsWith('/company');
+  const tokenService = isCompanyRoute
+    ? new CompanyTokenDBService(request.server.prisma)
+    : new TokenDBService(request.server.prisma);
   try {
     const token = parseBearerToken(request.headers.authorization);
     if (!token) {
