@@ -36,7 +36,7 @@ import { CompanyTokenDBService } from '../../services/DatabaseService/TokenDatab
 import { CompanyDBService } from '../../services/DatabaseService/CompanyDBService';
 
 // Add Static for typing
-export async function authRoutes(fastify: FastifyInstance, _options: FastifyPluginOptions) {
+export async function companyRoutes(fastify: FastifyInstance, _options: FastifyPluginOptions) {
   const companyService = new CompanyDBService(fastify.prisma);
   const tokenService = new CompanyTokenDBService(fastify.prisma);
 

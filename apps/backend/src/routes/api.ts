@@ -4,7 +4,7 @@ import { authRoutes } from './customer/auth.user';
 import { categoriesRoutes } from './categories';
 import { questionsRoutes } from './question';
 import { jobRoutes } from './job';
-import companyRoutes from './company/company';
+import { companyRoutes } from './company';
 // import { categoriesRoutes } from './categories';
 
 async function apiRoutes(fastify: FastifyInstance, _options: FastifyPluginOptions) {
