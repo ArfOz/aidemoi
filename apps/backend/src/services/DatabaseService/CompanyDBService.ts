@@ -51,7 +51,23 @@ export class CompanyDBService {
    */
   async create(companyData: Prisma.CompanyCreateInput): Promise<Company> {
     try {
-      return await this.prisma.company.create({ data: companyData });
+      // Validate password strength
+      const passwordValidation = PasswordService.validatePasswordStrength(companyData.password);
+      if (!passwordValidation.isValid) {
+        throw new Error(passwordValidation.message);
+      }
+
+      // Hash the password
+      const hashedPassword = await PasswordService.hashPassword(companyData.password);
+
+      const savedCompany = await this.prisma.company.create({
+        data: {
+          ...companyData,
+          password: hashedPassword,
+        },
+      });
+
+      return savedCompany;
     } catch (error) {
       const known = error as Prisma.PrismaClientKnownRequestError;
       if (known?.code === 'P2002') {
@@ -162,6 +178,11 @@ export class CompanyDBService {
     if (!company || !company.password) {
       return null;
     }
+    console.log('Company found for authentication:', {
+      id: company.id,
+      email: company.email,
+      password: company.password,
+    });
 
     // Compare password
     const isPasswordValid = await PasswordService.comparePassword(password, company.password);
@@ -169,7 +190,9 @@ export class CompanyDBService {
       return null;
     }
 
-    // Return user without password
-    return this.findById(company.id);
+    console.log('Password valid for company:', { id: company.id, email: company.email });
+
+    // Return company without password
+    return await this.findById(company.id);
   }
 }

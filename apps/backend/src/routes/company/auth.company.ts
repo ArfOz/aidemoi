@@ -60,6 +60,7 @@ export async function companyRoutes(fastify: FastifyInstance, _options: FastifyP
 
       try {
         const company = await companyService.authenticateUser(email, password);
+        console.log('Authentication result:', { companyId: company?.id, email: company?.email });
 
         if (!company) {
           return reply.status(401).send({
