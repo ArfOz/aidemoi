@@ -30,10 +30,8 @@ export const LoginCompanyResponseSchema = Type.Object({
 });
 
 export const ProfileCompanyResponseSchema = Type.Object({
-  company: Type.Object({
-    id: Type.String(),
-    name: Type.String(),
-    email: Type.String(),
-    roles: Type.Optional(Type.String()),
-  }),
+  id: Type.String(),
+  name: Type.String(),
+  email: Type.String(),
+  roles: Type.Optional(Type.String()),
 });

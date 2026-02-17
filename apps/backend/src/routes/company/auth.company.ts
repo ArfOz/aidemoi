@@ -252,12 +252,10 @@ export async function companyRoutes(fastify: FastifyInstance, _options: FastifyP
           success: true,
           message: 'Profile fetched',
           data: {
-            company: {
-              id: user.id.toString(),
-              name: user.name || '',
-              email: user.email,
-              roles: 'company' as const,
-            },
+            id: user.id.toString(),
+            name: user.name || '',
+            email: user.email,
+            roles: 'company' as const,
           },
         });
       } catch (error) {
