@@ -20,9 +20,12 @@ export interface CompanyTokenPayload extends BaseTokenPayload {
 
 type TokenPayload = UserTokenPayload | CompanyTokenPayload;
 
-type DecodedToken = TokenPayload & {
+type DecodedToken<T extends TokenPayload = TokenPayload> = T & {
   iat: number;
   exp: number;
+  iss?: string;
+  aud?: string | string[];
+  jti?: string;
 };
 
 export class JwtService {
@@ -59,9 +62,12 @@ export class JwtService {
   /**
    * Verify and decode token
    */
-  static verifyToken(token: string): DecodedToken | null {
+  static verifyToken<T extends TokenPayload = TokenPayload>(token: string): DecodedToken<T> | null {
     try {
-      const decoded = verify(token, this.JWT_SECRET) as DecodedToken;
+      const decoded = verify(token, this.JWT_SECRET, {
+        issuer: 'aide-moi-backend',
+        audience: 'aide-moi-frontend',
+      }) as DecodedToken<T>;
       return decoded;
     } catch (error) {
       return null;
@@ -73,8 +79,12 @@ export class JwtService {
    */
   static getTokenExpiration(token: string): Date | null {
     try {
-      const decoded = decode(token) as DecodedToken;
-      return decoded.exp ? new Date(decoded.exp * 1000) : null;
+      const decoded = decode(token) as DecodedToken | null;
+      return decoded && 'exp' in decoded
+        ? decoded.exp
+          ? new Date(decoded.exp * 1000)
+          : null
+        : null;
     } catch (error) {
       return null;
     }
