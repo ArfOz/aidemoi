@@ -6,7 +6,7 @@ import rateLimitPlugin from './plugins/rateLimit';
 import swaggerPlugin from './plugins/swagger';
 import healthRoutes from './routes/health';
 import apiRoutes from './routes/api';
-import { authRoutes } from './routes/auth';
+import { authRoutes } from './routes/customer/auth.user';
 
 function build(opts: FastifyServerOptions = {}): FastifyInstance {
   const app = fastify({
@@ -29,9 +29,7 @@ function build(opts: FastifyServerOptions = {}): FastifyInstance {
    */
   app.setSerializerCompiler(() => {
     return (data) =>
-      JSON.stringify(data, (_, value) =>
-        value instanceof Date ? value.toISOString() : value
-      );
+      JSON.stringify(data, (_, value) => (value instanceof Date ? value.toISOString() : value));
   });
 
   // ✅ onSend hook artık gereksiz, kaldırıldı

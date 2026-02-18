@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@components';
-import { RegisterRequestType } from '@api';
+import { RegisterUserRequestType } from '@api';
 import { LogoHeader, SignInLink, SocialSignUp, SubmitForm } from './components';
 
 const RegisterPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
@@ -12,7 +12,7 @@ const RegisterPage: React.FC<{ params: Promise<{ locale: string }> }> = ({
   const resolvedParams = React.use(params);
   const router = useRouter();
   const { register } = useAuth();
-  const [formData, setFormData] = useState<RegisterRequestType>({
+  const [formData, setFormData] = useState<RegisterUserRequestType>({
     username: '',
     email: '',
     password: '',

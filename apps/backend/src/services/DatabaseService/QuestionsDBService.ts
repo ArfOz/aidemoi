@@ -91,7 +91,7 @@ export class QuestionsDBService {
 
   async update(
     where: Prisma.QuestionWhereUniqueInput,
-    data: Prisma.QuestionUpdateInput
+    data: Prisma.QuestionUpdateInput,
   ): Promise<Question> {
     const updated = await this.prisma.question.update({
       where,
@@ -139,16 +139,14 @@ export class QuestionsDBService {
     });
   }
 
-  async updateSortOrder(
-    updates: { id: number; sortOrder: number }[]
-  ): Promise<void> {
+  async updateSortOrder(updates: { id: number; sortOrder: number }[]): Promise<void> {
     await this.prisma.$transaction(
       updates.map(({ id, sortOrder }) =>
         this.prisma.question.update({
           where: { id },
           data: { sortOrder },
-        })
-      )
+        }),
+      ),
     );
   }
 

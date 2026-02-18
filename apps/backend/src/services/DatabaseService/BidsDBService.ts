@@ -324,32 +324,26 @@ export class BidsDBService {
    * Get bid statistics for a job
    */
   async getJobBidStats(jobId: number) {
-    const [
-      total,
-      pending,
-      accepted,
-      rejected,
-      avgAmount,
-      minAmount,
-      maxAmount,
-    ] = await Promise.all([
-      this.prisma.bid.count({ where: { jobId } }),
-      this.prisma.bid.count({ where: { jobId, status: 'PENDING' } }),
-      this.prisma.bid.count({ where: { jobId, status: 'ACCEPTED' } }),
-      this.prisma.bid.count({ where: { jobId, status: 'REJECTED' } }),
-      this.prisma.bid.aggregate({
-        where: { jobId, amount: { not: null } },
-        _avg: { amount: true },
-      }),
-      this.prisma.bid.aggregate({
-        where: { jobId, amount: { not: null } },
-        _min: { amount: true },
-      }),
-      this.prisma.bid.aggregate({
-        where: { jobId, amount: { not: null } },
-        _max: { amount: true },
-      }),
-    ]);
+    const [total, pending, accepted, rejected, avgAmount, minAmount, maxAmount] = await Promise.all(
+      [
+        this.prisma.bid.count({ where: { jobId } }),
+        this.prisma.bid.count({ where: { jobId, status: 'PENDING' } }),
+        this.prisma.bid.count({ where: { jobId, status: 'ACCEPTED' } }),
+        this.prisma.bid.count({ where: { jobId, status: 'REJECTED' } }),
+        this.prisma.bid.aggregate({
+          where: { jobId, amount: { not: null } },
+          _avg: { amount: true },
+        }),
+        this.prisma.bid.aggregate({
+          where: { jobId, amount: { not: null } },
+          _min: { amount: true },
+        }),
+        this.prisma.bid.aggregate({
+          where: { jobId, amount: { not: null } },
+          _max: { amount: true },
+        }),
+      ],
+    );
 
     return {
       total,

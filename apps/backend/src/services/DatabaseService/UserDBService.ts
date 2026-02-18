@@ -71,17 +71,13 @@ export class UserDBService {
 
   async create(userData: CreateUserData) {
     // Validate password strength
-    const passwordValidation = PasswordService.validatePasswordStrength(
-      userData.password
-    );
+    const passwordValidation = PasswordService.validatePasswordStrength(userData.password);
     if (!passwordValidation.isValid) {
       throw new Error(passwordValidation.message);
     }
 
     // Hash the password
-    const hashedPassword = await PasswordService.hashPassword(
-      userData.password
-    );
+    const hashedPassword = await PasswordService.hashPassword(userData.password);
 
     // Create user with hashed password
     const savedUser = await this.prisma.user.create({
@@ -100,15 +96,11 @@ export class UserDBService {
 
     // If password is being updated, hash it
     if (userData.password) {
-      const passwordValidation = PasswordService.validatePasswordStrength(
-        userData.password
-      );
+      const passwordValidation = PasswordService.validatePasswordStrength(userData.password);
       if (!passwordValidation.isValid) {
         throw new Error(passwordValidation.message);
       }
-      updateData.password = await PasswordService.hashPassword(
-        userData.password
-      );
+      updateData.password = await PasswordService.hashPassword(userData.password);
     }
 
     await this.prisma.user.update({
@@ -121,9 +113,11 @@ export class UserDBService {
 
   async delete(id: number): Promise<boolean> {
     try {
-      await this.prisma.user.delete({
-        where: { id },
-      });
+      // delete tokens and user in a transaction to ensure tokens are revoked
+      await this.prisma.$transaction([
+        this.prisma.userToken.deleteMany({ where: { userId: id } }),
+        this.prisma.user.delete({ where: { id } }),
+      ]);
       return true;
     } catch (error) {
       return false;
@@ -142,10 +136,7 @@ export class UserDBService {
     }
 
     // Compare password
-    const isPasswordValid = await PasswordService.comparePassword(
-      password,
-      user.password
-    );
+    const isPasswordValid = await PasswordService.comparePassword(password, user.password);
     if (!isPasswordValid) {
       return null;
     }

@@ -40,10 +40,7 @@ import {
   SubCategoriesDBService, // Fixed: Changed from SubCategoriesDBService
 } from '../services/DatabaseService';
 
-export async function jobRoutes(
-  fastify: FastifyInstance,
-  _options: FastifyPluginOptions
-) {
+export async function jobRoutes(fastify: FastifyInstance, _options: FastifyPluginOptions) {
   const answerDBService = new AnswersDBService(fastify.prisma);
   const questionsService = new QuestionsDBService(fastify.prisma);
   const jobDBService = new JobsDBService(fastify.prisma);
@@ -102,10 +99,7 @@ export async function jobRoutes(
 
         console.log('Fetching job with ID:', jobId, 'and locale:', locale);
 
-        const job = await jobDBService.findUniqueWithAnswersAndQuestions(
-          { id: jobId },
-          locale
-        );
+        const job = await jobDBService.findUniqueWithAnswersAndQuestions({ id: jobId }, locale);
 
         if (!job) {
           return reply.status(404).send({
@@ -126,7 +120,7 @@ export async function jobRoutes(
           error: { message: 'Failed to retrieve job', code: 500 },
         });
       }
-    }
+    },
   );
 
   // ✅ GET /my-jobs → Get current user's jobs
@@ -152,9 +146,7 @@ export async function jobRoutes(
     async (request, reply) => {
       try {
         const userId =
-          (request as any).user?.userId ??
-          (request as any).user?.id ??
-          (request as any).userId;
+          (request as any).user?.userId ?? (request as any).user?.id ?? (request as any).userId;
 
         if (!userId) {
           return reply.status(401).send({
@@ -185,12 +177,7 @@ export async function jobRoutes(
         // Build translation filters based on locale
         const translationWhere = locale ? { locale } : undefined;
 
-        console.log(
-          'Fetching jobs with where clause:',
-          where,
-          'locale:',
-          locale
-        );
+        console.log('Fetching jobs with where clause:', where, 'locale:', locale);
 
         const jobsRaw = await fastify.prisma.job.findMany({
           where,
@@ -217,14 +204,8 @@ export async function jobRoutes(
         //Have to be fixed: Date fields conversion
         const jobs = jobsRaw.map((job) => ({
           ...job,
-          createdAt:
-            job.createdAt instanceof Date
-              ? job.createdAt.toISOString()
-              : job.createdAt,
-          updatedAt:
-            job.updatedAt instanceof Date
-              ? job.updatedAt.toISOString()
-              : job.updatedAt,
+          createdAt: job.createdAt instanceof Date ? job.createdAt.toISOString() : job.createdAt,
+          updatedAt: job.updatedAt instanceof Date ? job.updatedAt.toISOString() : job.updatedAt,
           subcategory: job.subcategory
             ? {
                 ...job.subcategory,
@@ -269,7 +250,7 @@ export async function jobRoutes(
           error: { message: 'Failed to retrieve user jobs', code: 500 },
         });
       }
-    }
+    },
   );
 
   // ✅ POST /jobs → Create a new job with answers
@@ -295,9 +276,7 @@ export async function jobRoutes(
     async (request, reply) => {
       try {
         const userId =
-          (request as any).user?.userId ??
-          (request as any).user?.id ??
-          (request as any).userId;
+          (request as any).user?.userId ?? (request as any).user?.id ?? (request as any).userId;
 
         if (!userId) {
           return reply.status(401).send({
@@ -369,14 +348,12 @@ export async function jobRoutes(
               });
 
               if (!question || !question.isActive) {
-                throw new Error(
-                  `Question with ID ${questionId} not found or inactive`
-                );
+                throw new Error(`Question with ID ${questionId} not found or inactive`);
               }
 
               if (question.subcategoryId !== subcategoryId) {
                 throw new Error(
-                  `Question ${questionId} does not belong to subcategory ${subcategoryId}`
+                  `Question ${questionId} does not belong to subcategory ${subcategoryId}`,
                 );
               }
 
@@ -391,7 +368,7 @@ export async function jobRoutes(
 
                 if (!option) {
                   throw new Error(
-                    `Option with ID ${optionId} not found or does not belong to question ${questionId}`
+                    `Option with ID ${optionId} not found or does not belong to question ${questionId}`,
                   );
                 }
               }
@@ -441,11 +418,7 @@ export async function jobRoutes(
                 }
                 await jobDBService.delete(createdJob.id);
               } catch (cleanupErr) {
-                fastify.log.error(
-                  'Cleanup after answer creation failed',
-                  undefined,
-                  cleanupErr
-                );
+                fastify.log.error('Cleanup after answer creation failed', undefined, cleanupErr);
               }
 
               return reply.status(400).send({
@@ -476,8 +449,7 @@ export async function jobRoutes(
           return reply.status(400).send({
             success: false,
             error: {
-              message:
-                'A job for this subcategory already exists for this user.',
+              message: 'A job for this subcategory already exists for this user.',
               code: 400,
             },
           });
@@ -487,7 +459,7 @@ export async function jobRoutes(
           error: { message: 'Failed to create job', code: 500 },
         });
       }
-    }
+    },
   );
 
   //delete job
@@ -512,14 +484,12 @@ export async function jobRoutes(
     async (request, reply) => {
       try {
         const userId =
-          (request as any).user?.userId ??
-          (request as any).user?.id ??
-          (request as any).userId;
+          (request as any).user?.userId ?? (request as any).user?.id ?? (request as any).userId;
         console.log(
           'Deleting job for userId:ssssssssssssssssssssss',
           userId,
           'jobId:',
-          request.params.id
+          request.params.id,
         );
         if (!userId) {
           return reply.status(401).send({
@@ -557,6 +527,6 @@ export async function jobRoutes(
           error: { message: 'Failed to delete job', code: 500 },
         });
       }
-    }
+    },
   );
 }

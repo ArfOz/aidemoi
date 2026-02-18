@@ -1,9 +1,9 @@
 'use client';
 
-import { useAuth } from '@aidemoi/shared-auth';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { useAuth } from '../../components/context/AuthContext';
 
 export default function DashboardPage() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
@@ -27,8 +27,8 @@ export default function DashboardPage() {
     return null;
   }
 
-  // Redirect non-repairmen users
-  if (user.role !== 'repairman' && user.role !== 'admin') {
+  // Redirect non-company users
+  if (user.role !== 'company' && user.role !== 'admin') {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

@@ -5,7 +5,17 @@ export default [
   ...nx.configs['flat/typescript'],
   ...nx.configs['flat/javascript'],
   {
-    ignores: ['**/dist'],
+    ignores: [
+      '**/dist',
+      '**/.next/**',
+      '.next/**',
+      'tmp/**',
+      'apps/*/.next/**',
+      'node_modules/**',
+      '__queuestorage__/**',
+      '__azurite_db_queue__/**',
+      'tmp/**',
+    ],
   },
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],

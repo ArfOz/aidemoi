@@ -1,5 +1,5 @@
 export * from './api';
-export * from './auth';
+export * from './customer/auth.user';
 export * from './categories';
 export * from './company';
 export * from './health';

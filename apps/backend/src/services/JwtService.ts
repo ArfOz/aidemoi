@@ -1,23 +1,39 @@
 import { sign, verify, decode, SignOptions, Secret } from 'jsonwebtoken';
 
-interface TokenPayload {
-  userId: number;
-  email: string;
-  username: string;
+interface BaseTokenPayload {
+  type: 'user' | 'company';
 }
 
-interface DecodedToken extends TokenPayload {
+export interface UserTokenPayload extends BaseTokenPayload {
+  type: 'user';
+  userId: number;
+  email?: string;
+  username?: string;
+}
+
+export interface CompanyTokenPayload extends BaseTokenPayload {
+  type: 'company';
+  companyId: number;
+  email?: string;
+  name?: string;
+}
+
+type TokenPayload = UserTokenPayload | CompanyTokenPayload;
+
+type DecodedToken<T extends TokenPayload = TokenPayload> = T & {
   iat: number;
   exp: number;
-}
+  iss?: string;
+  aud?: string | string[];
+  jti?: string;
+};
 
 export class JwtService {
-  private static readonly JWT_SECRET: Secret =
-    process.env.JWT_SECRET || 'your-super-secret-key';
+  private static readonly JWT_SECRET: Secret = process.env.JWT_SECRET || 'your-super-secret-key';
   private static readonly JWT_EXPIRES_IN = (process.env.JWT_EXPIRES_IN ||
     '24h') as SignOptions['expiresIn'];
-  private static readonly REFRESH_TOKEN_EXPIRES_IN = (process.env
-    .REFRESH_TOKEN_EXPIRES_IN || '7d') as SignOptions['expiresIn'];
+  private static readonly REFRESH_TOKEN_EXPIRES_IN = (process.env.REFRESH_TOKEN_EXPIRES_IN ||
+    '7d') as SignOptions['expiresIn'];
 
   /**
    * Generate access token
@@ -46,9 +62,12 @@ export class JwtService {
   /**
    * Verify and decode token
    */
-  static verifyToken(token: string): DecodedToken | null {
+  static verifyToken<T extends TokenPayload = TokenPayload>(token: string): DecodedToken<T> | null {
     try {
-      const decoded = verify(token, this.JWT_SECRET) as DecodedToken;
+      const decoded = verify(token, this.JWT_SECRET, {
+        issuer: 'aide-moi-backend',
+        audience: 'aide-moi-frontend',
+      }) as DecodedToken<T>;
       return decoded;
     } catch (error) {
       return null;
@@ -60,8 +79,12 @@ export class JwtService {
    */
   static getTokenExpiration(token: string): Date | null {
     try {
-      const decoded = decode(token) as DecodedToken;
-      return decoded.exp ? new Date(decoded.exp * 1000) : null;
+      const decoded = decode(token) as DecodedToken | null;
+      return decoded && 'exp' in decoded
+        ? decoded.exp
+          ? new Date(decoded.exp * 1000)
+          : null
+        : null;
     } catch (error) {
       return null;
     }
@@ -86,5 +109,27 @@ export class JwtService {
       accessToken: this.generateAccessToken(payload),
       refreshToken: this.generateRefreshToken(payload),
     };
+  }
+
+  /** Convenience: generate tokens for a user */
+  static generateUserTokenPair(user: { userId: number; email?: string; username?: string }) {
+    const payload: UserTokenPayload = {
+      type: 'user',
+      userId: user.userId,
+      email: user.email,
+      username: user.username,
+    };
+    return this.generateTokenPair(payload);
+  }
+
+  /** Convenience: generate tokens for a company */
+  static generateCompanyTokenPair(company: { companyId: number; email?: string; name?: string }) {
+    const payload: CompanyTokenPayload = {
+      type: 'company',
+      companyId: company.companyId,
+      email: company.email,
+      name: company.name,
+    };
+    return this.generateTokenPair(payload);
   }
 }

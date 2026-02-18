@@ -1,252 +1,266 @@
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Category {
-    id            String         @id
-    icon          String?
-    sortOrder     Int            @default(0)
-    name          String
-    createdAt     DateTime       @default(now())
-    updatedAt     DateTime       @updatedAt
-    i18n          CategoryI18n[]
-    subcategories Subcategory[]
+  id            String         @id
+  icon          String?
+  sortOrder     Int            @default(0)
+  name          String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  i18n          CategoryI18n[]
+  subcategories Subcategory[]
 }
 
 model CategoryI18n {
-    id          Int      @id @default(autoincrement())
-    categoryId  String
-    locale      String   @db.VarChar(8)
-    name        String   @db.VarChar(255)
-    description String?  @db.Text
-    category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  id          Int      @id @default(autoincrement())
+  categoryId  String
+  locale      String   @db.VarChar(8)
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
-    @@unique([categoryId, locale], name: "uq_category_i18n")
+  @@unique([categoryId, locale], name: "uq_category_i18n")
 }
 
 model Subcategory {
-    id         Int               @id @default(autoincrement())
-    categoryId String
-    slug       String            @db.VarChar(128)
-    icon       String?           @db.VarChar(16)
-    sortOrder  Int               @default(0)
-    name       String?
-    createdAt  DateTime          @default(now())
-    updatedAt  DateTime          @updatedAt
-    category   Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-    i18n       SubcategoryI18n[]
-    questions  Question[]
-    jobs       Job[] // New relationship
+  id         Int               @id @default(autoincrement())
+  categoryId String
+  slug       String            @db.VarChar(128)
+  icon       String?           @db.VarChar(16)
+  sortOrder  Int               @default(0)
+  name       String?
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+  category   Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  i18n       SubcategoryI18n[]
+  questions  Question[]
+  jobs       Job[] // New relationship
 
-    @@unique([categoryId, slug], name: "uq_subcategory_cat_slug")
+  @@unique([categoryId, slug], name: "uq_subcategory_cat_slug")
 }
 
 model SubcategoryI18n {
-    id            Int     @id @default(autoincrement())
-    subcategoryId Int
-    locale        String  @db.VarChar(8)
-    name          String  @db.VarChar(255)
-    description   String? @db.Text
+  id            Int     @id @default(autoincrement())
+  subcategoryId Int
+  locale        String  @db.VarChar(8)
+  name          String  @db.VarChar(255)
+  description   String? @db.Text
 
-    subcategory Subcategory @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
+  subcategory Subcategory @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
 
-    @@unique([subcategoryId, locale], name: "uq_subcategory_i18n")
+  @@unique([subcategoryId, locale], name: "uq_subcategory_i18n")
 }
 
 model User {
-    id        Int      @id @default(autoincrement())
-    email     String   @unique
-    password  String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    tokens    Token[]
-    username  String?  @unique
-    answers   Answer[]
-    // New relationships
-    jobs      Job[]    @relation("JobOwner") // Jobs created by the user
-    bids      Bid[] // Bids placed by the user
-    reviews   Review[] // Reviews received by the user
+  id        Int         @id @default(autoincrement())
+  email     String      @unique
+  password  String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  tokens    UserToken[]
+  username  String?     @unique
+  answers   Answer[]
+  // New relationships
+  jobs      Job[]       @relation("JobOwner") // Jobs created by the user
+  bids      Bid[] // Bids placed by the user
+  reviews   Review[] // Reviews received by the user
 }
 
-model Token {
-    id                    Int      @id @default(autoincrement())
-    userId                Int
-    user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    createdAt             DateTime @default(now())
-    refreshedAt           DateTime @updatedAt
-    accessToken           String   @unique
-    refreshToken          String   @unique
-    expiresAtAccessToken  DateTime
-    expiresAtRefreshToken DateTime
+model UserToken {
+  id                    Int      @id @default(autoincrement())
+  userId                Int
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt             DateTime @default(now())
+  refreshedAt           DateTime @updatedAt
+  accessToken           String   @unique
+  refreshToken          String   @unique
+  expiresAtAccessToken  DateTime
+  expiresAtRefreshToken DateTime
+}
+
+model CompanyToken {
+  id                    Int      @id @default(autoincrement())
+  companyId             Int
+  company               Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdAt             DateTime @default(now())
+  refreshedAt           DateTime @updatedAt
+  accessToken           String   @unique
+  refreshToken          String   @unique
+  expiresAtAccessToken  DateTime
+  expiresAtRefreshToken DateTime
 }
 
 model Company {
-    id            Int      @id @default(autoincrement())
-    name          String
-    email         String   @unique
-    description   String?
-    website       String?
-    phone         String?
-    address       String?
-    city          String?
-    country       String?
-    postalCode    String?
-    employeeCount Int?     @default(0)
-    status        String   @default("active")
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @updatedAt
+  id            Int            @id @default(autoincrement())
+  name          String
+  password      String
+  email         String         @unique
+  description   String?
+  website       String?
+  phone         String?
+  address       String?
+  city          String?
+  country       String?
+  postalCode    String?
+  employeeCount Int?           @default(0)
+  status        String         @default("active")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  tokens        CompanyToken[]
 }
 
 model Question {
-    id            Int     @id @default(autoincrement())
-    subcategoryId Int
-    type          String
-    required      Boolean
-    sortOrder     Int
-    validation    String?
-    isActive      Boolean @default(true)
+  id            Int     @id @default(autoincrement())
+  subcategoryId Int
+  type          String
+  required      Boolean
+  sortOrder     Int
+  validation    String?
+  isActive      Boolean @default(true)
 
-    subcategory  Subcategory           @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
-    options      Option[]
-    translations QuestionTranslation[]
-    answers      Answer[]
+  subcategory  Subcategory           @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
+  options      Option[]
+  translations QuestionTranslation[]
+  answers      Answer[]
 }
 
 model QuestionTranslation {
-    id          Int     @id @default(autoincrement())
-    questionId  Int
-    locale      String  @db.VarChar(8)
-    label       String
-    description String?
+  id          Int     @id @default(autoincrement())
+  questionId  Int
+  locale      String  @db.VarChar(8)
+  label       String
+  description String?
 
-    question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
-    @@unique([questionId, locale])
+  @@unique([questionId, locale])
 }
 
 model Option {
-    id         Int      @id @default(autoincrement())
-    value      String
-    questionId Int
-    question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  id         Int      @id @default(autoincrement())
+  value      String
+  questionId Int
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
-    translations OptionTranslation[]
-    answers      Answer[]
+  translations OptionTranslation[]
+  answers      Answer[]
 }
 
 model OptionTranslation {
-    id       Int    @id @default(autoincrement())
-    optionId Int
-    locale   String @db.VarChar(8)
-    label    String
+  id       Int    @id @default(autoincrement())
+  optionId Int
+  locale   String @db.VarChar(8)
+  label    String
 
-    option Option @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  option Option @relation(fields: [optionId], references: [id], onDelete: Cascade)
 
-    @@unique([optionId, locale])
+  @@unique([optionId, locale])
 }
 
 model Answer {
-    id            Int       @id @default(autoincrement())
-    userId        Int
-    questionId    Int
-    optionId      Int?
-    textValue     String?
-    numberValue   Float?
-    dateValue     DateTime?
-    inputLanguage String?   @db.VarChar(8)
-    createdAt     DateTime  @default(now())
-    updatedAt     DateTime  @updatedAt
+  id            Int       @id @default(autoincrement())
+  userId        Int
+  questionId    Int
+  optionId      Int?
+  textValue     String?
+  numberValue   Float?
+  dateValue     DateTime?
+  inputLanguage String?   @db.VarChar(8)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-    // Job relationship
-    jobId Int? // Which job this answer belongs to (optional)
+  // Job relationship
+  jobId Int? // Which job this answer belongs to (optional)
 
-    user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-    option   Option?  @relation(fields: [optionId], references: [id], onDelete: SetNull)
-    job      Job?     @relation("JobAnswers", fields: [jobId], references: [id], onDelete: SetNull)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  option   Option?  @relation(fields: [optionId], references: [id], onDelete: SetNull)
+  job      Job?     @relation("JobAnswers", fields: [jobId], references: [id], onDelete: SetNull)
 
-    @@unique([userId, questionId, optionId], name: "unique_user_question_option")
-    @@index([userId])
-    @@index([questionId])
-    @@index([jobId]) // New index
+  @@unique([userId, questionId, optionId], name: "unique_user_question_option")
+  @@index([userId])
+  @@index([questionId])
+  @@index([jobId]) // New index
 }
 
 // New Job model
 model Job {
-    id            Int       @id @default(autoincrement())
-    title         String
-    description   String?   @db.Text
-    subcategoryId Int
-    userId        Int // User who created the job
-    status        JobStatus @default(OPEN)
-    location      String?
-    createdAt     DateTime  @default(now())
-    updatedAt     DateTime  @updatedAt
+  id            Int       @id @default(autoincrement())
+  title         String
+  description   String?   @db.Text
+  subcategoryId Int
+  userId        Int // User who created the job
+  status        JobStatus @default(OPEN)
+  location      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-    // Relationships
-    user        User        @relation("JobOwner", fields: [userId], references: [id], onDelete: Cascade)
-    subcategory Subcategory @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
-    answers     Answer[]    @relation("JobAnswers") // Directly linked to Answers
-    bids        Bid[] // Bids received for this job
-    reviews     Review[] // Reviews for this job
+  // Relationships
+  user        User        @relation("JobOwner", fields: [userId], references: [id], onDelete: Cascade)
+  subcategory Subcategory @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
+  answers     Answer[]    @relation("JobAnswers") // Directly linked to Answers
+  bids        Bid[] // Bids received for this job
+  reviews     Review[] // Reviews for this job
 
-    @@index([userId])
-    @@index([subcategoryId])
-    @@index([status])
+  @@index([userId])
+  @@index([subcategoryId])
+  @@index([status])
 }
 
 // Job statuses
 enum JobStatus {
-    OPEN // Open - waiting for bids
-    IN_PROGRESS // In progress
-    COMPLETED // Completed
-    CANCELLED // Cancelled
+  OPEN // Open - waiting for bids
+  IN_PROGRESS // In progress
+  COMPLETED // Completed
+  CANCELLED // Cancelled
 }
 
 // Bid model
 model Bid {
-    id        Int       @id @default(autoincrement())
-    jobId     Int
-    userId    Int // User who placed the bid
-    amount    Float? // Optional - some jobs might have fixed prices
-    message   String?   @db.Text
-    status    BidStatus @default(PENDING)
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
+  id        Int       @id @default(autoincrement())
+  jobId     Int
+  userId    Int // User who placed the bid
+  amount    Float? // Optional - some jobs might have fixed prices
+  message   String?   @db.Text
+  status    BidStatus @default(PENDING)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-    job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@unique([jobId, userId]) // Each user can only bid once per job
-    @@index([jobId])
-    @@index([userId])
+  @@unique([jobId, userId]) // Each user can only bid once per job
+  @@index([jobId])
+  @@index([userId])
 }
 
 // Bid statuses
 enum BidStatus {
-    PENDING // Pending
-    ACCEPTED // Accepted
-    REJECTED // Rejected
+  PENDING // Pending
+  ACCEPTED // Accepted
+  REJECTED // Rejected
 }
 
 // Review model
 model Review {
-    id         Int      @id @default(autoincrement())
-    jobId      Int
-    reviewerId Int // User who gives the review
-    revieweeId Int // User who receives the review
-    rating     Int // Rating from 1-5
-    comment    String?  @db.Text
-    createdAt  DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  jobId      Int
+  reviewerId Int // User who gives the review
+  revieweeId Int // User who receives the review
+  rating     Int // Rating from 1-5
+  comment    String?  @db.Text
+  createdAt  DateTime @default(now())
 
-    job      Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
-    reviewer User @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+  job      Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  reviewer User @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
 
-    @@unique([jobId, reviewerId, revieweeId])
-    @@index([revieweeId])
+  @@unique([jobId, reviewerId, revieweeId])
+  @@index([revieweeId])
 }

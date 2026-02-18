@@ -11,10 +11,12 @@ export class CategoriesDBService {
     where,
     orderBy,
     languages,
+    include,
   }: {
     where?: Prisma.CategoryWhereInput;
     orderBy?: Prisma.CategoryOrderByWithRelationInput[];
     languages?: string[];
+    include?: { subcategories: boolean };
   } = {}): Promise<CategoryWithI18n[]> {
     return await this.prisma.category.findMany({
       where,
@@ -27,6 +29,20 @@ export class CategoriesDBService {
                 },
               }
             : true,
+        subcategories: include?.subcategories
+          ? {
+              include: {
+                i18n:
+                  languages && languages.length > 0
+                    ? {
+                        where: {
+                          locale: { in: languages },
+                        },
+                      }
+                    : true,
+              },
+            }
+          : false,
       },
       orderBy,
     });
@@ -81,10 +97,7 @@ export class CategoriesDBService {
     return created;
   }
 
-  async update(
-    id: string,
-    input: Prisma.CategoryUpdateInput
-  ): Promise<CategoryWithI18n> {
+  async update(id: string, input: Prisma.CategoryUpdateInput): Promise<CategoryWithI18n> {
     const updated = await this.prisma.category.update({
       where: { id },
       data: input,

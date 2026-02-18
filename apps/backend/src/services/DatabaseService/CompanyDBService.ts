@@ -1,4 +1,5 @@
 import { Prisma, PrismaClient, Company } from '@prisma/client';
+import { PasswordService } from '../PasswordService';
 
 export class CompanyDBService {
   constructor(private prisma: PrismaClient) {} // injected by Fastify plugin
@@ -50,14 +51,28 @@ export class CompanyDBService {
    */
   async create(companyData: Prisma.CompanyCreateInput): Promise<Company> {
     try {
-      return await this.prisma.company.create({ data: companyData });
+      // Validate password strength
+      const passwordValidation = PasswordService.validatePasswordStrength(companyData.password);
+      if (!passwordValidation.isValid) {
+        throw new Error(passwordValidation.message);
+      }
+
+      // Hash the password
+      const hashedPassword = await PasswordService.hashPassword(companyData.password);
+
+      const savedCompany = await this.prisma.company.create({
+        data: {
+          ...companyData,
+          password: hashedPassword,
+        },
+      });
+
+      return savedCompany;
     } catch (error) {
       const known = error as Prisma.PrismaClientKnownRequestError;
       if (known?.code === 'P2002') {
         // unique constraint violation
-        throw new Error(
-          'Unique constraint failed: a company with that value already exists'
-        );
+        throw new Error('Unique constraint failed: a company with that value already exists');
       }
       throw error;
     }
@@ -66,10 +81,7 @@ export class CompanyDBService {
   /**
    * Update an existing company by ID. Returns updated company or null if not found.
    */
-  async update(
-    id: number,
-    companyData: Prisma.CompanyUpdateInput
-  ): Promise<Company | null> {
+  async update(id: number, companyData: Prisma.CompanyUpdateInput): Promise<Company | null> {
     try {
       return await this.prisma.company.update({
         where: { id },
@@ -82,9 +94,7 @@ export class CompanyDBService {
         return null;
       }
       if (known?.code === 'P2002') {
-        throw new Error(
-          'Unique constraint failed: update would violate uniqueness'
-        );
+        throw new Error('Unique constraint failed: update would violate uniqueness');
       }
       throw error;
     }
@@ -95,7 +105,11 @@ export class CompanyDBService {
    */
   async deleteById(id: number): Promise<boolean> {
     try {
-      await this.prisma.company.delete({ where: { id } });
+      // delete tokens and company in a transaction to ensure tokens are revoked
+      await this.prisma.$transaction([
+        this.prisma.companyToken.deleteMany({ where: { companyId: id } }),
+        this.prisma.company.delete({ where: { id } }),
+      ]);
       return true;
     } catch (error) {
       const known = error as Prisma.PrismaClientKnownRequestError;
@@ -142,5 +156,43 @@ export class CompanyDBService {
       createdAt: company.createdAt,
       employeeCount: company.employeeCount ?? null,
     };
+  }
+
+  async findByEmailWithPassword(email: string) {
+    return this.prisma.company.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        password: true, // Include password for auth
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  async authenticateUser(email: string, password: string) {
+    // Find user with password included
+    const company = await this.findByEmailWithPassword(email);
+    if (!company || !company.password) {
+      return null;
+    }
+    console.log('Company found for authentication:', {
+      id: company.id,
+      email: company.email,
+      password: company.password,
+    });
+
+    // Compare password
+    const isPasswordValid = await PasswordService.comparePassword(password, company.password);
+    if (!isPasswordValid) {
+      return null;
+    }
+
+    console.log('Password valid for company:', { id: company.id, email: company.email });
+
+    // Return company without password
+    return await this.findById(company.id);
   }
 }

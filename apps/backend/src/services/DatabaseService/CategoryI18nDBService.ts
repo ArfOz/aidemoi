@@ -63,10 +63,7 @@ export class CategoryI18nDBService {
     });
   }
 
-  async update(
-    id: number,
-    data: { name?: string; description?: string | null }
-  ) {
+  async update(id: number, data: { name?: string; description?: string | null }) {
     return this.prisma.categoryI18n.update({
       where: { id },
       data: {
@@ -79,7 +76,7 @@ export class CategoryI18nDBService {
   async updateByLocaleAndCategory(
     categoryId: string,
     locale: string,
-    data: { name?: string; description?: string | null }
+    data: { name?: string; description?: string | null },
   ) {
     const categoryI18n = await this.findByLocaleAndCategory(categoryId, locale);
     if (!categoryI18n) {
@@ -95,10 +92,7 @@ export class CategoryI18nDBService {
     name: string;
     description?: string | null;
   }) {
-    const existing = await this.findByLocaleAndCategory(
-      data.categoryId,
-      data.locale
-    );
+    const existing = await this.findByLocaleAndCategory(data.categoryId, data.locale);
 
     if (existing) {
       const updated = await this.update(existing.id, {

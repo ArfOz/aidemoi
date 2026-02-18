@@ -1,9 +1,6 @@
 import { FastifyInstance } from 'fastify';
 // Fix: Import from the index file, not individual files
-import {
-  QuestionsDBService,
-  SubCategoriesDBService,
-} from '../services/DatabaseService';
+import { QuestionsDBService, SubCategoriesDBService } from '../services/DatabaseService';
 import {
   ApiResponseErrorSchema,
   QuestionGetRequest,
@@ -28,17 +25,13 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.setErrorHandler(async (error, request, reply) => {
     fastify.log.error(error);
 
-    const statusCode =
-      (error && (error as unknown as { statusCode?: number }).statusCode) ||
-      500;
+    const statusCode = (error && (error as unknown as { statusCode?: number }).statusCode) || 500;
     const message =
       process.env.NODE_ENV === 'development' && error instanceof Error
         ? error.message
         : statusCode >= 500
         ? 'Internal Server Error'
-        : String(
-            (error as unknown as { message?: unknown }).message || 'Error'
-          );
+        : String((error as unknown as { message?: unknown }).message || 'Error');
 
     // Always include the required "success" field and format "error" per ApiErrorSchema
     return reply.status(statusCode).send({
@@ -164,15 +157,11 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
           // Question translations
           translations: {
             create: data.translations.map(
-              (t: {
-                locale: string;
-                label: string;
-                description?: string | null;
-              }) => ({
+              (t: { locale: string; label: string; description?: string | null }) => ({
                 locale: t.locale,
                 label: t.label,
                 description: t.description ?? null,
-              })
+              }),
             ),
           },
 
@@ -191,7 +180,7 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
                         label: ot.label,
                       })),
                     },
-                  })
+                  }),
                 ),
               }
             : undefined,
@@ -219,7 +208,7 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
           error: { message: devMsg, code: 500 },
         });
       }
-    }
+    },
   );
 
   // GET /question/:id
@@ -267,7 +256,7 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
           error: { message: 'Failed to fetch questions', code: 500 },
         });
       }
-    }
+    },
   );
 
   // PATCH /question/:id -> update existing question
@@ -347,18 +336,9 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
         // Build update payload for question base fields
         const updateData: Prisma.QuestionUpdateInput = {
           type: payload.type ?? undefined,
-          required:
-            typeof payload.required === 'boolean'
-              ? payload.required
-              : undefined,
-          isActive:
-            typeof payload.isActive === 'boolean'
-              ? payload.isActive
-              : undefined,
-          sortOrder:
-            typeof payload.sortOrder === 'number'
-              ? payload.sortOrder
-              : undefined,
+          required: typeof payload.required === 'boolean' ? payload.required : undefined,
+          isActive: typeof payload.isActive === 'boolean' ? payload.isActive : undefined,
+          sortOrder: typeof payload.sortOrder === 'number' ? payload.sortOrder : undefined,
           subcategory: payload.subcategoryId
             ? { connect: { id: payload.subcategoryId } }
             : undefined,
@@ -425,7 +405,7 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
           error: { message: devMsg, code: 500 },
         });
       }
-    }
+    },
   );
 
   // GET /subcategory/:subcategoryId -> Get all questions for a subcategory
@@ -500,6 +480,6 @@ export async function questionsRoutes(fastify: FastifyInstance): Promise<void> {
           error: { message: devMsg, code: 500 },
         });
       }
-    }
+    },
   );
 }

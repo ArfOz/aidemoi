@@ -1,60 +1,55 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
-import { UserDBService } from '../services/DatabaseService/UserDBService';
-import { JwtService } from '../services/JwtService';
-import { Type } from '@sinclair/typebox';
-import { authenticateToken } from '../middleware/auth';
+import { UserDBService } from '../../services/DatabaseService/UserDBService';
+import { JwtService } from '../../services/JwtService';
+import { authenticateToken } from '../../middleware/auth';
 
 import {
-  ApiErrorResponseType,
   ApiResponseErrorSchema,
   LoginRequestType,
   LoginRequestSchema,
-  LoginSuccessResponseSchema,
-  LoginSuccessResponseType,
-  RegisterRequestType,
+  RegisterUserRequestType,
   RegisterSuccessResponseSchema,
-  RegisterSuccessResponseType,
-  RegisterRequestSchema,
+  RegisterUserRequestSchema,
   parseExpirationTime,
   ProfileSuccessResponseSchema,
-  ProfileSuccessResponseType,
-  RefreshSuccessResponseType,
   RefreshTokenRequestSchema,
   RefreshTokenSuccessResponseSchema,
   LogoutSuccessResponseSchema,
   RefreshRequest,
-  LogoutSuccessResponseType,
   LogoutHeaders,
   AuthHeadersSchema,
   ApiResponseSuccessSchema,
   ApiResponseType,
-  ApiSuccessResponseType,
-  LoginResponseSchema,
   RegisterResponseSchema,
-  ProfileResponseSchema,
+  ProfileUserResponseSchema,
   RefreshTokenResponseSchema,
   LogoutResponseSchema,
+  LoginCompanyResponseSchema,
+  RegisterCompanyRequestSchema,
+  RegisterCompanyRequestType,
+  ProfileCompanyResponseSchema,
+  RegisterCompanySuccessResponseSchema,
+  RegisterCompanyResponseSchema,
 } from '@api';
-import { TokenDBService } from '../services/DatabaseService/TokenDBService';
+import { parseBearerToken } from '@api';
+import { CompanyTokenDBService } from '../../services/DatabaseService/TokenDatabaseService/CompanyTokenDBservice';
+import { CompanyDBService } from '../../services/DatabaseService/CompanyDBService';
 
 // Add Static for typing
-export async function authRoutes(
-  fastify: FastifyInstance,
-  _options: FastifyPluginOptions
-) {
-  const userService = new UserDBService(fastify.prisma);
-  const tokenService = new TokenDBService(fastify.prisma);
+export async function companyRoutes(fastify: FastifyInstance, _options: FastifyPluginOptions) {
+  const companyService = new CompanyDBService(fastify.prisma);
+  const tokenService = new CompanyTokenDBService(fastify.prisma);
 
   fastify.post<{
     Body: LoginRequestType;
-    Reply: ApiResponseType<typeof LoginResponseSchema>;
+    Reply: ApiResponseType<typeof LoginCompanyResponseSchema>;
   }>(
     '/login',
     {
       schema: {
         body: LoginRequestSchema,
         response: {
-          200: LoginSuccessResponseSchema,
+          200: LoginCompanyResponseSchema,
           401: ApiResponseErrorSchema,
           500: ApiResponseErrorSchema,
         },
@@ -64,9 +59,10 @@ export async function authRoutes(
       const { email, password } = request.body;
 
       try {
-        const user = await userService.authenticateUser(email, password);
+        const company = await companyService.authenticateUser(email, password);
+        console.log('Authentication result:', { companyId: company?.id, email: company?.email });
 
-        if (!user) {
+        if (!company) {
           return reply.status(401).send({
             success: false,
             error: { message: 'Invalid email or password', code: 401 },
@@ -74,28 +70,27 @@ export async function authRoutes(
         }
 
         const tokenPayload = {
-          userId: user.id,
-          email: user.email,
-          username: user.username || '',
+          companyId: company.id,
+          email: company.email,
+          name: company.name || '',
+          type: 'company' as const,
         };
 
-        const { accessToken, refreshToken } =
-          JwtService.generateTokenPair(tokenPayload);
+        const { accessToken, refreshToken } = JwtService.generateTokenPair(tokenPayload);
 
         const accessTokenExpiresIn = process.env.JWT_EXPIRES_IN || '24h';
-        const refreshTokenExpiresIn =
-          process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
+        const refreshTokenExpiresIn = process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
 
         const now = new Date();
         const accessTokenExpiresAt = new Date(
-          now.getTime() + parseExpirationTime(accessTokenExpiresIn)
+          now.getTime() + parseExpirationTime(accessTokenExpiresIn),
         );
         const refreshTokenExpiresAt = new Date(
-          now.getTime() + parseExpirationTime(refreshTokenExpiresIn)
+          now.getTime() + parseExpirationTime(refreshTokenExpiresIn),
         );
 
         await tokenService.createToken({
-          userId: user.id,
+          companyId: company.id,
           token: accessToken,
           refreshToken: refreshToken,
           // store the correct expiries for each token
@@ -115,11 +110,11 @@ export async function authRoutes(
               refreshExpiresIn: refreshTokenExpiresIn,
               refreshExpiresAt: refreshTokenExpiresAt.toISOString(),
             },
-            user: {
-              id: user.id.toString(),
-              username: user.username || '',
-              email: user.email,
-              // roles: ['user'],
+            company: {
+              id: company.id.toString(),
+              name: company.name || '',
+              email: company.email,
+              roles: 'company' as const,
             },
           },
         };
@@ -132,73 +127,71 @@ export async function authRoutes(
           error: { message: 'Login failed', code: 500 },
         });
       }
-    }
+    },
   );
 
   // Register endpoint
   fastify.post<{
-    Body: RegisterRequestType;
-    Reply: ApiResponseType<typeof RegisterResponseSchema>;
+    Body: RegisterCompanyRequestType;
+    Reply: ApiResponseType<typeof RegisterCompanyResponseSchema>;
   }>(
     '/register',
     {
       schema: {
-        body: RegisterRequestSchema,
+        body: RegisterCompanyRequestSchema,
         response: {
-          201: ApiResponseSuccessSchema(RegisterSuccessResponseSchema),
+          201: RegisterCompanySuccessResponseSchema,
           400: ApiResponseErrorSchema,
           409: ApiResponseErrorSchema,
         },
       },
     },
     async (request, reply) => {
-      const { username, email, password } = request.body;
+      const { name, email, password } = request.body;
 
       try {
-        // Check if user already exists
-        const existingUser = await userService.findAll({
+        // Check if company already exists
+        const existingCompany = await companyService.findAll({
           where: { email },
         });
 
-        if (existingUser.length > 0) {
+        if (existingCompany.length > 0) {
           return reply.status(409).send({
             success: false,
             error: {
-              message: 'User with this email already exists',
+              message: 'Company with this email already exists',
               code: 409,
             },
           });
         }
 
-        const existingUsername = await userService.findAll({
-          where: { username },
+        const existingName = await companyService.findAll({
+          where: { name },
         });
-        if (existingUsername.length > 0) {
+        if (existingName.length > 0) {
           return reply.status(409).send({
             success: false,
             error: {
-              message: 'Username is already taken',
+              message: 'Company with this name already exists',
               code: 409,
             },
           });
         }
 
-        // Create new user
-        const newUser = await userService.create({ username, email, password });
+        // Create new company
+        const newCompany = await companyService.create({ name, email, password });
 
         // Log successful registration
-        fastify.log.info(`New user registered: ${newUser.username}`);
+        fastify.log.info(`New company registered: ${newCompany.name}`);
 
         const response = {
           success: true as const,
           message: 'Registration successful',
           data: {
-            user: {
-              id: newUser.id.toString(),
-              username: newUser.username || '',
-              email: newUser.email,
-              roles: ['user'],
-            },
+            id: newCompany.id.toString() || '',
+            name: newCompany.name || '',
+            email: newCompany.email || '',
+            roles: 'company' as const,
           },
         };
 
@@ -213,13 +206,13 @@ export async function authRoutes(
           },
         });
       }
-    }
+    },
   );
 
   // Get current user profile
   fastify.get<{
     Headers: { authorization: string };
-    Reply: ApiResponseType<typeof ProfileResponseSchema>;
+    Reply: ApiResponseType<typeof ProfileCompanyResponseSchema>;
   }>(
     '/profile',
     {
@@ -247,11 +240,11 @@ export async function authRoutes(
           });
         }
 
-        const user = await userService.findById(Number(userId));
+        const user = await companyService.findById(Number(userId));
         if (!user) {
           return reply.status(404).send({
             success: false,
-            error: { message: 'User not found', code: 404 },
+            error: { message: 'Company not found', code: 404 },
           });
         }
 
@@ -259,12 +252,10 @@ export async function authRoutes(
           success: true,
           message: 'Profile fetched',
           data: {
-            user: {
-              id: user.id.toString(),
-              username: user.username || '',
-              email: user.email,
-              roles: ['user'],
-            },
+            id: user.id.toString(),
+            name: user.name || '',
+            email: user.email,
+            roles: 'company' as const,
           },
         });
       } catch (error) {
@@ -274,7 +265,7 @@ export async function authRoutes(
           error: { message: 'Failed to get user profile', code: 500 },
         });
       }
-    }
+    },
   );
 
   // Refresh token endpoint
@@ -308,7 +299,8 @@ export async function authRoutes(
         }
 
         const decoded = JwtService.verifyToken(refreshToken);
-        if (!decoded || !decoded.userId) {
+        // ensure token exists and is a company token before accessing companyId
+        if (!decoded || decoded.type !== 'company' || !decoded.companyId) {
           return reply.status(401).send({
             success: false,
             error: { message: 'Invalid refresh token', code: 401 },
@@ -316,9 +308,10 @@ export async function authRoutes(
         }
 
         const payload = {
-          userId: decoded.userId,
+          companyId: decoded.companyId,
           email: decoded.email,
-          username: decoded.username,
+          name: decoded.name,
+          type: 'company' as const,
         };
 
         // Issue a fresh pair (no DB interaction)
@@ -326,19 +319,18 @@ export async function authRoutes(
           JwtService.generateTokenPair(payload);
 
         const accessTokenExpiresIn = process.env.JWT_EXPIRES_IN || '24h';
-        const refreshTokenExpiresIn =
-          process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
+        const refreshTokenExpiresIn = process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
 
         const now = new Date();
         const accessTokenExpiresAt = new Date(
-          now.getTime() + parseExpirationTime(accessTokenExpiresIn)
+          now.getTime() + parseExpirationTime(accessTokenExpiresIn),
         );
         const refreshTokenExpiresAt = new Date(
-          now.getTime() + parseExpirationTime(refreshTokenExpiresIn)
+          now.getTime() + parseExpirationTime(refreshTokenExpiresIn),
         );
 
         await tokenService.createToken({
-          userId: decoded.userId,
+          companyId: decoded.companyId,
           token: accessToken,
           refreshToken: newRefreshToken,
           expiresAtToken: accessTokenExpiresAt,
@@ -366,7 +358,7 @@ export async function authRoutes(
           error: { message: 'Token refresh failed', code: 500 },
         });
       }
-    }
+    },
   );
 
   // Logout endpoint
@@ -388,12 +380,23 @@ export async function authRoutes(
       },
     },
     async (_request, reply) => {
-      // No DB revoke; reply success only
-      return reply.status(200).send({
-        success: true,
-        message: 'Logged out successfully',
-        data: { loggedOut: true },
-      });
-    }
+      try {
+        const token = parseBearerToken((_request.headers as any).authorization);
+        if (token) {
+          await tokenService.deleteToken(token);
+        }
+        return reply.status(200).send({
+          success: true,
+          message: 'Logged out successfully',
+          data: { loggedOut: true },
+        });
+      } catch (error) {
+        fastify.log.error(error);
+        return reply.status(500).send({
+          success: false,
+          error: { message: 'Logout failed', code: 500 },
+        });
+      }
+    },
   );
 }

@@ -2,17 +2,19 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@aidemoi/shared-auth';
+import { useAuth } from '../../components/context/AuthContext';
 import Link from 'next/link';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isLoading, error } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+  const { login } = useAuth();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -45,6 +47,11 @@ export default function LoginPage() {
     }
 
     setFormErrors(errors);
+    const firstError = Object.keys(errors)[0];
+    if (firstError) {
+      const el = document.getElementById(firstError) as HTMLElement | null;
+      if (el) el.focus();
+    }
     return Object.keys(errors).length === 0;
   };
 
@@ -53,16 +60,16 @@ export default function LoginPage() {
 
     if (!validateForm()) return;
 
+    setIsLoading(true);
+    setError(null);
     try {
-      await login({
-        email: formData.email,
-        password: formData.password,
-      });
-
-      // Redirect to dashboard
+      await login({ email: formData.email, password: formData.password });
       router.push('/dashboard');
     } catch (err) {
-      console.error('Login error:', err);
+      const msg = err instanceof Error ? err.message : 'Login failed';
+      setError(msg || 'Invalid email or password');
+    } finally {
+      setIsLoading(false);
     }
   };
 

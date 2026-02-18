@@ -1,10 +1,7 @@
 import fp from 'fastify-plugin';
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 
-async function swaggerPlugin(
-  fastify: FastifyInstance,
-  _options: FastifyPluginOptions
-) {
+async function swaggerPlugin(fastify: FastifyInstance, _options: FastifyPluginOptions) {
   await fastify.register(require('@fastify/swagger'), {
     swagger: {
       info: {

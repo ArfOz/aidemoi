@@ -1,10 +1,7 @@
 import fp from 'fastify-plugin';
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 
-async function helmetPlugin(
-  fastify: FastifyInstance,
-  _options: FastifyPluginOptions
-) {
+async function helmetPlugin(fastify: FastifyInstance, _options: FastifyPluginOptions) {
   await fastify.register(require('@fastify/helmet'), {
     contentSecurityPolicy: {
       directives: {

@@ -1,0 +1,14 @@
+{
+  "name": "@aidemoi/backend",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "lint": "npx eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "npx eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "format": "npx prettier --write .",
+    "format:check": "npx prettier --check ."
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

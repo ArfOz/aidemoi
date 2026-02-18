@@ -1,25 +1,17 @@
 import { FastifyInstance } from 'fastify';
 import {
-  ApiErrorResponseType,
   ApiResponseErrorSchema,
   CategoryGetRequest,
   CategoryGetRequestSchema,
-  CategoryUpsertRequest,
-  CategoryUpsertSuccessResponse,
-  CategoryUpsertRequestSchema,
-  CategoryUpsertSuccessResponseSchema,
   CategoriesListRequest,
   CategoriesListSuccessResponse,
   CategoriesListSuccessResponseSchema,
-  // SubcategoryUpsertSuccessResponse,
   SubcategoryUpsertRequest,
   SubcategoryUpsertRequestSchema,
-  // SubcategoryUpsertSuccessResponseSchema,
   SubcategoryGetRequest,
   IdParamsSchema,
   ApiResponseType,
   CategoryDetailSuccessResponseSchema,
-  ApiResponseSuccessSchema,
   CategoriesListResponseSchema,
   CategoryDetailResponseSchema,
   CategoryDetailSuccessResponse,
@@ -27,14 +19,9 @@ import {
   SubcategoryDetailSuccessResponseSchema,
   SubcategoryUpsertSuccessResponseSchema,
 } from '@api';
-import {
-  CategoriesDBService,
-  SubCategoriesDBService,
-} from '../services/DatabaseService';
+import { CategoriesDBService, SubCategoriesDBService } from '../services/DatabaseService';
 
-export async function categoriesRoutes(
-  fastify: FastifyInstance
-): Promise<void> {
+export async function categoriesRoutes(fastify: FastifyInstance): Promise<void> {
   // Ensure all uncaught errors serialize to the expected error schema
   fastify.setErrorHandler(async (error, request, reply) => {
     fastify.log.error(error);
@@ -231,12 +218,14 @@ export async function categoriesRoutes(
     async (request, reply) => {
       try {
         // Get languages from query parameters
-        const { languages: lang } = request.query;
+        const { languages: lang, includeSubcategories: includeSubcategories } = request.query;
 
+        const subcategories = includeSubcategories ? true : false;
         // Fetch all categories with language filtering
-        const categories = await categoriesDBService.findAll(
-          lang && lang.length > 0 ? { languages: lang } : undefined
-        );
+        const categories = await categoriesDBService.findAll({
+          languages: lang && lang.length > 0 ? lang : undefined,
+          include: { subcategories },
+        });
 
         // return exact shape required by CategoriesListSuccessResponseSchema
         return reply.status(200).send({
@@ -258,7 +247,7 @@ export async function categoriesRoutes(
           error: { message: devMsg, code: 500 },
         });
       }
-    }
+    },
   );
 
   // Get Category by ID
@@ -309,8 +298,7 @@ export async function categoriesRoutes(
           success: true,
           message: 'Category fetched',
           data: {
-            details:
-              details as unknown as CategoryDetailSuccessResponse['data']['details'],
+            details: details as unknown as CategoryDetailSuccessResponse['data']['details'],
           },
         });
       } catch (err) {
@@ -324,7 +312,7 @@ export async function categoriesRoutes(
           error: { message: devMsg, code: 500 },
         });
       }
-    }
+    },
   );
 
   // Get Subcategory by ID
@@ -395,7 +383,7 @@ export async function categoriesRoutes(
           error: { message: devMsg, code: 500 },
         });
       }
-    }
+    },
   );
 
   // Upsert Subcategory
@@ -511,7 +499,7 @@ export async function categoriesRoutes(
                 deleteMany: {},
                 create: normalizedI18n,
               },
-            }
+            },
           );
         }
 
@@ -539,7 +527,7 @@ export async function categoriesRoutes(
           error: { message: devMsg, code: 500 },
         });
       }
-    }
+    },
   );
 }
 
