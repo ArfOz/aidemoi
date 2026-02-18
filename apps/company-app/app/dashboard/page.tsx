@@ -1,9 +1,9 @@
 'use client';
 
-import { useAuth } from '@aidemoi/shared-auth';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { useAuth } from '../../components/context/AuthContext';
 
 export default function DashboardPage() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();

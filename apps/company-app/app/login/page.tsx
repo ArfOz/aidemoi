@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../../components/context/AuthContext';
 import Link from 'next/link';
 
 export default function LoginPage() {
@@ -13,6 +14,7 @@ export default function LoginPage() {
     password: '',
   });
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+  const { login } = useAuth();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -45,6 +47,11 @@ export default function LoginPage() {
     }
 
     setFormErrors(errors);
+    const firstError = Object.keys(errors)[0];
+    if (firstError) {
+      const el = document.getElementById(firstError) as HTMLElement | null;
+      if (el) el.focus();
+    }
     return Object.keys(errors).length === 0;
   };
 
@@ -55,18 +62,15 @@ export default function LoginPage() {
 
     setIsLoading(true);
     setError(null);
-    // TODO: Replace with real company-app login API call
-    setTimeout(() => {
-      if (
-        formData.email === 'test@company.com' &&
-        formData.password === 'password123'
-      ) {
-        router.push('/dashboard');
-      } else {
-        setError('Invalid email or password');
-      }
+    try {
+      await login({ email: formData.email, password: formData.password });
+      router.push('/dashboard');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Login failed';
+      setError(msg || 'Invalid email or password');
+    } finally {
       setIsLoading(false);
-    }, 1200);
+    }
   };
 
   return (
